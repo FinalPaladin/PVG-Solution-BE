@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PVG.Application/PVG.Application.csproj" Id="91541030-9ba6-4fa6-b425-efebfa55ab86" />
+  <Project Path="PVG.Core/PVG.Domain.csproj" Id="be886455-08d8-4b98-ba33-3e42bb6ef71b" />
+  <Project Path="PVG.Repository/PVG.Infrastucture.csproj" Id="b3d87625-1a7f-42ea-b352-3639f01ccb87" />
+  <Project Path="PVG.Web/PVG.Web.csproj" />
+</Solution>

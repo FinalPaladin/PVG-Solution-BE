@@ -1,0 +1,207 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\PVG\\PVG-BE\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{773E8E1B-2C83-E9AC-9CFA-004F2458B51C}|PVG.Web\\PVG.Web.csproj|d:\\pvg\\pvg-be\\pvg.web\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{773E8E1B-2C83-E9AC-9CFA-004F2458B51C}|PVG.Web\\PVG.Web.csproj|solutionrelative:pvg.web\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{773E8E1B-2C83-E9AC-9CFA-004F2458B51C}|PVG.Web\\PVG.Web.csproj|d:\\pvg\\pvg-be\\pvg.web\\controllers\\samplecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{773E8E1B-2C83-E9AC-9CFA-004F2458B51C}|PVG.Web\\PVG.Web.csproj|solutionrelative:pvg.web\\controllers\\samplecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{773E8E1B-2C83-E9AC-9CFA-004F2458B51C}|PVG.Web\\PVG.Web.csproj|d:\\pvg\\pvg-be\\pvg.web\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{773E8E1B-2C83-E9AC-9CFA-004F2458B51C}|PVG.Web\\PVG.Web.csproj|solutionrelative:pvg.web\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|d:\\pvg\\pvg-be\\pvg.repository\\domain\\repositorybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|solutionrelative:pvg.repository\\domain\\repositorybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE886455-08D8-4B98-BA33-3E42BB6EF71B}|PVG.Core\\PVG.Domain.csproj|d:\\pvg\\pvg-be\\pvg.core\\basemodels\\entitynotfoundexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE886455-08D8-4B98-BA33-3E42BB6EF71B}|PVG.Core\\PVG.Domain.csproj|solutionrelative:pvg.core\\basemodels\\entitynotfoundexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BE886455-08D8-4B98-BA33-3E42BB6EF71B}|PVG.Core\\PVG.Domain.csproj|d:\\pvg\\pvg-be\\pvg.core\\basemodels\\baseresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BE886455-08D8-4B98-BA33-3E42BB6EF71B}|PVG.Core\\PVG.Domain.csproj|solutionrelative:pvg.core\\basemodels\\baseresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|d:\\pvg\\pvg-be\\pvg.repository\\repositories\\samplereporitory\\samplerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|solutionrelative:pvg.repository\\repositories\\samplereporitory\\samplerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|d:\\pvg\\pvg-be\\pvg.repository\\repositories\\samplereporitory\\isamplerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|solutionrelative:pvg.repository\\repositories\\samplereporitory\\isamplerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{773E8E1B-2C83-E9AC-9CFA-004F2458B51C}|PVG.Web\\PVG.Web.csproj|d:\\pvg\\pvg-be\\pvg.web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{773E8E1B-2C83-E9AC-9CFA-004F2458B51C}|PVG.Web\\PVG.Web.csproj|solutionrelative:pvg.web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|d:\\pvg\\pvg-be\\pvg.repository\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|solutionrelative:pvg.repository\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|d:\\pvg\\pvg-be\\pvg.repository\\pvg.infrastucture.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{B3D87625-1A7F-42EA-B352-3639F01CCB87}|PVG.Repository\\PVG.Infrastucture.csproj|solutionrelative:pvg.repository\\pvg.infrastucture.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EntityNotFoundException.cs",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Core\\BaseModels\\EntityNotFoundException.cs",
+              "RelativeDocumentMoniker": "PVG.Core\\BaseModels\\EntityNotFoundException.cs",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Core\\BaseModels\\EntityNotFoundException.cs",
+              "RelativeToolTip": "PVG.Core\\BaseModels\\EntityNotFoundException.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-11T03:50:34.765Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "BaseResponse.cs",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Core\\BaseModels\\BaseResponse.cs",
+              "RelativeDocumentMoniker": "PVG.Core\\BaseModels\\BaseResponse.cs",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Core\\BaseModels\\BaseResponse.cs",
+              "RelativeToolTip": "PVG.Core\\BaseModels\\BaseResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-11T03:50:30.929Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RepositoryBase.cs",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Repository\\Domain\\RepositoryBase.cs",
+              "RelativeDocumentMoniker": "PVG.Repository\\Domain\\RepositoryBase.cs",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Repository\\Domain\\RepositoryBase.cs",
+              "RelativeToolTip": "PVG.Repository\\Domain\\RepositoryBase.cs",
+              "ViewState": "AgIAABQAAAAAAAAAAAAwwJsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-11T03:49:47.696Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ISampleRepository.cs",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Repository\\Repositories\\SampleReporitory\\ISampleRepository.cs",
+              "RelativeDocumentMoniker": "PVG.Repository\\Repositories\\SampleReporitory\\ISampleRepository.cs",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Repository\\Repositories\\SampleReporitory\\ISampleRepository.cs",
+              "RelativeToolTip": "PVG.Repository\\Repositories\\SampleReporitory\\ISampleRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAUAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-11T03:48:31.173Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Startup.cs",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Web\\Startup.cs",
+              "RelativeDocumentMoniker": "PVG.Web\\Startup.cs",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Web\\Startup.cs",
+              "RelativeToolTip": "PVG.Web\\Startup.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGIAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-11T03:47:30.176Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Web\\appsettings.json",
+              "RelativeDocumentMoniker": "PVG.Web\\appsettings.json",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Web\\appsettings.json",
+              "RelativeToolTip": "PVG.Web\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-11-11T03:47:27.83Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Web\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "PVG.Web\\Properties\\launchSettings.json",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Web\\Properties\\launchSettings.json",
+              "RelativeToolTip": "PVG.Web\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-11-11T03:46:33.303Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SampleController.cs",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Web\\Controllers\\SampleController.cs",
+              "RelativeDocumentMoniker": "PVG.Web\\Controllers\\SampleController.cs",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Web\\Controllers\\SampleController.cs",
+              "RelativeToolTip": "PVG.Web\\Controllers\\SampleController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-11T03:45:51.723Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "PVG.Infrastucture",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Repository\\PVG.Infrastucture.csproj",
+              "RelativeDocumentMoniker": "PVG.Repository\\PVG.Infrastucture.csproj",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Repository\\PVG.Infrastucture.csproj",
+              "RelativeToolTip": "PVG.Repository\\PVG.Infrastucture.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-11T03:44:49.42Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SampleRepository.cs",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Repository\\Repositories\\SampleReporitory\\SampleRepository.cs",
+              "RelativeDocumentMoniker": "PVG.Repository\\Repositories\\SampleReporitory\\SampleRepository.cs",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Repository\\Repositories\\SampleReporitory\\SampleRepository.cs",
+              "RelativeToolTip": "PVG.Repository\\Repositories\\SampleReporitory\\SampleRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-11T03:44:18.655Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "DependencyInjection.cs",
+              "DocumentMoniker": "D:\\PVG\\PVG-BE\\PVG.Repository\\DependencyInjection.cs",
+              "RelativeDocumentMoniker": "PVG.Repository\\DependencyInjection.cs",
+              "ToolTip": "D:\\PVG\\PVG-BE\\PVG.Repository\\DependencyInjection.cs",
+              "RelativeToolTip": "PVG.Repository\\DependencyInjection.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAB5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-11T03:43:18.862Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

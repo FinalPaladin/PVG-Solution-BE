@@ -1,0 +1,12 @@
+[
+  {
+    "ContainingType": "PVG.Web.Controllers.SampleController",
+    "Method": "Test",
+    "RelativePath": "pvg/test",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
