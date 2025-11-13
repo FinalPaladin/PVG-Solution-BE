@@ -1,0 +1,32 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+out/
+
+# NuGet
+*.nupkg
+packages/
+*.snupkg
+
+# EF Core migrations (nếu muốn bỏ qua)
+# Migrations/
+
+# LocalDB / SQL Server files
+*.mdf
+*.ldf
+
+# Logs
+*.log
+
+# Rider
+.idea/
+
+# Node.js
+node_modules/

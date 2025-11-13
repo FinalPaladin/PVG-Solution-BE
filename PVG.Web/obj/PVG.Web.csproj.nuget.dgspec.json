@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\PVG\\PVG-BE\\PVG.Web\\PVG.Web.csproj": {}
+    "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Web\\PVG.Web.csproj": {}
   },
   "projects": {
-    "D:\\PVG\\PVG-BE\\PVG.Application\\PVG.Application.csproj": {
+    "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Application\\PVG.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\PVG\\PVG-BE\\PVG.Application\\PVG.Application.csproj",
+        "projectUniqueName": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Application\\PVG.Application.csproj",
         "projectName": "PVG.Application",
-        "projectPath": "D:\\PVG\\PVG-BE\\PVG.Application\\PVG.Application.csproj",
-        "packagesPath": "C:\\Users\\tv20330067\\.nuget\\packages\\",
-        "outputPath": "D:\\PVG\\PVG-BE\\PVG.Application\\obj\\",
+        "projectPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Application\\PVG.Application.csproj",
+        "packagesPath": "C:\\Users\\MP093796\\.nuget\\packages\\",
+        "outputPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\tv20330067\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\MP093796\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -25,19 +25,17 @@
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\PVG\\PVG-BE\\PVG.Core\\PVG.Domain.csproj": {
-                "projectPath": "D:\\PVG\\PVG-BE\\PVG.Core\\PVG.Domain.csproj"
+              "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Core\\PVG.Domain.csproj": {
+                "projectPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Core\\PVG.Domain.csproj"
               },
-              "D:\\PVG\\PVG-BE\\PVG.Repository\\PVG.Infrastucture.csproj": {
-                "projectPath": "D:\\PVG\\PVG-BE\\PVG.Repository\\PVG.Infrastucture.csproj"
+              "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Repository\\PVG.Infrastucture.csproj": {
+                "projectPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Repository\\PVG.Infrastucture.csproj"
               }
             }
           }
@@ -77,20 +75,20 @@
         }
       }
     },
-    "D:\\PVG\\PVG-BE\\PVG.Core\\PVG.Domain.csproj": {
+    "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Core\\PVG.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\PVG\\PVG-BE\\PVG.Core\\PVG.Domain.csproj",
+        "projectUniqueName": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Core\\PVG.Domain.csproj",
         "projectName": "PVG.Domain",
-        "projectPath": "D:\\PVG\\PVG-BE\\PVG.Core\\PVG.Domain.csproj",
-        "packagesPath": "C:\\Users\\tv20330067\\.nuget\\packages\\",
-        "outputPath": "D:\\PVG\\PVG-BE\\PVG.Core\\obj\\",
+        "projectPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Core\\PVG.Domain.csproj",
+        "packagesPath": "C:\\Users\\MP093796\\.nuget\\packages\\",
+        "outputPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\tv20330067\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\MP093796\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -98,8 +96,6 @@
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -173,20 +169,20 @@
         }
       }
     },
-    "D:\\PVG\\PVG-BE\\PVG.Repository\\PVG.Infrastucture.csproj": {
+    "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Repository\\PVG.Infrastucture.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\PVG\\PVG-BE\\PVG.Repository\\PVG.Infrastucture.csproj",
+        "projectUniqueName": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Repository\\PVG.Infrastucture.csproj",
         "projectName": "PVG.Infrastucture",
-        "projectPath": "D:\\PVG\\PVG-BE\\PVG.Repository\\PVG.Infrastucture.csproj",
-        "packagesPath": "C:\\Users\\tv20330067\\.nuget\\packages\\",
-        "outputPath": "D:\\PVG\\PVG-BE\\PVG.Repository\\obj\\",
+        "projectPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Repository\\PVG.Infrastucture.csproj",
+        "packagesPath": "C:\\Users\\MP093796\\.nuget\\packages\\",
+        "outputPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Repository\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\tv20330067\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\MP093796\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -194,16 +190,14 @@
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\PVG\\PVG-BE\\PVG.Core\\PVG.Domain.csproj": {
-                "projectPath": "D:\\PVG\\PVG-BE\\PVG.Core\\PVG.Domain.csproj"
+              "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Core\\PVG.Domain.csproj": {
+                "projectPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Core\\PVG.Domain.csproj"
               }
             }
           }
@@ -253,6 +247,10 @@
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[8.0.2, )"
+            },
+            "Pomelo.EntityFrameworkCore.MySql": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             }
           },
           "imports": [
@@ -275,20 +273,20 @@
         }
       }
     },
-    "D:\\PVG\\PVG-BE\\PVG.Web\\PVG.Web.csproj": {
+    "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Web\\PVG.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\PVG\\PVG-BE\\PVG.Web\\PVG.Web.csproj",
+        "projectUniqueName": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Web\\PVG.Web.csproj",
         "projectName": "PVG.Web",
-        "projectPath": "D:\\PVG\\PVG-BE\\PVG.Web\\PVG.Web.csproj",
-        "packagesPath": "C:\\Users\\tv20330067\\.nuget\\packages\\",
-        "outputPath": "D:\\PVG\\PVG-BE\\PVG.Web\\obj\\",
+        "projectPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Web\\PVG.Web.csproj",
+        "packagesPath": "C:\\Users\\MP093796\\.nuget\\packages\\",
+        "outputPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Web\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\tv20330067\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\MP093796\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -296,16 +294,14 @@
           "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\PVG\\PVG-BE\\PVG.Application\\PVG.Application.csproj": {
-                "projectPath": "D:\\PVG\\PVG-BE\\PVG.Application\\PVG.Application.csproj"
+              "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Application\\PVG.Application.csproj": {
+                "projectPath": "D:\\Source\\PVG.Solution\\VayThueChap\\PVG-Solution-BE\\PVG.Application\\PVG.Application.csproj"
               }
             }
           }
