@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PVG.Infrastucture")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+baaf88a1aeba7f82f8aa6b5cf368101e3ea0d8c8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13873cdd76d329c35272eb203c809eb83e1eb10f")]
 [assembly: System.Reflection.AssemblyProductAttribute("PVG.Infrastucture")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PVG.Infrastucture")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
