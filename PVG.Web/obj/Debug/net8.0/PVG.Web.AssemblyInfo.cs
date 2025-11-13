@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PVG.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+756c53c663a0791570471da447fcbd830b069b7d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+13873cdd76d329c35272eb203c809eb83e1eb10f")]
 [assembly: System.Reflection.AssemblyProductAttribute("PVG.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PVG.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

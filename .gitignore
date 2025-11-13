@@ -1,0 +1,98 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build output
+bin/
+obj/
+out/
+
+# NuGet
+*.nupkg
+packages/
+*.snupkg
+
+# EF Core migrations (nếu muốn bỏ qua)
+# Migrations/
+
+# LocalDB / SQL Server files
+*.mdf
+*.ldf
+
+# Logs
+*.log
+
+# Rider
+.idea/
+
+# Node.js
+node_modules/
+/PVG.Application/bin/Debug/net8.0
+/PVG.Application/bin/Debug
+/PVG.Application/bin
+PVG.Application/bin/Debug/net8.0/PVG.Application.dll
+PVG.Application/bin/Debug/net8.0/PVG.Application.pdb
+PVG.Application/bin/Debug/net8.0/PVG.Domain.dll
+PVG.Application/bin/Debug/net8.0/PVG.Domain.pdb
+PVG.Application/bin/Debug/net8.0/PVG.Infrastucture.dll
+PVG.Application/bin/Debug/net8.0/PVG.Infrastucture.pdb
+PVG.Application/obj/Debug/net8.0/PVG.Application.AssemblyInfo.cs
+PVG.Application/obj/Debug/net8.0/PVG.Application.AssemblyInfoInputs.cache
+PVG.Application/obj/Debug/net8.0/PVG.Application.csproj.AssemblyReference.cache
+PVG.Application/obj/Debug/net8.0/PVG.Application.dll
+PVG.Application/obj/Debug/net8.0/PVG.Application.pdb
+PVG.Application/obj/Debug/net8.0/PVG.Application.sourcelink.json
+PVG.Application/obj/Debug/net8.0/ref/PVG.Application.dll
+PVG.Application/obj/Debug/net8.0/refint/PVG.Application.dll
+PVG.Core/bin/Debug/net8.0/PVG.Domain.dll
+PVG.Core/bin/Debug/net8.0/PVG.Domain.pdb
+PVG.Core/obj/Debug/net8.0/PVG.Domain.AssemblyInfo.cs
+PVG.Core/obj/Debug/net8.0/PVG.Domain.AssemblyInfoInputs.cache
+PVG.Core/obj/Debug/net8.0/PVG.Domain.dll
+PVG.Core/obj/Debug/net8.0/PVG.Domain.pdb
+PVG.Core/obj/Debug/net8.0/PVG.Domain.sourcelink.json
+PVG.Core/obj/Debug/net8.0/ref/PVG.Domain.dll
+PVG.Core/obj/Debug/net8.0/refint/PVG.Domain.dll
+PVG.Repository/bin/Debug/net8.0/PVG.Domain.dll
+PVG.Repository/bin/Debug/net8.0/PVG.Domain.pdb
+PVG.Repository/bin/Debug/net8.0/PVG.Infrastucture.dll
+PVG.Repository/bin/Debug/net8.0/PVG.Infrastucture.pdb
+PVG.Repository/obj/Debug/net8.0/PVG.Infrastucture.AssemblyInfo.cs
+PVG.Repository/obj/Debug/net8.0/PVG.Infrastucture.AssemblyInfoInputs.cache
+PVG.Repository/obj/Debug/net8.0/PVG.Infrastucture.csproj.AssemblyReference.cache
+PVG.Repository/obj/Debug/net8.0/PVG.Infrastucture.dll
+PVG.Repository/obj/Debug/net8.0/PVG.Infrastucture.pdb
+PVG.Repository/obj/Debug/net8.0/PVG.Infrastucture.sourcelink.json
+PVG.Repository/obj/Debug/net8.0/ref/PVG.Infrastucture.dll
+PVG.Repository/obj/Debug/net8.0/refint/PVG.Infrastucture.dll
+PVG.Web/bin/Debug/net8.0/PVG.Application.dll
+PVG.Web/bin/Debug/net8.0/PVG.Application.pdb
+PVG.Web/bin/Debug/net8.0/PVG.Domain.dll
+PVG.Web/bin/Debug/net8.0/PVG.Domain.pdb
+PVG.Web/bin/Debug/net8.0/PVG.Infrastucture.dll
+PVG.Web/bin/Debug/net8.0/PVG.Infrastucture.pdb
+PVG.Web/bin/Debug/net8.0/PVG.Web.dll
+PVG.Web/bin/Debug/net8.0/PVG.Web.exe
+PVG.Web/bin/Debug/net8.0/PVG.Web.pdb
+PVG.Web/obj/Debug/net8.0/apphost.exe
+PVG.Web/obj/Debug/net8.0/PVG.Web.AssemblyInfo.cs
+PVG.Web/obj/Debug/net8.0/PVG.Web.AssemblyInfoInputs.cache
+PVG.Web/obj/Debug/net8.0/PVG.Web.csproj.AssemblyReference.cache
+PVG.Web/obj/Debug/net8.0/PVG.Web.dll
+PVG.Web/obj/Debug/net8.0/PVG.Web.pdb
+PVG.Web/obj/Debug/net8.0/PVG.Web.sourcelink.json
+PVG.Web/obj/Debug/net8.0/ref/PVG.Web.dll
+PVG.Web/obj/Debug/net8.0/refint/PVG.Web.dll
+PVG.Web/obj/Debug/net8.0/rjsmcshtml.dswa.cache.json
+PVG.Web/obj/Debug/net8.0/rjsmrazor.dswa.cache.json
+PVG.Web/obj/Debug/net8.0/rpswa.dswa.cache.json
+/PVG.Application/bin
+/PVG.Web/obj/Debug
+/PVG.Web/obj
+/PVG.Application/obj
+/PVG.Repository/obj
+/PVG.Repository/obj
+/PVG.Web/obj

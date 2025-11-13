@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using PVG.Application;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Infrastucture;
+using PVG.Infrastucture.Persistence;
 using PVG.Web.Extensions;
 using System.Net.Mime;
 
