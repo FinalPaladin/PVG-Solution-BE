@@ -1,1 +1,13 @@
-/.vs/PVG.Web.slnx/FileContentIndex
+# Visual Studio user-specific files
+*.suo
+*.user
+*.useros
+
+# Build output
+[Bb]in/
+[Oo]bj/
+bin/
+obj/
+
+# VS code temporary files
+.vs/
