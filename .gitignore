@@ -6,6 +6,8 @@
 # Build output
 [Bb]in/
 [Oo]bj/
+bin/
+obj/
 
 # VS code temporary files
 .vs/

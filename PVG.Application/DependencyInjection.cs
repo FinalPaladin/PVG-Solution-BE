@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using PVG.Application.Mappings;
+using PVG.Application.Services.RequestCustomerService;
 using PVG.Application.Services.SampleService;
 
 namespace PVG.Application
@@ -20,6 +21,7 @@ namespace PVG.Application
             services.AddSingleton(mapper);
 
             services.AddScoped<ISampleService, SampleService>();
+            services.AddScoped<IRequestCustomerService, RequestCustomerService>();
 
             return services;
         }

@@ -21,6 +21,11 @@ namespace PVG.Infrastucture.Persistence
         public DbSet<ProductCategory> ProductCategory { get; set; }
         public DbSet<ProductInfo> ProductInfo { get; set; }
         public DbSet<RequestCustomer> RequestCustomer { get; set; }
+        public DbSet<Configuration> Configuration { get; set; }
+        public DbSet<Permission> Permission { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<UserPermission> UserPermission { get; set; }
+        public DbSet<ViewLog> ViewLog { get; set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -139,10 +144,6 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("20"))
                     .HasMaxLength(20)
                     .IsRequired();
-
-                entity.Property(e => e.Email)
-                    .HasColumnType(ColumType.TypeVarchar("30"))
-                    .HasMaxLength(30);
 
                 entity.Property(e => e.Key)
                     .HasColumnType(ColumType.TypeVarchar("30"))

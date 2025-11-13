@@ -11,8 +11,8 @@ using PVG.Infrastucture.Persistence;
 namespace PVG.Infrastucture.Migrations
 {
     [DbContext(typeof(PVGDbContext))]
-    [Migration("20251113033600_init")]
-    partial class init
+    [Migration("20251113102226_createtable")]
+    partial class createtable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -345,11 +345,6 @@ namespace PVG.Infrastucture.Migrations
 
                     b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("varchar(30)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
