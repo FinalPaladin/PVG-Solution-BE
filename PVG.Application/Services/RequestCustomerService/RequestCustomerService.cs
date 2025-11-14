@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
@@ -7,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -90,19 +92,25 @@ namespace PVG.Application.Services.RequestCustomerService
             {
                 var result = _requestCustomerRepository.FindByCondition(x => x.Phone == _input).ToList();
 
-                var data = new List<SaveRequestCustomerModel>();
+                var requestCutomers = new List<RequestCustomerModel>();
 
                 foreach (var rc in result)
                 {
-                    data.Add(
-                        new SaveRequestCustomerModel()
+                    requestCutomers.Add(
+                        new RequestCustomerModel()
                         {
                             Key = rc.Key,
-                            Phone = rc.Phone,
                             Value = rc.Value,
                         }
                     );
                 }
+
+                var data = new GetRequestCustomerModel()
+                {
+                    Phone = _input,
+                    ListRequestCustomer = requestCutomers
+                };
+
                 return new BaseResponse<RS_GetRequestCustomerModel>
                 {
                     IsSuccess = true,
@@ -126,32 +134,41 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        public async Task<BaseResponse<RS_GetRequestCustomerModel>> GetAllData()
+        public async Task<BaseResponse<RS_GetAllRequestCustomerModel>> GetAllData()
         {
             try
             {
                 var result = _requestCustomerRepository.FindAll().ToList();
 
-                var data = new List<SaveRequestCustomerModel>();
+                var requestCutomers = new List<RequestCustomerModel>();
 
                 foreach (var rc in result)
                 {
-                    data.Add(
-                        new SaveRequestCustomerModel()
+                    requestCutomers.Add(
+                        new RequestCustomerModel()
                         {
                             Key = rc.Key,
-                            Phone = rc.Phone,
                             Value = rc.Value,
                         }    
                     );
                 }
 
-                //var resultGroup = data
-                //            .GroupBy(x => x.Phone)
-                //            .Select(g => g.ToDictionary(x => x.Key, x => x.Value))
-                //            .ToList();
+                var data = result
+                    .GroupBy(x => x.Phone)
+                    .Select(g => new GetRequestCustomerModel()
+                    {
+                        Phone = g.Key,
+                        ListRequestCustomer = g
+                        .Select(item => new RequestCustomerModel
+                        {
+                            Key = item.Key,
+                            Value = item.Value
+                        })
+                        .ToList()
+                    })
+                    .ToList();
 
-                return new BaseResponse<RS_GetRequestCustomerModel>
+                return new BaseResponse<RS_GetAllRequestCustomerModel>
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
@@ -164,7 +181,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_GetRequestCustomerModel>
+                return new BaseResponse<RS_GetAllRequestCustomerModel>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
