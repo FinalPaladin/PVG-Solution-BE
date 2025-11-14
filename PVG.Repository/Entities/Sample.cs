@@ -2,7 +2,7 @@
 
 namespace PVG.Infrastucture.Entities
 {
-    public class Sample : EntityBase<int>, IAddFullAudited
+    public class Sample : EntityBase<Guid>, IAddFullAudited
     {
         public Guid? CreatedBy { get; set; }
         public string CreatedByName { get; set; }
