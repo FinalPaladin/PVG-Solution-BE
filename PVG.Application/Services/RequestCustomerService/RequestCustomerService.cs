@@ -27,15 +27,15 @@ namespace PVG.Application.Services.RequestCustomerService
         {
             try
             {
-                if(_input == null)
-                {
+                //if(_input == null)
+                //{
 
-                }
+                //}
 
-                if(_input.Data == null && _input.Data.Count == 0)
-                {
+                //if(_input.Data == null && _input.Data.Count == 0)
+                //{
 
-                }
+                //}
 
                 List<RequestCustomer> data = new List<RequestCustomer>();
                 var id = Guid.NewGuid();
@@ -57,7 +57,7 @@ namespace PVG.Application.Services.RequestCustomerService
                             ModifiedDate = DateTime.Now,
 
                             Key = rc.Key,
-                            Phone = rc.Phone,
+                            Phone = _input.Phone,
                             Value = rc.Value,
                         }    
                     );
