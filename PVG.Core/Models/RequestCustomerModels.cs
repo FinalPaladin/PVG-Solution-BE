@@ -8,12 +8,12 @@ namespace PVG.Domain.Models
 {
     public class RQ_SaveRequestCustomerModel
     {
+        public string Phone { get; set; }
         public List<SaveRequestCustomerModel> Data { get; set; } = new();
     }
 
     public class SaveRequestCustomerModel
     {
-        public string Phone { get; set; }
         public string Key { get; set; }
         public string Value { get; set; }
     }
