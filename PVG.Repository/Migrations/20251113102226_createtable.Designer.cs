@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PVG.Infrastucture.Persistence;
 
@@ -10,9 +11,11 @@ using PVG.Infrastucture.Persistence;
 namespace PVG.Infrastucture.Migrations
 {
     [DbContext(typeof(PVGDbContext))]
-    partial class PVGDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251113102226_createtable")]
+    partial class createtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

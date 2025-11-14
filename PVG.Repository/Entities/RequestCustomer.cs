@@ -10,7 +10,6 @@ namespace PVG.Infrastucture.Entities
     {
         public Guid? Id { get; set; }
         public string Phone { get; set; }
-        public string Email { get; set; }
         public string Key { get; set; }
         public string Value { get; set; }
     }

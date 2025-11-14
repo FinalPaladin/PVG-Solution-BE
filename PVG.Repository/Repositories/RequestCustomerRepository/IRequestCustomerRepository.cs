@@ -1,4 +1,5 @@
-﻿using PVG.Infrastucture.Domain;
+﻿using PVG.Domain.Models;
+using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,5 @@ namespace PVG.Infrastucture.Repositories.RequestCustomerRepository
 {
     public interface IRequestCustomerRepository : IRepositoryBase<RequestCustomer, Guid>
     {
-        public Task<RequestCustomer> GetById(Guid _id);
     }
 }
