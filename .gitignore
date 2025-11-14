@@ -1,1 +1,10 @@
-/.vs/PVG.Web.slnx/FileContentIndex
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build folders
+bin/
+obj/
+Debug/
+Release/
