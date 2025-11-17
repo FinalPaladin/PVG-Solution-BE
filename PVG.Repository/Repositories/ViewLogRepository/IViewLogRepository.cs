@@ -10,6 +10,5 @@ namespace PVG.Infrastucture.Repositories.ViewLogRepository
 {
     public interface IViewLogRepository : IRepositoryBase<ViewLog, Guid>
     {
-        public Task<ViewLog> GetById(Guid _id);
     }
 }

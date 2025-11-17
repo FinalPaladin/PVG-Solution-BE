@@ -18,10 +18,5 @@ namespace PVG.Infrastucture.Repositories.UserRepository
         {
             dbContext = _dbContext;
         }
-
-        public async Task<User> GetById(Guid _id)
-        {
-            return await dbContext.Set<User>().FirstOrDefaultAsync(x => x.Id.Equals(_id));
-        }
     }
 }

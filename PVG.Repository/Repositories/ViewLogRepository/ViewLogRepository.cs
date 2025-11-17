@@ -18,10 +18,5 @@ namespace PVG.Infrastucture.Repositories.ViewLogRepository
         {
             dbContext = _dbContext;
         }
-
-        public async Task<ViewLog> GetById(Guid _id)
-        {
-            return await dbContext.Set<ViewLog>().FirstOrDefaultAsync(x => x.Id.Equals(_id));
-        }
     }
 }

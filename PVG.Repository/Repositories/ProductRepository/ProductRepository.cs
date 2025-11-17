@@ -17,10 +17,5 @@ namespace PVG.Infrastucture.Repositories.ProductRepository
         {
             dbContext = _dbContext;
         }
-
-        public async Task<Product> GetById(Guid _id)
-        {
-            return await dbContext.Set<Product>().FirstOrDefaultAsync(x => x.Id.Equals(_id));
-        }
     }
 }
