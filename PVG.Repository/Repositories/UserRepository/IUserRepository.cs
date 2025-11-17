@@ -10,6 +10,5 @@ namespace PVG.Infrastucture.Repositories.UserRepository
 {
     public interface IUserRepository : IRepositoryBase<User, Guid>
     {
-        public Task<User> GetById(Guid _id);
     }
 }

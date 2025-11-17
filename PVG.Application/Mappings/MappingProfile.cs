@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using PVG.Domain.Models;
+using PVG.Infrastucture.Entities;
 
 namespace PVG.Application.Mappings
 {
@@ -9,6 +11,9 @@ namespace PVG.Application.Mappings
             // Add your mapping configurations here
             // Example: CreateMap<SourceModel, DestinationModel>();
             // You can also use ReverseMap() for bi-directional mapping
+
+            CreateMap<ConfigurationModel, Configuration>();
+            CreateMap<Configuration, ConfigurationModel>();
         }
     }
 }

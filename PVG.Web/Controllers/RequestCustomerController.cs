@@ -17,7 +17,7 @@ namespace PVG.Web.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllData")]
+        [Route("getalldata")]
         public async Task<IActionResult> GetAllData()
         {
             var result = await requestCustomerService.GetAllData();
@@ -25,7 +25,7 @@ namespace PVG.Web.Controllers
         }
 
         [HttpGet]
-        [Route("GetData/{_input}")]
+        [Route("getdata/{_input}")]
         public async Task<IActionResult> GetData(string _input)
         {
             var result = await requestCustomerService.GetData(_input);
@@ -33,10 +33,24 @@ namespace PVG.Web.Controllers
         }
 
         [HttpPost]
-        [Route("Save")]
+        [Route("save")]
         public async Task<IActionResult> Save([FromBody] RQ_SaveRequestCustomerModel _input)
         {
             return ReturnData(await requestCustomerService.Save(_input));
+        }
+
+        [HttpDelete]
+        [Route("deletekey/{_phone}/{_key}")]
+        public async Task<IActionResult> DeleteKey(string _phone, string _key)
+        {
+            return ReturnData(await requestCustomerService.DeleteKey(_phone, _key));
+        }
+
+        [HttpDelete]
+        [Route("delete/{_phone}")]
+        public async Task<IActionResult> Delete(string _phone)
+        {
+            return ReturnData(await requestCustomerService.Delete(_phone));
         }
     }
 }

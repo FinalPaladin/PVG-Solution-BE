@@ -10,6 +10,5 @@ namespace PVG.Infrastucture.Repositories.UserPermissionRepository
 {
     public interface IUserPermissionRepository : IRepositoryBase<UserPermission, Guid>
     {
-        public Task<UserPermission> GetById(Guid _id);
     }
 }

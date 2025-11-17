@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
@@ -37,41 +38,51 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 //}
 
-                List<RequestCustomer> data = new List<RequestCustomer>();
                 var id = Guid.NewGuid();
+
+                var dataUpdate = _requestCustomerRepository.FindByCondition(x => x.Phone == _input.Phone).ToList();
+                var dataCreate = new List<RequestCustomer>();
 
                 foreach (var rc in _input.Data)
                 {
-                    data.Add(
-                        new RequestCustomer()
-                        {
-                            CreatedBy = null,
-                            CreatedByName = "",
-                            CreatedDate = DateTime.Now,
-                            DeletedBy = null,
-                            DeletedByName = "",
-                            DeletedDate = DateTime.Now,
-                            IsDeleted = false,
-                            ModifiedBy = null,
-                            ModifiedByName = "",
-                            ModifiedDate = DateTime.Now,
+                    var iExist = dataUpdate.FindIndex(y => y.Key == rc.Key);
+                    if (iExist >= 0)
+                    {
+                        dataUpdate[iExist].Value = rc.Value;
+                    }
+                    else
+                    {
+                        dataCreate.Add(
+                            new RequestCustomer()
+                            {
+                                CreatedBy = null,
+                                CreatedByName = "",
+                                CreatedDate = DateTime.Now,
+                                DeletedBy = null,
+                                DeletedByName = "",
+                                DeletedDate = DateTime.Now,
+                                IsDeleted = false,
+                                ModifiedBy = null,
+                                ModifiedByName = "",
+                                ModifiedDate = DateTime.Now,
 
-                            Key = rc.Key,
-                            Phone = _input.Phone,
-                            Value = rc.Value,
-                        }    
-                    );
+                                Key = rc.Key,
+                                Phone = _input.Phone,
+                                Value = rc.Value,
+                            }
+                        );
+                    }
                 }
 
-                await _requestCustomerRepository.CreateListAsync(data);
+                await _requestCustomerRepository.CreateListAsync(dataCreate);
+                await _requestCustomerRepository.UpdateListAsync(dataUpdate);
                 await _requestCustomerRepository.SaveChangesAsync();
 
                 return new BaseResponse
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Test successful",
-                    Result = new { Data = "Sample data" }
+                    Message = "Save data completed",
                 };
             }
             catch (Exception ex)
@@ -81,7 +92,6 @@ namespace PVG.Application.Services.RequestCustomerService
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status200OK,
                     Message = ex.Message,
-                    Result = new { Data = "Sample data" }
                 };
             }
         }
@@ -115,7 +125,7 @@ namespace PVG.Application.Services.RequestCustomerService
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Test successful",
+                    Message = "Get data complete",
                     Result = new()
                     {
                         Data = data
@@ -172,7 +182,7 @@ namespace PVG.Application.Services.RequestCustomerService
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Test successful",
+                    Message = "Get data complete",
                     Result = new()
                     {
                         Data = data
@@ -187,6 +197,83 @@ namespace PVG.Application.Services.RequestCustomerService
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = ex.Message,
                     Result = new(),
+                };
+            }
+        }
+
+        public async Task<BaseResponse> DeleteKey(string _phone, string _key)
+        {
+            try
+            {
+                var checkExist = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false 
+                    && x.Phone == _phone 
+                    && x.Key == _key).FirstOrDefaultAsync();
+
+                if (checkExist == null)
+                {
+                    return new BaseResponse
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Object does not exist",
+                    };
+                }
+
+                await _requestCustomerRepository.DeleteAsync(checkExist);
+                await _requestCustomerRepository.SaveChangesAsync();
+
+                return new BaseResponse
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Delete completed",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        public async Task<BaseResponse> Delete(string _phone)
+        {
+            try
+            {
+                var checkExist = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
+                    && x.Phone == _phone).ToList();
+
+                if (checkExist == null)
+                {
+                    return new BaseResponse
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Object does not exist",
+                    };
+                }
+
+                await _requestCustomerRepository.DeleteListAsync(checkExist);
+                await _requestCustomerRepository.SaveChangesAsync();
+
+                return new BaseResponse
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Delete completed",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
                 };
             }
         }

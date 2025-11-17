@@ -10,6 +10,5 @@ namespace PVG.Infrastucture.Repositories.ProductRepository
 {
     public interface IProductRepository : IRepositoryBase<Product, Guid>
     {
-        public Task<Product> GetById(Guid _id);
     }
 }
