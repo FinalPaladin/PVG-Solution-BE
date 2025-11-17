@@ -24,19 +24,19 @@ namespace PVG.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-
             services.AddCors(options =>
             {
-                options.AddPolicy(_policyName, builder =>
+                options.AddPolicy("AllowAll", builder => //_policyName
                 {
-                    builder.WithOrigins()
+                    builder.WithOrigins("http://localhost:5173")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials()
                         .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
                 });
             });
+
+            services.AddControllers();
 
             // add config appsettings
             services.AddConfigureAppSetting(_configuration);
@@ -131,7 +131,9 @@ namespace PVG.Web
             app.UseHealthChecks("/health");
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseCors(_policyName);
+            app.UseCors("AllowAll"); // ⚠️ Quan trọng: đặt trước Authorization
+
+            //app.UseCors(_policyName);
 
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "PVG Services v1"); c.RoutePrefix = "swagger"; });
