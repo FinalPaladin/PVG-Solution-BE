@@ -9,6 +9,7 @@ namespace PVG.Domain.Models
     public class RQ_SaveRequestCustomerModel
     {
         public string Phone { get; set; }
+        public Guid? ProductId { get; set; }
         public List<SaveRequestCustomerModel> Data { get; set; } = new();
     }
 
@@ -30,13 +31,42 @@ namespace PVG.Domain.Models
 
     public class GetRequestCustomerModel
     {
+        public Guid? RequestCode { get; set; }
         public string Phone { get; set; }
-        public List<RequestCustomerModel> ListRequestCustomer { get; set; } = new();
+        public Guid? ProductId { get; set; }
+        public List<ObjRequestCustomerModel> ListRequestCustomer { get; set; } = new();
     }
 
-    public class RequestCustomerModel
+    public class ObjRequestCustomerModel
     {
         public string Key { get; set; }
         public string Value { get; set; }
+    }
+
+
+    public class RequestCustomerModel
+    {
+        public Guid? Id { get; set; }
+        public Guid? RequestCode { get; set; }
+        public string Phone { get; set; }
+        public string Key { get; set; }
+        public string Value { get; set; }
+        public Guid? ProductId { get; set; }
+    }
+
+    public class RQ_DeleteRequestCustomerModel
+    {
+        public string UserDelete { get; set; }
+        public Guid? Id { get; set; }
+        public Guid? RequestCode { get; set; }
+        public string Phone { get; set; }
+        public Guid? ProductId { get; set; }
+    }
+
+    public class RQ_GetRequestCustomerModel
+    {
+        public Guid? RequestCode { get; set; }
+        public string Phone { get; set; }
+        public Guid? ProductId { get; set; }
     }
 }

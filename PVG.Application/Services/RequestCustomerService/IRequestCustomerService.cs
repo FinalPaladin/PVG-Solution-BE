@@ -12,9 +12,9 @@ namespace PVG.Application.Services.RequestCustomerService
     public interface IRequestCustomerService
     {
         public Task<BaseResponse> Save(RQ_SaveRequestCustomerModel _input);
-        public Task<BaseResponse<RS_GetRequestCustomerModel>> GetData(string _input);
+        public Task<BaseResponse<RS_GetRequestCustomerModel>> GetData(RQ_GetRequestCustomerModel _input);
         public Task<BaseResponse<RS_GetAllRequestCustomerModel>> GetAllData();
-        public Task<BaseResponse> DeleteKey(string _phone, string _key);
-        public Task<BaseResponse> Delete(string _phone);
+        public Task<BaseResponse> DeleteKey(RQ_DeleteRequestCustomerModel _input);
+        public Task<BaseResponse> Delete(RQ_DeleteRequestCustomerModel _input);
     }
 }

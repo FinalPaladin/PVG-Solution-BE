@@ -140,6 +140,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(36)
                     .IsRequired();
 
+                entity.Property(e => e.RequestCode)
+                    .HasColumnType(ColumType.TypeVarchar("36"))
+                    .HasMaxLength(36)
+                    .IsRequired();
+
                 entity.Property(e => e.Phone)
                     .HasColumnType(ColumType.TypeVarchar("20"))
                     .HasMaxLength(20)

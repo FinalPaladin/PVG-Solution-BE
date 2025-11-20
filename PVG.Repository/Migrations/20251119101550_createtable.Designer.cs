@@ -11,7 +11,7 @@ using PVG.Infrastucture.Persistence;
 namespace PVG.Infrastucture.Migrations
 {
     [DbContext(typeof(PVGDbContext))]
-    [Migration("20251113102226_createtable")]
+    [Migration("20251119101550_createtable")]
     partial class createtable
     {
         /// <inheritdoc />
@@ -368,6 +368,14 @@ namespace PVG.Infrastucture.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
+
+                    b.Property<Guid?>("ProductId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("RequestCode")
+                        .IsRequired()
+                        .HasMaxLength(36)
+                        .HasColumnType("varchar(36)");
 
                     b.Property<string>("Value")
                         .IsRequired()

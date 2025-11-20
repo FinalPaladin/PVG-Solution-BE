@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace PVG.Application.Services.UserPermissionService
 {
-    public class UserPermissionService
+    public class UserPermissionService : IUserPermissionService
     {
         private readonly IUserPermissionRepository _userPermissionRepository;
 
