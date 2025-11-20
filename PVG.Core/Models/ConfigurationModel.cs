@@ -19,7 +19,8 @@ namespace PVG.Domain.Models
 
     public class RQ_SaveConfigurationModel
     {
-        ConfigurationModel Data { get; set; } = new();
+        public Guid? CreateUserId { get; set; }
+        public List<ConfigurationModel> Data { get; set; } = new();
     }
 
 }
