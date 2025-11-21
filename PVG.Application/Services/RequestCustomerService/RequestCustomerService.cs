@@ -84,7 +84,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 Guid? id = Guid.NewGuid();
 
-                var dataUpdate = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone && x.ProductId == _input.ProductId).ToList();
+                var dataUpdate = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone && x.ProductId == _input.ProductId).ToListAsync();
 
                 if(dataUpdate != null && dataUpdate.Count > 0)
                 {
