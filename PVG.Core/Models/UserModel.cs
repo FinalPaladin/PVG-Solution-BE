@@ -17,9 +17,18 @@ namespace PVG.Domain.Models
         public UserModel Data { get; set; } = new();
     }
 
-    public class RS_GetAllUserModel
+    public class RQ_SearchUserModel
     {
-        public List<UserModel> Data { get; set; } = new();
+        public bool Actived { get; set; }
+        public string FullName { get; set; }
+        public string UserName { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    public class RS_SearchUserModel
+    {
+        public PaginationModel<List<UserModel>> Data { get; set; } = new();
     }
 
     public class UserModel
@@ -44,6 +53,6 @@ namespace PVG.Domain.Models
     public class RQ_DeleteUserModel
     {
         public string UserAction { get; set; }
-        public string UserDelete { get; set; }
+        public string DeleteUser { get; set; }
     }
 }

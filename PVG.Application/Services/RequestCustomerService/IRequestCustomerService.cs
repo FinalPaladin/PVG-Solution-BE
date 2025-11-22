@@ -13,7 +13,7 @@ namespace PVG.Application.Services.RequestCustomerService
     {
         public Task<BaseResponse> Save(RQ_SaveRequestCustomerModel _input);
         public Task<BaseResponse<RS_GetRequestCustomerModel>> GetData(RQ_GetRequestCustomerModel _input);
-        public Task<BaseResponse<RS_GetAllRequestCustomerModel>> GetAllData();
+        public Task<BaseResponse<RS_SearchRequestCustomerModel>> Search(RQ_SearchRequestCustomerModel _input);
         public Task<BaseResponse> DeleteKey(RQ_DeleteRequestCustomerModel _input);
         public Task<BaseResponse> Delete(RQ_DeleteRequestCustomerModel _input);
     }

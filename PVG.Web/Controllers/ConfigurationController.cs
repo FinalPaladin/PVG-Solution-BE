@@ -11,17 +11,17 @@ namespace PVG.Web.Controllers
     [ApiController]
     public class ConfigurationController : PVGControllerBase
     {
-        IConfigurationService _configurationService;
-        public ConfigurationController(IConfigurationService configurationService)
+        IConfigurationService _service;
+        public ConfigurationController(IConfigurationService service)
         {
-            _configurationService = configurationService;
+            _service = service;
         }
 
         [HttpGet]
         [Route("getall")]
         public async Task<IActionResult> GetAllData()
         {
-            var result = await _configurationService.GetAllData();
+            var result = await _service.GetAllData();
             return ReturnData(result);
         }
 
@@ -30,7 +30,7 @@ namespace PVG.Web.Controllers
         [Route("save")]
         public async Task<IActionResult> Save([FromBody] RQ_SaveConfigurationModel _input)
         {
-            return ReturnData(await _configurationService.Save(_input));
+            return ReturnData(await _service.Save(_input));
         }
     }
 }

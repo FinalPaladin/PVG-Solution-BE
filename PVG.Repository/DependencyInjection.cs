@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Persistence;
 using PVG.Infrastucture.Repositories.ConfigurationRepository;
+using PVG.Infrastucture.Repositories.NewRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductInfoRepository;
@@ -36,6 +37,7 @@ namespace PVG.Infrastucture
             services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IViewLogRepository, ViewLogRepository>();
+            services.AddScoped<INewRepository, NewRepository>();
 
             return services;
         }

@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using PVG.Application.Mappings;
 using PVG.Application.Services.ConfigurationService;
 using PVG.Application.Services.EmailService;
+using PVG.Application.Services.InitPageService;
+using PVG.Application.Services.NewService;
 using PVG.Application.Services.PermissionService;
 using PVG.Application.Services.ProductCategoryService;
 using PVG.Application.Services.ProductInfoService;
@@ -40,6 +42,8 @@ namespace PVG.Application
             services.AddScoped<IUserPermissionService, UserPermissionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IViewLogService, ViewLogService>();
+            services.AddScoped<INewService, NewService>();
+            services.AddScoped<IInitPageService, InitPageService>();
 
             return services;
         }

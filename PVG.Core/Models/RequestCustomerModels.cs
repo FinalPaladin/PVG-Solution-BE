@@ -19,9 +19,18 @@ namespace PVG.Domain.Models
         public string Value { get; set; }
     }
 
-    public class RS_GetAllRequestCustomerModel
+    public class RQ_SearchRequestCustomerModel
     {
-        public List<GetRequestCustomerModel> Data { get; set; } = new();
+        public Guid? RequestCode { get; set; }
+        public Guid? ProductId { get; set; }
+        public string Phone { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    public class RS_SearchRequestCustomerModel
+    {
+        public PaginationModel<List<GetRequestCustomerModel>> Data { get; set; } = new();
     }
 
     public class RS_GetRequestCustomerModel

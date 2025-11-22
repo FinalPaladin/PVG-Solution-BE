@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
@@ -13,6 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static PVG.Domain.Enums.NewEnum;
+using static PVG.Domain.Enums.UserEnum;
 
 namespace PVG.Application.Services.ProductService
 {
@@ -21,14 +25,17 @@ namespace PVG.Application.Services.ProductService
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
         public ProductService(IProductRepository productRepository,
             IMapper mapper,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IUserService userService)
         {
             _productRepository = productRepository;
             _mapper = mapper;
             _userRepository = userRepository;
+            _userService = userService;
         }
 
         public async Task<BaseResponse> Save(RQ_SaveProductModel _input)
@@ -47,9 +54,9 @@ namespace PVG.Application.Services.ProductService
 
                 var id = Guid.NewGuid();
 
-                var dataUpdate = _productRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefault();
+                var dataUpdate = await _productRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
 
-                var userEntity = _userRepository.FindByCondition(x => x.Id == _input.CreateUserId).FirstOrDefault();
+                var userEntity = await _userRepository.FindByCondition(x => x.UserName == _input.CreateUser && x.IsDeleted == false).FirstOrDefaultAsync();
 
                 if (userEntity == null)
                 {
@@ -115,28 +122,53 @@ namespace PVG.Application.Services.ProductService
             }
         }
 
-        public async Task<BaseResponse<RS_GetAllProductModel>> GetAll()
+        public async Task<BaseResponse<RS_SearchProductModel>> Search(RQ_SearchProductModel _input)
         {
             try
             {
-                var productsEntity = _productRepository.FindAll().ToList();
+                if (_input == null)
+                {
+                    return new BaseResponse<RS_SearchProductModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
 
-                var data = _mapper.Map<List<ProductModel>>(productsEntity);
+                IQueryable<Product> query = _productRepository.FindByCondition(x => x.IsDeleted == false
+                    && (
+                        ((_input.ProductCategoryId == null) && ((string.IsNullOrEmpty(_input.Name) || x.Name.Contains(_input.Name))
+                        && (string.IsNullOrEmpty(_input.Description) || x.Description.Contains(_input.Description)))) 
+                        || (_input.ProductCategoryId == x.ProductCategoryId)
+                    )
+                ).AsQueryable();
 
-                return new BaseResponse<RS_GetAllProductModel>()
+                var pagination = await _productRepository.OffsetPagination<Product>(query, _input.Page, _input.PageSize);
+
+                var data = _mapper.Map<List<ProductModel>>(pagination.Items);
+
+                return new BaseResponse<RS_SearchProductModel>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = "Lấy dữ liệu thành công",
                     Result = new()
                     {
-                        Data = data
+                        Data = new()
+                        {
+                            Items = data,
+                            PageNumber = pagination.PageNumber,
+                            PerPage = pagination.PerPage,
+                            TotalItems = pagination.TotalItems,
+                            TotalPages = pagination.TotalPages,
+                        }
                     }
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_GetAllProductModel>()
+                return new BaseResponse<RS_SearchProductModel>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status200OK,
@@ -212,10 +244,24 @@ namespace PVG.Application.Services.ProductService
                     };
                 }
 
+                var AD = UserAdminType.SystemAdmin;
+
+                var isAdmin = await _userService.CheckAdmin(_input.UserDelete, AD);
+
+                if (isAdmin == null || !isAdmin.IsSuccess)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = string.Format("Phải là {0} mới đủ quyền xóa", nameof(AD)),
+                    };
+                }
+
                 productEntity.IsDeleted = true;
                 productEntity.DeletedDate = DateTime.Now;
-                productEntity.DeletedBy= _input.DeleteUserId;
-                
+                productEntity.DeletedBy = isAdmin.Result.Id;
+
                 await _productRepository.UpdateAsync(productEntity);
                 await _productRepository.SaveChangesAsync();
 

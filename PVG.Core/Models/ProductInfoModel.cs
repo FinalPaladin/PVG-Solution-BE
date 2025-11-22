@@ -17,7 +17,7 @@ namespace PVG.Domain.Models
 
     public class RQ_SaveProductInfoModel
     {
-        public Guid? CreateUserId { get; set; }
+        public string CreateUser { get; set; }
         public Guid? Id { get; set; }
         public Guid? ProductId { get; set; }
         public string Type { get; set; }
@@ -25,9 +25,19 @@ namespace PVG.Domain.Models
         public string Content { get; set; }
     }
 
-    public class RS_GetAllProductInfoModel
+    public class RQ_SearchProductInfoModel
     {
-        public List<ProductInfoModel> Data { get; set; } = new List<ProductInfoModel>();
+        public Guid? ProductId { get; set; }
+        public string Type { get; set; }
+        public string Description { get; set; }
+        public string Content { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    public class RS_SearchProductInfoModel
+    {
+        public PaginationModel<List<ProductInfoModel>> Data { get; set; } = new();
     }
 
     public class RQ_GetProductInfoModel
@@ -42,7 +52,7 @@ namespace PVG.Domain.Models
 
     public class RQ_DeleteProductInfoModel
     {
-        public Guid? DeleteUserId { get; set; }
+        public string UserDelete { get; set; }
         public Guid? Id { get; set; }
     }
 }
