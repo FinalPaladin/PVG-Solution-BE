@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Entities;
@@ -20,6 +21,5 @@ namespace PVG.Infrastucture.Repositories.RequestCustomerRepository
         {
             dbContext = _dbContext;
         }
-
     }
 }

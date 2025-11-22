@@ -22,6 +22,7 @@ namespace PVG.Application.Mappings
             CreateMap<Product, ProductModel>();
             CreateMap<ProductCategory, ProductCategoryModel>();
             CreateMap<ProductInfo, ProductInfoModel>();
+            CreateMap<New, NewModel>();
         }
     }
 }

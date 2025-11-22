@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
@@ -33,7 +34,7 @@ namespace PVG.Application.Services.ConfigurationService
         {
             try
             {
-                var configurationsEntity = _configurationRepository.FindAll().ToList();
+                var configurationsEntity = await _configurationRepository.FindAll().ToListAsync();
 
                 if(configurationsEntity == null || configurationsEntity.Count == 0)
                 {
@@ -97,10 +98,10 @@ namespace PVG.Application.Services.ConfigurationService
 
                 var id = Guid.NewGuid();
 
-                var dataUpdate = _configurationRepository.FindAll().ToList();
+                var dataUpdate = await _configurationRepository.FindAll().ToListAsync();
                 var dataCreate = new List<Configuration>();
 
-                var userEntity = _userReponsitory.FindByCondition(x => x.Id == _input.CreateUserId).FirstOrDefault();
+                var userEntity = await _userReponsitory.FindByCondition(x => x.Id == _input.CreateUserId).FirstOrDefaultAsync();
 
                 if (userEntity == null)
                 {

@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace PVG.Web.Controllers
 {
-    [Route("api/request_customer")]
+    [Route("api/request")]
     [ApiController]
     public class RequestCustomerController: PVGControllerBase
     {
-        IRequestCustomerService _requestCustomerService;
-        public RequestCustomerController(IRequestCustomerService requestCustomerService)
+        IRequestCustomerService _service;
+        public RequestCustomerController(IRequestCustomerService service)
         {
-            _requestCustomerService = requestCustomerService;
+            _service = service;
         }
 
-        [HttpGet]
-        [Route("getall")]
-        public async Task<IActionResult> GetAllData()
+        [HttpPost]
+        [Route("search")]
+        public async Task<IActionResult> Search(RQ_SearchRequestCustomerModel _input)
         {
-            var result = await _requestCustomerService.GetAllData();
+            var result = await _service.Search(_input);
             return ReturnData(result);
         }
 
@@ -28,7 +28,7 @@ namespace PVG.Web.Controllers
         [Route("get")]
         public async Task<IActionResult> GetData([FromBody] RQ_GetRequestCustomerModel _input)
         {
-            var result = await _requestCustomerService.GetData(_input);
+            var result = await _service.GetData(_input);
             return ReturnData(result);
         }
 
@@ -36,21 +36,21 @@ namespace PVG.Web.Controllers
         [Route("save")]
         public async Task<IActionResult> Save([FromBody] RQ_SaveRequestCustomerModel _input)
         {
-            return ReturnData(await _requestCustomerService.Save(_input));
+            return ReturnData(await _service.Save(_input));
         }
 
         [HttpPost]
         [Route("deletekey")]
         public async Task<IActionResult> DeleteKey(RQ_DeleteRequestCustomerModel _input)
         {
-            return ReturnData(await _requestCustomerService.DeleteKey(_input));
+            return ReturnData(await _service.DeleteKey(_input));
         }
 
         [HttpPost]
         [Route("delete")]
         public async Task<IActionResult> Delete(RQ_DeleteRequestCustomerModel _input)
         {
-            return ReturnData(await _requestCustomerService.Delete(_input));
+            return ReturnData(await _service.Delete(_input));
         }
     }
 }

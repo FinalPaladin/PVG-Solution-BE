@@ -29,12 +29,12 @@ namespace PVG.Application.Services.EmailService
                 int port = 0;
                 if (configs != null && configs.Count > 0)
                 {
-                    fromName = configs.Find(x => x.Key == "EmailFromName").Value;
-                    fromEmail = configs.Find(x => x.Key == "EmailSend").Value;
-                    password = configs.Find(x => x.Key == "EmailPassword").Value;
-                    toEmail = configs.Find(x => x.Key == "EmailReceive").Value;
-                    smtpHost = configs.Find(x => x.Key == "EmailSmtpHost").Value;
-                    port = int.Parse(configs.Find(x => x.Key == "EmailPort").Value);
+                    fromName = configs.Find(x => x.Key == "EmailFromName")?.Value;
+                    fromEmail = configs.Find(x => x.Key == "EmailSend")?.Value;
+                    password = configs.Find(x => x.Key == "EmailPassword")?.Value;
+                    toEmail = configs.Find(x => x.Key == "EmailReceive")?.Value;
+                    smtpHost = configs.Find(x => x.Key == "EmailSmtpHost")?.Value;
+                    port = int.Parse(configs.Find(x => x.Key == "EmailPort")?.Value);
                 }
 
                 //smtpHost = "smtp.gmail.com";

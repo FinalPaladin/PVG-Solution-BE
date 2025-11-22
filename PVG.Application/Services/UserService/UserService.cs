@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
+using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.UserPermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static PVG.Domain.Enums.UserEnum;
 
 namespace PVG.Application.Services.UserService
 {
@@ -42,7 +44,7 @@ namespace PVG.Application.Services.UserService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Input empty"
+                        Message = "Dữ liệu đầu vào không hợp lệ"
                     };
 
                 if(string.IsNullOrEmpty(_input.UserName) || string.IsNullOrEmpty(_input.Password))
@@ -50,17 +52,17 @@ namespace PVG.Application.Services.UserService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Wrong username/password"
+                        Message = "Sai tài khoản/mật khẩu"
                     };
 
-                var data = _userRepository.FindByCondition(x => x.UserName == _input.UserName && x.Password == _input.Password).FirstOrDefault();
+                var data = await _userRepository.FindByCondition(x => x.UserName == _input.UserName && x.Password == _input.Password).FirstOrDefaultAsync();
 
                 if(data == null)
                     return new BaseResponse()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Wrong username/password"
+                        Message = "Sai tài khoản/mật khẩu"
                     };
 
                 if(!data.Actived)
@@ -68,14 +70,14 @@ namespace PVG.Application.Services.UserService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "User locked"
+                        Message = "Tài khoản bị khóa"
                     };
 
                 return new BaseResponse()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Login successed"
+                    Message = "Đang nhập thành công"
                 };
             }
             catch (Exception ex)
@@ -89,35 +91,58 @@ namespace PVG.Application.Services.UserService
             }
         }
 
-        public async Task<BaseResponse<RS_GetAllUserModel>> GetAllData()
+        public async Task<BaseResponse<RS_SearchUserModel>> Search(RQ_SearchUserModel _input)
         {
             try
             {
-                var usersEntity = _userRepository.FindAll().ToList();
-
-                if(usersEntity == null)
-                    return new BaseResponse<RS_GetAllUserModel>()
+                if (_input == null)
+                {
+                    return new BaseResponse<RS_SearchUserModel>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Data not found"
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+
+                IQueryable<User> query = _userRepository.FindByCondition(x => x.IsDeleted == false
+                    && (string.IsNullOrEmpty(_input.FullName) || x.FullName.Contains(_input.FullName))
+                    && (string.IsNullOrEmpty(_input.UserName) || x.UserName.Contains(_input.UserName))
+                    && x.Actived == _input.Actived
+                ).AsQueryable();
+
+                var pagination = await _userRepository.OffsetPagination<User>(query, _input.Page, _input.PageSize);
+
+                if(pagination.Items == null)
+                    return new BaseResponse<RS_SearchUserModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Không tìm thấy"
                     };
 
-                var data = _mapper.Map<List<UserModel>>(usersEntity);
-                return new BaseResponse<RS_GetAllUserModel>()
+                var data = _mapper.Map<List<UserModel>>(pagination.Items);
+                return new BaseResponse<RS_SearchUserModel>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Get data successed",
+                    Message = "Tìm kiếm thành công",
                     Result = new()
                     {
-                        Data = data
+                        Data = new()
+                        {
+                            Items = data,
+                            PageNumber = pagination.PageNumber,
+                            PerPage = pagination.PerPage,
+                            TotalItems = pagination.TotalItems,
+                            TotalPages = pagination.TotalPages,
+                        }
                     }
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_GetAllUserModel>()
+                return new BaseResponse<RS_SearchUserModel>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -126,7 +151,7 @@ namespace PVG.Application.Services.UserService
             }
         }
 
-        public async Task<BaseResponse<RS_GetUserModel>> GetUser(RQ_GetUserModel _input)
+        public async Task<BaseResponse<RS_GetUserModel>> Get(RQ_GetUserModel _input)
         {
             try
             {
@@ -135,7 +160,7 @@ namespace PVG.Application.Services.UserService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Input empty"
+                        Message = "Dữ liệu đầu vào không hợp lệ"
                     };
 
                 if (string.IsNullOrEmpty(_input.UserName))
@@ -143,7 +168,7 @@ namespace PVG.Application.Services.UserService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "User does not exist"
+                        Message = "Tài khoản không tồn tại"
                     };
 
                 var usersEntity = _userRepository.FindByCondition(x => x.UserName == _input.UserName).ToList();
@@ -153,7 +178,7 @@ namespace PVG.Application.Services.UserService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Data not found"
+                        Message = "Tài khoản không tồn tại"
                     };
 
                 var data = _mapper.Map<UserModel>(usersEntity);
@@ -161,7 +186,7 @@ namespace PVG.Application.Services.UserService
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Get data successed",
+                    Message = "Lấy dữ liệu thành công",
                     Result = new()
                     {
                         Data = data
@@ -183,7 +208,7 @@ namespace PVG.Application.Services.UserService
         {
             try
             {
-                var userDeleteEntity = await _userRepository.FindByCondition(x => x.UserName == _input.UserDelete).FirstOrDefaultAsync();
+                var userDeleteEntity = await _userRepository.FindByCondition(x => x.UserName == _input.DeleteUser).FirstOrDefaultAsync();
 
                 if (userDeleteEntity == null)
                 {
@@ -195,43 +220,17 @@ namespace PVG.Application.Services.UserService
                     };
                 }
 
-                var userActionEntity = await _userRepository.FindByCondition(x => x.UserName == _input.UserAction).FirstOrDefaultAsync();
+                var AD = UserAdminType.SystemAdmin;
 
-                if (userActionEntity == null)
+                var isAdmin = await CheckAdmin(_input.UserAction, AD);
+
+                if (isAdmin == null || !isAdmin.IsSuccess)
                 {
                     return new BaseResponse()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Tài khoản không tồn tại",
-                    };
-                }
-
-                var userAction = _mapper.Map<UserModel>(userActionEntity);
-
-                var permissionEntity = _permissionRepository.FindByCondition(x => x.Name == "DELETE_REQUEST_CUSTOMER").FirstOrDefaultAsync();
-
-                if (permissionEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Phải là System Admin mới đủ quyền xóa",
-                    };
-                }
-
-                var permission = _mapper.Map<PermissionModel>(permissionEntity);
-
-                var userPermissionEntity = _userPermissionRepository.FindByCondition(x => x.UserId == userAction.Id && x.PermissionId == permission.Id).FirstOrDefaultAsync();
-
-                if (userPermissionEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Phải là System Admin mới đủ quyền xóa",
+                        Message = string.Format("Phải là {0} mới đủ quyền xóa", nameof(AD)),
                     };
                 }
 
@@ -251,6 +250,59 @@ namespace PVG.Application.Services.UserService
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
+    
+        public async Task<BaseResponse<UserModel>> CheckAdmin(string _userName, UserAdminType _adminType)
+        {
+            try
+            {
+                string systemAD = nameof(_adminType);
+
+                var userEntity = _userRepository.FindByCondition(x => x.IsDeleted == false && x.UserName == _userName).FirstOrDefaultAsync();
+
+                if (userEntity == null)
+                {
+                    return new BaseResponse<UserModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Not admin",
+                        Result = null
+                    };
+                }
+
+                var user = _mapper.Map<UserModel>(userEntity);
+
+                var permissionEntity = _permissionRepository.FindByCondition(x => x.Name == systemAD && x.IsDeleted == false).FirstOrDefaultAsync();
+
+                if (permissionEntity == null)
+                {
+                    return new BaseResponse<UserModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Not admin",
+                        Result = user
+                    };
+                }
+
+                return new BaseResponse<UserModel>()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Admin",
+                    Result = user
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<UserModel>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status200OK,
                     Message = ex.Message,
                 };
             }

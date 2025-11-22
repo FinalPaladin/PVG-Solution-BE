@@ -19,9 +19,16 @@ namespace PVG.Domain.Models
         public string Name { get; set; }
     }
 
-    public class RS_GetAllPermissionModel
+    public class RQ_SearchPermissionModel
     {
-        public List<PermissionModel> Data { get; set; } = new List<PermissionModel>();
+        public string Name { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    public class RS_SearchPermissionModel
+    {
+        public PaginationModel<List<PermissionModel>> Data { get; set; } = new();
     }
 
     public class RQ_GetPermissionModel
@@ -31,12 +38,12 @@ namespace PVG.Domain.Models
 
     public class RS_GetPermissionModel
     {
-        public PermissionModel Data { get; set; } = new PermissionModel();
+        public PermissionModel Data { get; set; } = new();
     }
 
     public class RQ_DeletePermissionModel
     {
-        public Guid? DeleteUserId { get; set; }
+        public string UserDelete { get; set; }
         public Guid? Id { get; set; }
     }
 }

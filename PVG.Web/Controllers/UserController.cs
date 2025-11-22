@@ -13,33 +13,33 @@ namespace PVG.Web.Controllers
     [ApiController]
     public class UserController : PVGControllerBase
     {
-        IUserService _userService;
-        public UserController(IUserService userService)
+        IUserService _service;
+        public UserController(IUserService service)
         {
-            _userService = userService;
+            _service = service;
         }
 
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login(RQ_UserLoginModel _input)
         {
-            var result = await _userService.Login(_input);
+            var result = await _service.Login(_input);
             return ReturnData(result);
         }
 
         [HttpPost]
-        [Route("getall")]
-        public async Task<IActionResult> GetAllData()
+        [Route("search")]
+        public async Task<IActionResult> Search(RQ_SearchUserModel _input)
         {
-            var result = await _userService.GetAllData();
+            var result = await _service.Search(_input);
             return ReturnData(result);
         }
 
         [HttpPost]
         [Route("get")]
-        public async Task<IActionResult> GetUser(RQ_GetUserModel _input)
+        public async Task<IActionResult> Get(RQ_GetUserModel _input)
         {
-            var result = await _userService.GetUser(_input);
+            var result = await _service.Get(_input);
             return ReturnData(result);
         }
 
@@ -47,7 +47,7 @@ namespace PVG.Web.Controllers
         [Route("delete")]
         public async Task<IActionResult> Delete(RQ_DeleteUserModel _input)
         {
-            var result = await _userService.Delete(_input);
+            var result = await _service.Delete(_input);
             return ReturnData(result);
         }
     }

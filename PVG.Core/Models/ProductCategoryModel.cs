@@ -10,6 +10,7 @@ namespace PVG.Domain.Models
     {
         public Guid? Id { get; set; }
         public string Name { get; set; }
+        public List<ProductModel> Products { get; set; } = new();
     }
 
     public class RQ_SaveProductCategoryModel
@@ -19,9 +20,16 @@ namespace PVG.Domain.Models
         public string Name { get; set; }
     }
 
-    public class RS_GetAllProductCategoryModel
+    public class RQ_SearchProductCategoryModel
     {
-        public List<ProductCategoryModel> Data { get; set; } = new List<ProductCategoryModel>();
+        public string Name { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+    }
+
+    public class RS_SearchProductCategoryModel
+    {
+        public PaginationModel<List<ProductCategoryModel>> Data { get; set; } = new();
     }
 
     public class RQ_GetProductCategoryModel

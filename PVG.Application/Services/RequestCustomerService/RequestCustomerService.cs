@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MimeKit;
 using PVG.Application.Services.EmailService;
+using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
@@ -21,6 +22,8 @@ using System.Numerics;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static PVG.Domain.Enums.UserEnum;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PVG.Application.Services.RequestCustomerService
@@ -30,22 +33,17 @@ namespace PVG.Application.Services.RequestCustomerService
         private readonly IRequestCustomerRepository _requestCustomerRepository;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
-        private readonly IUserRepository _userReponsitory;
-        private readonly IPermissionRepository _permissionRepository;
-        private readonly IUserPermissionRepository _userPermissionRepository;
+        private readonly IUserService _userService;
+
         public RequestCustomerService(IRequestCustomerRepository requestCustomerRepository,
             IMapper mapper,
             IEmailService emailService,
-            IUserRepository userReponsitory,
-            IPermissionRepository permissionRepository,
-            IUserPermissionRepository userPermissionRepository)
+            IUserService userService)
         {
             _requestCustomerRepository = requestCustomerRepository;
             _mapper = mapper;
             _emailService = emailService;
-            _userReponsitory = userReponsitory;
-            _permissionRepository = permissionRepository;
-            _userPermissionRepository = userPermissionRepository;
+            _userService = userService;
         }
 
         public async Task<BaseResponse> Save(RQ_SaveRequestCustomerModel _input)
@@ -202,9 +200,19 @@ namespace PVG.Application.Services.RequestCustomerService
         {
             try
             {
-                var requestCutomersEntity = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone 
+                if (_input == null)
+                {
+                    return new BaseResponse<RS_GetRequestCustomerModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+
+                var requestCutomersEntity = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone 
                 && x.RequestCode == _input.RequestCode
-                && x.ProductId == _input.ProductId).ToList();
+                && x.ProductId == _input.ProductId).ToListAsync();
 
                 var requestCutomers = _mapper.Map<List<RequestCustomerModel>>(requestCutomersEntity);
 
@@ -247,13 +255,29 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        public async Task<BaseResponse<RS_GetAllRequestCustomerModel>> GetAllData()
+        public async Task<BaseResponse<RS_SearchRequestCustomerModel>> Search(RQ_SearchRequestCustomerModel _input)
         {
             try
             {
-                var requestCustomersEntity = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false).ToList();
+                if (_input == null)
+                {
+                    return new BaseResponse<RS_SearchRequestCustomerModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
 
-                var requestCutomers = _mapper.Map< List<RequestCustomerModel>>(requestCustomersEntity);
+                IQueryable<RequestCustomer> query = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
+                    && (string.IsNullOrEmpty(_input.Phone) || x.Phone.Contains(_input.Phone))
+                    && (_input.ProductId == null || x.ProductId == _input.ProductId)
+                    && (_input.RequestCode == null || x.ProductId == _input.RequestCode)
+                ).OrderByDescending(x => x.CreatedDate).AsQueryable();
+
+                var pagination = await _requestCustomerRepository.OffsetPagination<RequestCustomer>(query, _input.Page, _input.PageSize);
+
+                var requestCutomers = _mapper.Map<List<RequestCustomerModel>>(pagination.Items);
 
                 var data = requestCutomers
                     .GroupBy(x => new { x.RequestCode, x.Phone, x.ProductId })
@@ -272,20 +296,27 @@ namespace PVG.Application.Services.RequestCustomerService
                     })
                     .ToList();
 
-                return new BaseResponse<RS_GetAllRequestCustomerModel>()
+                return new BaseResponse<RS_SearchRequestCustomerModel>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Lấy thông tin thành công",
                     Result = new()
                     {
-                        Data = data
+                        Data = new()
+                        {
+                            Items = data,
+                            PageNumber = pagination.PageNumber,
+                            PerPage = pagination.PerPage,
+                            TotalItems = pagination.TotalItems,
+                            TotalPages = pagination.TotalPages,
+                        }
                     },
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_GetAllRequestCustomerModel>()
+                return new BaseResponse<RS_SearchRequestCustomerModel>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -312,37 +343,9 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                var userEntity = _userReponsitory.FindByCondition(x => x.IsDeleted == false && x.UserName == _input.UserDelete).FirstOrDefaultAsync();
+                var isAdmin = await _userService.CheckAdmin(_input.UserDelete, UserAdminType.SystemAdmin);
 
-                if (userEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Phải là System Admin mới đủ quyền xóa",
-                    };
-                }
-
-                var user = _mapper.Map<UserModel>(userEntity);
-
-                var permissionEntity = _permissionRepository.FindByCondition(x => x.Name == "DELETE_REQUEST_CUSTOMER").FirstOrDefaultAsync();
-
-                if (permissionEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Phải là System Admin mới đủ quyền xóa",
-                    };
-                }
-
-                var permission = _mapper.Map<PermissionModel>(permissionEntity);
-
-                var userPermissionEntity = _userPermissionRepository.FindByCondition(x => x.UserId == user.Id && x.PermissionId == permission.Id).FirstOrDefaultAsync();
-
-                if (userPermissionEntity == null)
+                if (isAdmin == null || !isAdmin.IsSuccess)
                 {
                     return new BaseResponse()
                     {
@@ -353,7 +356,7 @@ namespace PVG.Application.Services.RequestCustomerService
                 }
 
                 checkExist.IsDeleted = true;
-                checkExist.DeletedBy = user.Id;
+                checkExist.DeletedBy = isAdmin.Result.Id;
                 checkExist.DeletedDate = DateTime.Now;
                 await _requestCustomerRepository.UpdateAsync(checkExist);
                 await _requestCustomerRepository.SaveChangesAsync();
@@ -380,10 +383,10 @@ namespace PVG.Application.Services.RequestCustomerService
         {
             try
             {
-                var checkExist = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
+                var checkExist = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
                     && x.RequestCode == _input.RequestCode 
                     && x.Phone == _input.Phone
-                    && x.ProductId == _input.ProductId).ToList();
+                    && x.ProductId == _input.ProductId).ToListAsync();
 
                 if (checkExist == null || checkExist.Count == 0)
                 {
@@ -395,37 +398,9 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                var userEntity = _userReponsitory.FindByCondition(x => x.IsDeleted == false && x.UserName == _input.UserDelete).FirstOrDefaultAsync();
+                var isAdmin = await _userService.CheckAdmin(_input.UserDelete, UserAdminType.SystemAdmin);
 
-                if (userEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Phải là System Admin mới đủ quyền xóa",
-                    };
-                }
-
-                var user = _mapper.Map<UserModel>(userEntity);
-
-                var permissionEntity = _permissionRepository.FindByCondition(x => x.Name == "DELETE_REQUEST_CUSTOMER").FirstOrDefaultAsync();
-
-                if (permissionEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Phải là System Admin mới đủ quyền xóa",
-                    };
-                }
-
-                var permission = _mapper.Map<PermissionModel>(permissionEntity);
-
-                var userPermissionEntity = _userPermissionRepository.FindByCondition(x => x.UserId == user.Id && x.PermissionId == permission.Id).FirstOrDefaultAsync();
-
-                if (userPermissionEntity == null)
+                if (isAdmin == null || !isAdmin.IsSuccess)
                 {
                     return new BaseResponse()
                     {
@@ -438,7 +413,7 @@ namespace PVG.Application.Services.RequestCustomerService
                 foreach (var rc in checkExist)
                 {
                     rc.IsDeleted = true;
-                    rc.DeletedBy = user.Id;
+                    rc.DeletedBy = isAdmin.Result.Id;
                     rc.DeletedDate = DateTime.Now;
                 }
 

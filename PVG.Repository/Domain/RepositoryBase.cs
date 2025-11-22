@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using PVG.Core.BaseModels;
+using PVG.Domain.Models;
 using PVG.Infrastucture.Entities.BaseEntities;
 using PVG.Infrastucture.Persistence;
 using System.Data;
@@ -182,5 +183,52 @@ namespace PVG.Infrastucture.Domain
 
         public Task RollbackTransactionAsync()
             => _dbContext.Database.RollbackTransactionAsync();
+
+        public PaginationModel Paging<T>(List<T> items, int page, int pageSize)
+        {
+            var pagination = new PaginationModel();
+            pagination.Items = items.Skip((page - 1) * pageSize)
+                    .Take(pageSize).ToList();
+            pagination.PageNumber = page;
+            pagination.PerPage = pageSize;
+            pagination.TotalItems = items.Count;
+            pagination.TotalPages = (int)Math.Ceiling(pagination.TotalItems / (double)pagination.PerPage);
+
+            return pagination;
+        }
+
+        public IQueryable<T> Paging<T>(IQueryable<T> query, bool isPaging, int currentPage, int perPage)
+        {
+            if (isPaging)
+            {
+                query = query.Skip(perPage * (currentPage - 1)).Take(perPage);
+            }
+            return query;
+        }
+
+        public List<T> Paging<T>(List<T> query, bool isPaging, int currentPage, int perPage)
+        {
+            if (isPaging)
+            {
+                query = query.Skip(perPage * (currentPage - 1)).Take(perPage).ToList();
+            }
+            return query;
+        }
+
+        public async Task<PaginationModel> OffsetPagination<T>(IQueryable<T> query, int page, int pageSize)
+        {
+            var pagination = new PaginationModel();
+            pagination.Items = await query
+                            .Skip((page - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToListAsync();
+
+            pagination.PageNumber = page;
+            pagination.PerPage = pageSize;
+            pagination.TotalItems = await query.CountAsync();
+            pagination.TotalPages = (int)Math.Ceiling(pagination.TotalItems / (double)pagination.PerPage);
+
+            return pagination;
+        }
     }
 }

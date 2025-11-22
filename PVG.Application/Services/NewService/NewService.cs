@@ -1,40 +1,44 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using PVG.Application.Services.PermissionService;
+using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Repositories.ConfigurationRepository;
-using PVG.Infrastucture.Repositories.ProductCategoryRepository;
-using PVG.Infrastucture.Repositories.ProductRepository;
+using PVG.Infrastucture.Repositories.NewRepository;
+using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using static PVG.Domain.Enums.NewEnum;
+using static PVG.Domain.Enums.UserEnum;
 
-namespace PVG.Application.Services.ProductCategoryService
+namespace PVG.Application.Services.NewService
 {
-    public class ProductCategoryService: IProductCategoryService
+    public class NewService : INewService
     {
-        private readonly IProductCategoryRepository _productCategoryRepository;
-        private readonly IProductRepository _productRepository;
+        private readonly INewRepository _newRepository;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
-
-        public ProductCategoryService(IProductCategoryRepository productCategoryRepository,
-            IProductRepository productRepository,
+        public NewService(INewRepository newRepository,
             IMapper mapper,
+            IUserService userService,
             IUserRepository userRepository)
         {
-            _productCategoryRepository = productCategoryRepository;
-            _productRepository = productRepository;
+            _newRepository = newRepository;
             _mapper = mapper;
+            _userService = userService;
             _userRepository = userRepository;
         }
 
-        public async Task<BaseResponse> Save(RQ_SaveProductCategoryModel _input)
+
+        public async Task<BaseResponse> Save(RQ_SaveNewModel _input)
         {
             try
             {
@@ -50,9 +54,9 @@ namespace PVG.Application.Services.ProductCategoryService
 
                 var id = Guid.NewGuid();
 
-                var dataUpdate = await _productCategoryRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
+                var dataUpdate = await _newRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
 
-                var userEntity = await _userRepository.FindByCondition(x => x.Id == _input.CreateUserId).FirstOrDefaultAsync();
+                var userEntity = await _userRepository.FindByCondition(x => x.UserName == _input.CreateUser && x.IsDeleted == false).FirstOrDefaultAsync();
 
                 if (userEntity == null)
                 {
@@ -66,15 +70,19 @@ namespace PVG.Application.Services.ProductCategoryService
 
                 if (dataUpdate != null)
                 {
-                    dataUpdate.Name = _input.Name;
                     dataUpdate.ModifiedBy = userEntity.Id;
                     dataUpdate.ModifiedByName = userEntity.FullName;
                     dataUpdate.ModifiedDate = DateTime.Now;
-                    await _productCategoryRepository.UpdateAsync(dataUpdate);
+
+                    dataUpdate.Title = _input.Title;
+                    dataUpdate.Content = _input.Content;
+                    dataUpdate.PostedDate = _input.PostedDate;
+                    dataUpdate.Status = _input.Status;
+                    await _newRepository.UpdateAsync(dataUpdate);
                 }
                 else
                 {
-                    var dataCreate = new ProductCategory()
+                    var dataCreate = new New()
                     {
                         CreatedBy = userEntity.Id,
                         CreatedByName = userEntity.FullName,
@@ -87,12 +95,15 @@ namespace PVG.Application.Services.ProductCategoryService
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
 
-                        Name = _input.Name,
+                        Title = _input.Title,
+                        Content = _input.Content,
+                        PostedDate = _input.PostedDate,
+                        Status = Domain.Enums.NewEnum.NewStatus.Created
                     };
-                    await _productCategoryRepository.CreateAsync(dataCreate);
+                    await _newRepository.CreateAsync(dataCreate);
                 }
 
-                await _productCategoryRepository.SaveChangesAsync();
+                await _newRepository.SaveChangesAsync();
 
                 return new BaseResponse()
                 {
@@ -112,13 +123,13 @@ namespace PVG.Application.Services.ProductCategoryService
             }
         }
 
-        public async Task<BaseResponse<RS_SearchProductCategoryModel>> Search(RQ_SearchProductCategoryModel _input)
+        public async Task<BaseResponse<RS_SearchNewModel>> Search(RQ_SearchNewModel _input)
         {
             try
             {
                 if (_input == null)
                 {
-                    return new BaseResponse<RS_SearchProductCategoryModel>()
+                    return new BaseResponse<RS_SearchNewModel>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -126,15 +137,18 @@ namespace PVG.Application.Services.ProductCategoryService
                     };
                 }
 
-                IQueryable<ProductCategory> query = _productCategoryRepository.FindByCondition(x => x.IsDeleted == false
-                    && (string.IsNullOrEmpty(_input.Name) || x.Name.Contains(_input.Name))
+                IQueryable<New> query = _newRepository.FindByCondition(x => x.IsDeleted == false
+                    && (string.IsNullOrEmpty(_input.Title) || x.Title.Contains(_input.Title))
+                    && (string.IsNullOrEmpty(_input.Content) || x.Content.Contains(_input.Content))
+                    && x.Status == _input.Status
+                    && (_input.PostedDate == null || x.PostedDate == _input.PostedDate)
                 ).AsQueryable();
 
-                var pagination = await _productCategoryRepository.OffsetPagination<ProductCategory>(query, _input.Page, _input.PageSize);
+                var pagination = await _newRepository.OffsetPagination<New>(query, _input.Page, _input.PageSize);
 
-                var data = _mapper.Map<List<ProductCategoryModel>>(pagination.Items);
+                var data = _mapper.Map<List<NewModel>>(pagination.Items);
 
-                return new BaseResponse<RS_SearchProductCategoryModel>()
+                return new BaseResponse<RS_SearchNewModel>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -154,7 +168,7 @@ namespace PVG.Application.Services.ProductCategoryService
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_SearchProductCategoryModel>()
+                return new BaseResponse<RS_SearchNewModel>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status200OK,
@@ -163,13 +177,13 @@ namespace PVG.Application.Services.ProductCategoryService
             }
         }
 
-        public async Task<BaseResponse<RS_GetProductCategoryModel>> Get(RQ_GetProductCategoryModel _input)
+        public async Task<BaseResponse<RS_GetNewModel>> Get(RQ_GetNewModel _input)
         {
             try
             {
                 if (_input == null)
                 {
-                    return new BaseResponse<RS_GetProductCategoryModel>()
+                    return new BaseResponse<RS_GetNewModel>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -177,11 +191,11 @@ namespace PVG.Application.Services.ProductCategoryService
                     };
                 }
 
-                var productEntity = await _productCategoryRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
+                var productEntity = await _newRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
 
-                var data = _mapper.Map<ProductCategoryModel>(productEntity);
+                var data = _mapper.Map<NewModel>(productEntity);
 
-                return new BaseResponse<RS_GetProductCategoryModel>()
+                return new BaseResponse<RS_GetNewModel>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -194,7 +208,7 @@ namespace PVG.Application.Services.ProductCategoryService
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_GetProductCategoryModel>()
+                return new BaseResponse<RS_GetNewModel>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status200OK,
@@ -203,7 +217,7 @@ namespace PVG.Application.Services.ProductCategoryService
             }
         }
 
-        public async Task<BaseResponse> Delete(RQ_DeleteProductCategoryModel _input)
+        public async Task<BaseResponse> Delete(RQ_DeleteNewModel _input)
         {
             try
             {
@@ -218,7 +232,7 @@ namespace PVG.Application.Services.ProductCategoryService
                     };
                 }
 
-                var tableEntity = await _productCategoryRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
+                var tableEntity = await _newRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
 
                 if (tableEntity == null)
                 {
@@ -230,24 +244,26 @@ namespace PVG.Application.Services.ProductCategoryService
                     };
                 }
 
-                var productEntity = await _productRepository.FindByCondition(x => x.IsDeleted == false && x.ProductCategoryId == tableEntity.Id).FirstOrDefaultAsync();
+                var AD = tableEntity?.Status == NewStatus.Created ? UserAdminType.MarketingAdmin : UserAdminType.SystemAdmin;
 
-                if (productEntity != null)
+                var isAdmin = await _userService.CheckAdmin(_input.UserDelete, AD);
+
+                if (isAdmin == null || !isAdmin.IsSuccess)
                 {
                     return new BaseResponse()
                     {
                         IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Có sản phẩm trực thuộc còn tồn tại"
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = string.Format("Phải là {0} mới đủ quyền xóa", nameof(AD)),
                     };
                 }
 
                 tableEntity.IsDeleted = true;
                 tableEntity.DeletedDate = DateTime.Now;
-                tableEntity.DeletedBy = _input.DeleteUserId;
+                tableEntity.DeletedBy = isAdmin.Result.Id;
 
-                await _productCategoryRepository.UpdateAsync(tableEntity);
-                await _productCategoryRepository.SaveChangesAsync();
+                await _newRepository.UpdateAsync(tableEntity);
+                await _newRepository.SaveChangesAsync();
 
                 return new BaseResponse()
                 {

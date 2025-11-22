@@ -11,7 +11,7 @@ namespace PVG.Application.Services.ProductInfoService
     public interface IProductInfoService
     {
         public Task<BaseResponse> Save(RQ_SaveProductInfoModel _input);
-        public Task<BaseResponse<RS_GetAllProductInfoModel>> GetAll();
+        public Task<BaseResponse<RS_SearchProductInfoModel>> Search(RQ_SearchProductInfoModel _input);
         public Task<BaseResponse<RS_GetProductInfoModel>> Get(RQ_GetProductInfoModel _input);
         public Task<BaseResponse> Delete(RQ_DeleteProductInfoModel _input);
     }
