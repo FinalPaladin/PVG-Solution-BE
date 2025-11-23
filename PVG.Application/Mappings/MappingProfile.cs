@@ -12,17 +12,17 @@ namespace PVG.Application.Mappings
             // Example: CreateMap<SourceModel, DestinationModel>();
             // You can also use ReverseMap() for bi-directional mapping
 
-            CreateMap<ConfigurationModel, Configuration>();
-            CreateMap<Configuration, ConfigurationModel>();
-            CreateMap<RequestCustomerModel, RequestCustomer>();
-            CreateMap<RequestCustomer, RequestCustomerModel>();
-            CreateMap<User, UserModel>();
-            CreateMap<Permission, PermissionModel>();
-            CreateMap<UserPermission, UserPermissionModel>();
-            CreateMap<Product, ProductModel>();
-            CreateMap<ProductCategory, ProductCategoryModel>();
-            CreateMap<ProductInfo, ProductInfoModel>();
-            CreateMap<New, NewModel>();
+            CreateMap<ConfigurationModel, Configuration>().ReverseMap();
+            CreateMap<Configuration, ConfigurationModel>().ReverseMap();
+            CreateMap<RequestCustomerModel, RequestCustomer>().ReverseMap();
+            CreateMap<RequestCustomer, RequestCustomerModel>().ReverseMap();
+            CreateMap<User, UserModel>().ReverseMap();
+            CreateMap<Permission, PermissionModel>().ReverseMap();
+            CreateMap<UserPermission, UserPermissionModel>().ReverseMap();
+            CreateMap<Product, ProductModel>().ReverseMap();
+            CreateMap<ProductCategory, ProductCategoryModel>().ReverseMap();
+            CreateMap<ProductInfo, ProductInfoModel>().ReverseMap();
+            CreateMap<New, NewModel>().ReverseMap();
         }
     }
 }
