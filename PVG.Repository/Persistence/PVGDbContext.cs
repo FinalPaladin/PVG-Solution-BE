@@ -26,6 +26,8 @@ namespace PVG.Infrastucture.Persistence
         public DbSet<User> User { get; set; }
         public DbSet<UserPermission> UserPermission { get; set; }
         public DbSet<ViewLog> ViewLog { get; set; }
+        public DbSet<New> New { get; set; }
+        public DbSet<ImageRequest> ImageRequest { get; set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -252,6 +254,51 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("50"))
                     .HasMaxLength(50)
                     .IsRequired();
+            });
+            #endregion
+
+            #region New
+            modelBuilder.Entity<New>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasColumnType(ColumType.TypeVarchar("36"))
+                    .HasMaxLength(36)
+                    .IsRequired();
+
+                entity.Property(e => e.Content)
+                    .HasColumnType("mediumtext")
+                    .UseCollation("utf8mb4_unicode_ci");
+
+                entity.Property(e => e.Status)
+                    .HasConversion<int>()
+                    .HasColumnType("int");
+
+                entity.Property(e => e.Title)
+                    .HasColumnType(ColumType.TypeVarchar("250"))
+                    .HasMaxLength(250)
+                    .HasCharSet("utf8mb4");
+            });
+            #endregion
+
+            #region ImageRequest
+            modelBuilder.Entity<ImageRequest>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasColumnType(ColumType.TypeVarchar("36"))
+                    .HasMaxLength(36)
+                    .IsRequired();
+
+                entity.Property(e => e.RequestCode)
+                    .HasColumnType(ColumType.TypeVarchar("36"))
+                    .HasMaxLength(36)
+                    .IsRequired();
+
+                entity.Property(e => e.Content)
+                    .HasColumnType("mediumtext");
+
+                entity.Property(e => e.Url)
+                    .HasColumnType(ColumType.TypeVarchar("500"))
+                    .HasMaxLength(500);
             });
             #endregion
         }
