@@ -1,45 +1,35 @@
 ﻿using AutoMapper;
-using MailKit.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using MimeKit;
+using Microsoft.Extensions.Logging;
 using PVG.Application.Services.EmailService;
 using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
+using PVG.Domain.Constants;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
-using PVG.Infrastucture.Repositories.UserPermissionRepository;
-using PVG.Infrastucture.Repositories.UserRepository;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Numerics;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static PVG.Domain.Enums.UserEnum;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PVG.Application.Services.RequestCustomerService
 {
-    public class RequestCustomerService: IRequestCustomerService
+    public class RequestCustomerService : BaseService, IRequestCustomerService
     {
+        private readonly ILogger<RequestCustomerService> _logger;
         private readonly IRequestCustomerRepository _requestCustomerRepository;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
 
-        public RequestCustomerService(IRequestCustomerRepository requestCustomerRepository,
+        public RequestCustomerService(
+            ILogger<RequestCustomerService> logger,
+            IRequestCustomerRepository requestCustomerRepository,
             IMapper mapper,
             IEmailService emailService,
             IUserService userService)
         {
+            _logger = logger;
             _requestCustomerRepository = requestCustomerRepository;
             _mapper = mapper;
             _emailService = emailService;
@@ -70,7 +60,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                if(_input.ProductId == null || string.IsNullOrEmpty(_input.Phone))
+                if (_input.ProductId == null || string.IsNullOrEmpty(_input.Phone))
                 {
                     return new BaseResponse()
                     {
@@ -84,7 +74,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 var dataUpdate = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone && x.ProductId == _input.ProductId).ToListAsync();
 
-                if(dataUpdate != null && dataUpdate.Count > 0)
+                if (dataUpdate != null && dataUpdate.Count > 0)
                 {
                     id = dataUpdate.FirstOrDefault().RequestCode;
                 }
@@ -124,7 +114,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     }
                 }
 
-                if(dataCreate.Count > 0)
+                if (dataCreate.Count > 0)
                 {
                     string emailTitle = string.Format("Yêu cầu khách hàng số điện thoại: {0} - {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
 
@@ -210,7 +200,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                var requestCutomersEntity = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone 
+                var requestCutomersEntity = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone
                 && x.RequestCode == _input.RequestCode
                 && x.ProductId == _input.ProductId).ToListAsync();
 
@@ -255,13 +245,13 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        public async Task<BaseResponse<RS_SearchRequestCustomerModel>> Search(RQ_SearchRequestCustomerModel _input)
+        public async Task<BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>> Search(RQ_SearchRequestCustomerModel _input)
         {
             try
             {
                 if (_input == null)
                 {
-                    return new BaseResponse<RS_SearchRequestCustomerModel>()
+                    return new BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -296,27 +286,26 @@ namespace PVG.Application.Services.RequestCustomerService
                     })
                     .ToList();
 
-                return new BaseResponse<RS_SearchRequestCustomerModel>()
+                data.ForEach(c => c.CreatedDate = requestCutomers.FirstOrDefault(m => m.RequestCode == c.RequestCode)?.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss"));
+
+                return new BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Lấy thông tin thành công",
                     Result = new()
                     {
-                        Data = new()
-                        {
-                            Items = data,
-                            PageNumber = pagination.PageNumber,
-                            PerPage = pagination.PerPage,
-                            TotalItems = pagination.TotalItems,
-                            TotalPages = pagination.TotalPages,
-                        }
+                        Items = data,
+                        PageNumber = pagination.PageNumber,
+                        PerPage = pagination.PerPage,
+                        TotalItems = pagination.TotalItems,
+                        TotalPages = pagination.TotalPages,
                     },
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_SearchRequestCustomerModel>()
+                return new BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -330,7 +319,7 @@ namespace PVG.Application.Services.RequestCustomerService
         {
             try
             {
-                var checkExist = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false 
+                var checkExist = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
                     && x.Id == _input.Id).FirstOrDefaultAsync();
 
                 if (checkExist == null)
@@ -384,7 +373,7 @@ namespace PVG.Application.Services.RequestCustomerService
             try
             {
                 var checkExist = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
-                    && x.RequestCode == _input.RequestCode 
+                    && x.RequestCode == _input.RequestCode
                     && x.Phone == _input.Phone
                     && x.ProductId == _input.ProductId).ToListAsync();
 
@@ -435,6 +424,26 @@ namespace PVG.Application.Services.RequestCustomerService
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = ex.Message,
                 };
+            }
+        }
+
+        public async Task<BaseResponse> GetRequestDetail(Guid _requestCode)
+        {
+            try
+            {
+                var request = await _requestCustomerRepository.FindByCondition(c => c.RequestCode == _requestCode).ToListAsync();
+                if (request?.Count > 0)
+                {
+                    var data = _mapper.Map<List<RequestCustomerModel>>(request);
+                    return SuccessResponse(data);
+                }    
+                else
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, $"request_ERR_NOT_FOUND ({ErrorCodeConst.ERROR_REQUEST_NOT_FOUND})");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("GetRequestDetail: {0}", ex.Message);
+                return CatchErrorResponse(ex);
             }
         }
     }

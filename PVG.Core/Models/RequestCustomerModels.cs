@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PVG.Domain.Models
+﻿namespace PVG.Domain.Models
 {
     public class RQ_SaveRequestCustomerModel
     {
@@ -23,14 +17,9 @@ namespace PVG.Domain.Models
     {
         public Guid? RequestCode { get; set; }
         public Guid? ProductId { get; set; }
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
-    }
-
-    public class RS_SearchRequestCustomerModel
-    {
-        public PaginationModel<List<GetRequestCustomerModel>> Data { get; set; } = new();
     }
 
     public class RS_GetRequestCustomerModel
@@ -44,6 +33,7 @@ namespace PVG.Domain.Models
         public string Phone { get; set; }
         public Guid? ProductId { get; set; }
         public List<ObjRequestCustomerModel> ListRequestCustomer { get; set; } = new();
+        public string? CreatedDate { get; set; }
     }
 
     public class ObjRequestCustomerModel
@@ -51,7 +41,6 @@ namespace PVG.Domain.Models
         public string Key { get; set; }
         public string Value { get; set; }
     }
-
 
     public class RequestCustomerModel
     {
@@ -61,6 +50,7 @@ namespace PVG.Domain.Models
         public string Key { get; set; }
         public string Value { get; set; }
         public Guid? ProductId { get; set; }
+        public DateTime CreatedDate { get; set; }
     }
 
     public class RQ_DeleteRequestCustomerModel
