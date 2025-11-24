@@ -9,7 +9,6 @@ using PVG.Domain.Constants;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
-using System.Collections.Generic;
 using static PVG.Domain.Enums.UserEnum;
 
 namespace PVG.Application.Services.RequestCustomerService
@@ -431,12 +430,14 @@ namespace PVG.Application.Services.RequestCustomerService
         {
             try
             {
-                var request = await _requestCustomerRepository.FindByCondition(c => c.RequestCode == _requestCode).ToListAsync();
+                var listAllowShow = new List<string> { "address", "phone", "fullname", "redBookAddress" };
+
+                var request = await _requestCustomerRepository.FindByCondition(c => c.RequestCode == _requestCode && listAllowShow.Contains(c.Key)).ToListAsync();
                 if (request?.Count > 0)
                 {
                     var data = _mapper.Map<List<RequestCustomerModel>>(request);
                     return SuccessResponse(data);
-                }    
+                }
                 else
                     return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, $"request_ERR_NOT_FOUND ({ErrorCodeConst.ERROR_REQUEST_NOT_FOUND})");
             }
