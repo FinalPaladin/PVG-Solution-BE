@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PVG.Infrastucture.Entities.BaseEntities;
 
 namespace PVG.Infrastucture.Entities
 {
-    public class Permission : Sample
+    public class Permission : EntityBase<int>
     {
-        public string Name { get; set; }
+        public string Code { get; set; }
+        public ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
     }
 }

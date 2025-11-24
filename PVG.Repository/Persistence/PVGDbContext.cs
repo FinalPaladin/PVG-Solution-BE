@@ -28,6 +28,7 @@ namespace PVG.Infrastucture.Persistence
         public DbSet<ViewLog> ViewLog { get; set; }
         public DbSet<New> New { get; set; }
         public DbSet<ImageRequest> ImageRequest { get; set; }
+        public DbSet<AuthToken> AuthTokens { get; set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -190,7 +191,7 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(36)
                     .IsRequired();
 
-                entity.Property(e => e.Name)
+                entity.Property(e => e.Code)
                     .HasColumnType(ColumType.TypeVarchar("100"))
                     .HasMaxLength(100);
             });
@@ -299,6 +300,36 @@ namespace PVG.Infrastucture.Persistence
                 entity.Property(e => e.Url)
                     .HasColumnType(ColumType.TypeVarchar("500"))
                     .HasMaxLength(500);
+            });
+            #endregion
+
+            #region AuthTokens
+            modelBuilder.Entity<AuthToken>(entity =>
+            {
+                entity.ToTable("AuthTokens");
+
+                entity.Property(e => e.Id)
+                    .HasColumnType(ColumType.TypeVarchar("36"))
+                    .HasMaxLength(36)
+                    .IsRequired();
+
+                entity.HasKey(t => t.Id);
+
+                entity.Property(t => t.Token)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.HasIndex(t => t.Token).IsUnique();
+
+                entity.HasOne(t => t.User)
+                    .WithMany(u => u.to)    // nhớ thêm ICollection<Token> Tokens trong User
+                    .HasForeignKey(t => t.UserId)
+                    .OnDelete(DeleteBehavior.Cascade); // xoá user thì xoá token
+
+                entity.Property(e => e.Password)
+                    .HasColumnType(ColumType.TypeVarchar("20"))
+                    .HasMaxLength(20)
+                    .IsRequired();
             });
             #endregion
         }

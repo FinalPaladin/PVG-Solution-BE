@@ -5,24 +5,19 @@ using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static PVG.Domain.Enums.UserEnum;
 
 namespace PVG.Application.Services.PermissionService
 {
-    public class PermissionService: IPermissionService
+    public class PermissionService : IPermissionService
     {
         private readonly IPermissionRepository _permissionRepository;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
+
         public PermissionService(IPermissionRepository permissionRepository,
             IMapper mapper,
             IUserService userService,
@@ -207,7 +202,6 @@ namespace PVG.Application.Services.PermissionService
         {
             try
             {
-
                 if (_input == null)
                 {
                     return new BaseResponse()
