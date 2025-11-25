@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Persistence;
+using PVG.Infrastucture.Repositories.AuthTokenRepository;
 using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.ImageRequestRepository;
 using PVG.Infrastucture.Repositories.NewRepository;
@@ -45,6 +46,8 @@ namespace PVG.Infrastucture
             services.AddScoped<IRequestCustomerDetailRepository, RequestCustomerDetailRepository>();
             services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
             services.AddScoped<IProductDetailCategoryRepository, ProductDetailCategoryRepository>();
+            services.AddScoped<INewRepository, NewRepository>();
+            services.AddScoped<IAuthTokenRepository, AuthTokenRepository>();
 
             return services;
         }

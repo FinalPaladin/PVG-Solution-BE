@@ -1,94 +1,142 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PVG.Application.Services.TokenService;
 using PVG.Core.BaseModels;
+using PVG.Domain.Constants;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
+using PVG.Infrastucture.Repositories.AuthTokenRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.UserPermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
-using PVG.Infrastucture.Repositories.ViewLogRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static PVG.Domain.Enums.UserEnum;
 
 namespace PVG.Application.Services.UserService
 {
-    public class UserService : IUserService
+    public class UserService : BaseService, IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IPermissionRepository _permissionRepository;
         private readonly IUserPermissionRepository _userPermissionRepository;
+        private readonly IAuthTokenRepository _authTokenRepository;
+        private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly ITokenService _tokenService;
 
         public UserService(IUserRepository userRepository,
             IMapper mapper,
             IPermissionRepository permissionRepository,
-            IUserPermissionRepository userPermissionRepository)
+            IUserPermissionRepository userPermissionRepository,
+            IAuthTokenRepository authTokenRepository,
+            IPasswordHasher<User> passwordHasher,
+            ITokenService tokenService
+            )
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _permissionRepository = permissionRepository;
             _userPermissionRepository = userPermissionRepository;
+            _passwordHasher = passwordHasher;
+            _tokenService = tokenService;
         }
 
         public async Task<BaseResponse> Login(RQ_UserLoginModel _input)
         {
             try
             {
-                if(_input == null)
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Dữ liệu đầu vào không hợp lệ"
-                    };
+                if (_input == null || string.IsNullOrEmpty(_input.UserName) || string.IsNullOrEmpty(_input.Password))
+                    return BadRequestResponse(ErrorCodeConst.ERROR_LOGIN_INVALID_INPUT, "Dữ liệu đầu vào không hợp lệ");
 
-                if(string.IsNullOrEmpty(_input.UserName) || string.IsNullOrEmpty(_input.Password))
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Sai tài khoản/mật khẩu"
-                    };
+                var user = await _userRepository.FindByCondition(x => x.UserName == _input.UserName).FirstOrDefaultAsync();
+                if (user == null)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_LOGIN_USER_NOT_FOUND, "Tài khoản không tồn tại");
 
-                var data = await _userRepository.FindByCondition(x => x.UserName == _input.UserName && x.Password == _input.Password).FirstOrDefaultAsync();
+                if (!user.Actived)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_LOGIN_USER_INACTIVE, "Tài khoản đã bị khóa");
 
-                if(data == null)
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Sai tài khoản/mật khẩu"
-                    };
+                var verifyPassword = _passwordHasher.VerifyHashedPassword(user, user.Password, _input.Password);
+                if (verifyPassword == PasswordVerificationResult.Failed)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_LOGIN_PASSWORD_WRONG, "Mật khẩu không đúng");
 
-                if(!data.Actived)
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Tài khoản bị khóa"
-                    };
+                var newToken = await _tokenService.CreateTokenAsync(user);
 
-                return new BaseResponse()
+                return SuccessResponse(new
                 {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = "Đang nhập thành công"
-                };
+                    Token = newToken,
+                    FullName = user.UserName,
+                    ExpireAt = DateTime.UtcNow.AddDays(30),
+                });
             }
             catch (Exception ex)
             {
-                return new BaseResponse()
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = ex.Message
-                };
+                return CatchErrorResponse(ex);
             }
+        }
+
+        public async Task<BaseResponse> Logout(string userName)
+        {
+            try
+            {
+                var user = await _userRepository.FindByCondition(x => x.UserName == userName).FirstOrDefaultAsync();
+                if (user == null)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_LOGIN_USER_NOT_FOUND, "Tài khoản không tồn tại");
+
+                var authTokens = await _authTokenRepository.FindByCondition(x => x.UserId == user.Id).ToListAsync();
+                if (authTokens == null || authTokens.Count == 0)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_SESSION_NOT_FOUND, "Không tìm thấy phiên đăng nhập");
+
+                await _authTokenRepository.DeleteListAsync(authTokens);
+                await _authTokenRepository.SaveChangesAsync();
+                return SuccessResponse(true);
+            }
+            catch (Exception ex)
+            {
+                return CatchErrorResponse(ex);
+            }
+        }
+
+        public async Task<BaseResponse> CreateUserAsync(string userName, string password, string fullName)
+        {
+            // Check trùng userName
+            var exists = await _userRepository.FindByCondition(u => u.UserName == userName).FirstOrDefaultAsync();
+            if (exists == null)
+                return BadRequestResponse(ErrorCodeConst.ERROR_REGISTER_ACCOUNT_EXISTED, "Tài khoản đã tồn tại");
+
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                UserName = userName,
+                FullName = fullName,
+                Actived = true,
+                CreatedDate = DateTime.UtcNow
+            };
+
+            // Hash password theo chuẩn Identity
+            user.Password = _passwordHasher.HashPassword(user, password);
+
+            await _userRepository.CreateAsync(user);
+            await _userRepository.SaveChangesAsync();
+
+            return SuccessResponse(true);
+        }
+
+        public async Task<BaseResponse> ChangePasswordAsync(string userName, string currentPassword, string newPassword)
+        {
+            var user = await _userRepository.FindByCondition(u => u.UserName == userName).FirstOrDefaultAsync();
+            if (user == null)
+                return BadRequestResponse(ErrorCodeConst.ERROR_LOGIN_USER_NOT_FOUND, "Tài khoản không tồn tại");
+
+            var verifyPassword = _passwordHasher.VerifyHashedPassword(user, user.Password, currentPassword);
+            if (verifyPassword == PasswordVerificationResult.Failed)
+                return BadRequestResponse(ErrorCodeConst.ERROR_LOGIN_PASSWORD_WRONG, "Mật khẩu hiện tại không đúng");
+
+            user.Password = _passwordHasher.HashPassword(user, newPassword);
+
+            await _userRepository.UpdateAsync(user);
+            await _userRepository.SaveChangesAsync();
+            return SuccessResponse(true);
         }
 
         public async Task<BaseResponse<RS_SearchUserModel>> Search(RQ_SearchUserModel _input)
@@ -105,7 +153,7 @@ namespace PVG.Application.Services.UserService
                     };
                 }
 
-                IQueryable<User> query = _userRepository.FindByCondition(x => x.IsDeleted == false
+                IQueryable<User> query = _userRepository.FindByCondition(x => x.Actived
                     && (string.IsNullOrEmpty(_input.FullName) || x.FullName.Contains(_input.FullName))
                     && (string.IsNullOrEmpty(_input.UserName) || x.UserName.Contains(_input.UserName))
                     && x.Actived == _input.Actived
@@ -113,7 +161,7 @@ namespace PVG.Application.Services.UserService
 
                 var pagination = await _userRepository.OffsetPagination<User>(query, _input.Page, _input.PageSize);
 
-                if(pagination.Items == null)
+                if (pagination.Items == null)
                     return new BaseResponse<RS_SearchUserModel>()
                     {
                         IsSuccess = false,
@@ -254,14 +302,14 @@ namespace PVG.Application.Services.UserService
                 };
             }
         }
-    
+
         public async Task<BaseResponse<UserModel>> CheckAdmin(string _userName, UserAdminType _adminType)
         {
             try
             {
                 string systemAD = nameof(_adminType);
 
-                var userEntity = _userRepository.FindByCondition(x => x.IsDeleted == false && x.UserName == _userName).FirstOrDefaultAsync();
+                var userEntity = _userRepository.FindByCondition(x => x.Actived && x.UserName == _userName).FirstOrDefaultAsync();
 
                 if (userEntity == null)
                 {
@@ -276,18 +324,18 @@ namespace PVG.Application.Services.UserService
 
                 var user = _mapper.Map<UserModel>(userEntity);
 
-                var permissionEntity = _permissionRepository.FindByCondition(x => x.Name == systemAD && x.IsDeleted == false).FirstOrDefaultAsync();
+                //var permissionEntity = _permissionRepository.FindByCondition(x => x.Name == systemAD && x.IsDeleted == false).FirstOrDefaultAsync();
 
-                if (permissionEntity == null)
-                {
-                    return new BaseResponse<UserModel>()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Not admin",
-                        Result = user
-                    };
-                }
+                //if (permissionEntity == null)
+                //{
+                //    return new BaseResponse<UserModel>()
+                //    {
+                //        IsSuccess = false,
+                //        StatusCode = StatusCodes.Status404NotFound,
+                //        Message = "Not admin",
+                //        Result = user
+                //    };
+                //}
 
                 return new BaseResponse<UserModel>()
                 {

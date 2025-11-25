@@ -15,7 +15,7 @@ namespace PVG.Domain.Models
     public class RQ_SavePermissionModel
     {
         public Guid? CreateUserId { get; set; }
-        public Guid? Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
     }
 
