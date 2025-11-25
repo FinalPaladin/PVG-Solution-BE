@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Persistence;
+using PVG.Infrastucture.Repositories.AuthTokenRepository;
 using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.NewRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
@@ -38,6 +39,7 @@ namespace PVG.Infrastucture
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IViewLogRepository, ViewLogRepository>();
             services.AddScoped<INewRepository, NewRepository>();
+            services.AddScoped<IAuthTokenRepository, AuthTokenRepository>();
 
             return services;
         }

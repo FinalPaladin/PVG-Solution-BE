@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PVG.Application.Services.ConfigurationService;
-using PVG.Application.Services.EmailService;
-using PVG.Application.Services.RequestCustomerService;
 using PVG.Application.Services.UserService;
-using PVG.Core.BaseModels;
 using PVG.Domain.Models;
-using System.Threading.Tasks;
 
 namespace PVG.Web.Controllers
 {
@@ -13,7 +8,8 @@ namespace PVG.Web.Controllers
     [ApiController]
     public class UserController : PVGControllerBase
     {
-        IUserService _service;
+        private IUserService _service;
+
         public UserController(IUserService service)
         {
             _service = service;
@@ -22,33 +18,45 @@ namespace PVG.Web.Controllers
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login(RQ_UserLoginModel _input)
-        {
-            var result = await _service.Login(_input);
-            return ReturnData(result);
-        }
+            => ReturnData(await _service.Login(_input));
 
         [HttpPost]
-        [Route("search")]
-        public async Task<IActionResult> Search(RQ_SearchUserModel _input)
-        {
-            var result = await _service.Search(_input);
-            return ReturnData(result);
-        }
+        [Route("logout")]
+        public async Task<IActionResult> Logout(string _userName)
+            => ReturnData(await _service.Logout(_userName));
 
         [HttpPost]
-        [Route("get")]
-        public async Task<IActionResult> Get(RQ_GetUserModel _input)
-        {
-            var result = await _service.Get(_input);
-            return ReturnData(result);
-        }
+        [Route("register")]
+        public async Task<IActionResult> Register([FromBody] RQ_RegisterUserModel _input)
+            => ReturnData(await _service.CreateUserAsync(_input.UserName, _input.Password, _input.FullName));
 
         [HttpPost]
-        [Route("delete")]
-        public async Task<IActionResult> Delete(RQ_DeleteUserModel _input)
-        {
-            var result = await _service.Delete(_input);
-            return ReturnData(result);
-        }
+        [Route("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] RQ_ChangePasswordModel _input)
+            => ReturnData(await _service.ChangePasswordAsync(_input.UserName,  _input.CurrentPassword, _input.NewPassword));
+
+        //[HttpPost]
+        //[Route("search")]
+        //public async Task<IActionResult> Search(RQ_SearchUserModel _input)
+        //{
+        //    var result = await _service.Search(_input);
+        //    return ReturnData(result);
+        //}
+
+        //[HttpPost]
+        //[Route("get")]
+        //public async Task<IActionResult> Get(RQ_GetUserModel _input)
+        //{
+        //    var result = await _service.Get(_input);
+        //    return ReturnData(result);
+        //}
+
+        //[HttpPost]
+        //[Route("delete")]
+        //public async Task<IActionResult> Delete(RQ_DeleteUserModel _input)
+        //{
+        //    var result = await _service.Delete(_input);
+        //    return ReturnData(result);
+        //}
     }
 }

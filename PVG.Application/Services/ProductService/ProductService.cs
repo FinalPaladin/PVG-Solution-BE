@@ -56,7 +56,7 @@ namespace PVG.Application.Services.ProductService
 
                 var dataUpdate = await _productRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
 
-                var userEntity = await _userRepository.FindByCondition(x => x.UserName == _input.CreateUser && x.IsDeleted == false).FirstOrDefaultAsync();
+                var userEntity = await _userRepository.FindByCondition(x => x.UserName == _input.CreateUser && x.Actived).FirstOrDefaultAsync();
 
                 if (userEntity == null)
                 {

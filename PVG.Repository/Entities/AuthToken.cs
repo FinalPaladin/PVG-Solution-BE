@@ -1,8 +1,9 @@
-﻿namespace PVG.Infrastucture.Entities
+﻿using PVG.Infrastucture.Entities.BaseEntities;
+
+namespace PVG.Infrastucture.Entities
 {
-    public class AuthToken
+    public class AuthToken : EntityBase<Guid>
     {
-        public Guid Id { get; set; }
         public string Token { get; set; } = default!;
         public Guid UserId { get; set; }
         public User User { get; set; } = default!;

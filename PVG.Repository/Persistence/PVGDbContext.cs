@@ -4,19 +4,20 @@ using PVG.Infrastucture.Commons;
 using PVG.Infrastucture.Entities;
 using System.Data;
 using System.Reflection;
-using Pomelo.EntityFrameworkCore.MySql;
 
 namespace PVG.Infrastucture.Persistence
 {
     public class PVGDbContext : DbContext
     {
         public IDbConnection Connection => Database.GetDbConnection();
+
         public PVGDbContext(DbContextOptions<PVGDbContext> options)
             : base(options)
         {
         }
 
         #region Database Setting
+
         public DbSet<Product> Product { get; set; }
         public DbSet<ProductCategory> ProductCategory { get; set; }
         public DbSet<ProductInfo> ProductInfo { get; set; }
@@ -29,7 +30,8 @@ namespace PVG.Infrastucture.Persistence
         public DbSet<New> New { get; set; }
         public DbSet<ImageRequest> ImageRequest { get; set; }
         public DbSet<AuthToken> AuthTokens { get; set; }
-        #endregion
+
+        #endregion Database Setting
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -56,6 +58,7 @@ namespace PVG.Infrastucture.Persistence
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             #region Product
+
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -83,11 +86,12 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("150"))
                     .HasMaxLength(150)
                     .IsRequired();
-
             });
-            #endregion
+
+            #endregion Product
 
             #region ProductCategory
+
             modelBuilder.Entity<ProductCategory>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -100,11 +104,12 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(100)
                     .HasCharSet("utf8mb4")
                     .IsRequired();
-
             });
-            #endregion
+
+            #endregion ProductCategory
 
             #region ProductInfo
+
             modelBuilder.Entity<ProductInfo>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -131,11 +136,12 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("2000"))
                     .HasMaxLength(2000)
                     .HasCharSet("utf8mb4");
-
             });
-            #endregion
+
+            #endregion ProductInfo
 
             #region RequestCustomer
+
             modelBuilder.Entity<RequestCustomer>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -162,9 +168,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(100)
                     .HasCharSet("utf8mb4");
             });
-            #endregion
+
+            #endregion RequestCustomer
 
             #region Configuration
+
             modelBuilder.Entity<Configuration>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -181,9 +189,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(2000)
                     .HasCharSet("utf8mb4");
             });
-            #endregion
+
+            #endregion Configuration
 
             #region Permission
+
             modelBuilder.Entity<Permission>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -195,9 +205,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("100"))
                     .HasMaxLength(100);
             });
-            #endregion
+
+            #endregion Permission
 
             #region User
+
             modelBuilder.Entity<User>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -220,30 +232,38 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("20"))
                     .HasMaxLength(20)
                     .IsRequired();
+
+                entity.Property(x => x.Actived)
+                    .IsRequired()
+                    .HasDefaultValue(true);
+
+                entity.Property(x => x.CreatedByName).HasMaxLength(80);
+                entity.Property(x => x.ModifiedByName).HasMaxLength(80);
             });
-            #endregion
+
+            #endregion User
 
             #region UserPermission
+
             modelBuilder.Entity<UserPermission>(entity =>
             {
-                entity.Property(e => e.Id)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
+                entity.HasKey(x => new { x.UserId, x.PermissionId });
 
-                entity.Property(e => e.UserId)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
+                entity.HasOne(x => x.User)
+                    .WithMany(u => u.UserPermissions)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
-                entity.Property(e => e.PermissionId)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
+                entity.HasOne(x => x.Permission)
+                    .WithMany(p => p.UserPermissions)
+                    .HasForeignKey(x => x.PermissionId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
-            #endregion
+
+            #endregion UserPermission
 
             #region ViewLog
+
             modelBuilder.Entity<ViewLog>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -256,9 +276,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(50)
                     .IsRequired();
             });
-            #endregion
+
+            #endregion ViewLog
 
             #region New
+
             modelBuilder.Entity<New>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -279,9 +301,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(250)
                     .HasCharSet("utf8mb4");
             });
-            #endregion
+
+            #endregion New
 
             #region ImageRequest
+
             modelBuilder.Entity<ImageRequest>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -301,9 +325,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("500"))
                     .HasMaxLength(500);
             });
-            #endregion
+
+            #endregion ImageRequest
 
             #region AuthTokens
+
             modelBuilder.Entity<AuthToken>(entity =>
             {
                 entity.ToTable("AuthTokens");
@@ -321,18 +347,16 @@ namespace PVG.Infrastucture.Persistence
 
                 entity.HasIndex(t => t.Token).IsUnique();
 
-                entity.HasOne(t => t.User)
-                    .WithMany(u => u.to)    // nhớ thêm ICollection<Token> Tokens trong User
-                    .HasForeignKey(t => t.UserId)
-                    .OnDelete(DeleteBehavior.Cascade); // xoá user thì xoá token
-
-                entity.Property(e => e.Password)
-                    .HasColumnType(ColumType.TypeVarchar("20"))
-                    .HasMaxLength(20)
+                entity.Property(t => t.ExpiresAt)
                     .IsRequired();
+
+                entity.Property(t => t.IsRevoked)
+                    .HasDefaultValue(false);
             });
-            #endregion
+
+            #endregion AuthTokens
         }
+
         // Define DbSet properties for your entities
         // public DbSet<YourEntity> YourEntities { get; set; }
     }

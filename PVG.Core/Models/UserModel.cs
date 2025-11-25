@@ -1,20 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PVG.Domain.Models
+﻿namespace PVG.Domain.Models
 {
-    public class RQ_UserLoginModel
+    public class RQ_UserModel
     {
         public string UserName { get; set; }
+    }
+
+    public class RQ_UserLoginModel : RQ_UserModel
+    {
         public string Password { get; set; }
     }
 
-    public class RS_UserLoginModel
+    public class RQ_RegisterUserModel : RQ_UserModel
     {
-        public UserModel Data { get; set; } = new();
+        public string Password { get; set; }
+        public string FullName { get; set; }
+    }
+
+    public class RQ_ChangePasswordModel : RQ_UserModel
+    {
+        public string CurrentPassword { get; set; }
+        public string NewPassword { get; set; }
     }
 
     public class RQ_SearchUserModel

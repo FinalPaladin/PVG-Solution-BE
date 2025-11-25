@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using PVG.Application.Mappings;
 using PVG.Application.Services.ConfigurationService;
@@ -11,9 +12,11 @@ using PVG.Application.Services.ProductInfoService;
 using PVG.Application.Services.ProductService;
 using PVG.Application.Services.RequestCustomerService;
 using PVG.Application.Services.SampleService;
+using PVG.Application.Services.TokenService;
 using PVG.Application.Services.UserPermissionService;
 using PVG.Application.Services.UserService;
 using PVG.Application.Services.ViewLogService;
+using PVG.Infrastucture.Entities;
 
 namespace PVG.Application
 {
@@ -31,6 +34,8 @@ namespace PVG.Application
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
+            services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
             services.AddScoped<ISampleService, SampleService>();
             services.AddScoped<IRequestCustomerService, RequestCustomerService>();
             services.AddScoped<IEmailService, EmailService>();
@@ -44,6 +49,7 @@ namespace PVG.Application
             services.AddScoped<IViewLogService, ViewLogService>();
             services.AddScoped<INewService, NewService>();
             services.AddScoped<IInitPageService, InitPageService>();
+            services.AddScoped<ITokenService, TokenService>();
 
             return services;
         }

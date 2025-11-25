@@ -1,11 +1,13 @@
-﻿namespace PVG.Infrastucture.Entities
+﻿using PVG.Infrastucture.Entities.BaseEntities;
+
+namespace PVG.Infrastucture.Entities
 {
-    public class UserPermission
+    public class UserPermission : EntityBase<Guid>
     {
         public Guid? UserId { get; set; }
-        public User User { get; set; } = default;
+        public User User { get; set; } = null;
 
         public int PermissionId { get; set; }
-        public Permission Permission { get; set; } = default;
+        public Permission Permission { get; set; } = null;
     }
 }
