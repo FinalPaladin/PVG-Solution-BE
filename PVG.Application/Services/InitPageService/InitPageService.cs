@@ -81,10 +81,33 @@ namespace PVG.Application.Services.InitPageService
                 return new BaseResponse<ProductInitPageModel>()
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
+                    StatusCode = StatusCodes.Status404NotFound,
                     Message = ex.Message,
                 };
             }
         }
+
+        public async Task<BaseResponse> System()
+        {
+            try
+            {
+                
+                return new BaseResponse()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
+
     }
 }

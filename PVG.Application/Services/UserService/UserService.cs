@@ -302,7 +302,7 @@ namespace PVG.Application.Services.UserService
                 return new BaseResponse<UserModel>()
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
+                    StatusCode = StatusCodes.Status404NotFound,
                     Message = ex.Message,
                 };
             }

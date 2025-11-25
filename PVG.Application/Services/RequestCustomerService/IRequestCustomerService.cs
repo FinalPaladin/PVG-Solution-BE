@@ -11,7 +11,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
         public Task<BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>> Search(RQ_SearchRequestCustomerModel _input);
 
-        public Task<BaseResponse> DeleteKey(RQ_DeleteRequestCustomerModel _input);
+        public Task<BaseResponse> DeleteDetail(RQ_DeleteRequestCustomerModel _input);
 
         public Task<BaseResponse> Delete(RQ_DeleteRequestCustomerModel _input);
 

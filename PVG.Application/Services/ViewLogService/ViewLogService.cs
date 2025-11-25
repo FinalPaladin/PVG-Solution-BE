@@ -26,21 +26,22 @@ namespace PVG.Application.Services.ViewLogService
         {
             try
             {
-                string IP = "";
-                DateTime FromDate = DateTime.Now,
-                    ToDate = DateTime.Now;
-
-                if(_input != null)
+                if (_input == null)
                 {
-                    IP = _input.IP;
-                    FromDate = _input.FromDate;
-                    ToDate = _input.ToDate;
+                    return new BaseResponse<RS_ViewLogModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
                 }
 
                 var data = _viewLogRepository.FindByCondition(x =>
-                    string.IsNullOrEmpty(IP) || x.IP.Contains(IP)
-                    && x.CreatedDate >= FromDate
-                    && x.CreatedDate <= ToDate
+                    (string.IsNullOrEmpty(_input.IP) || x.IP == _input.IP)
+                    && x.Screen == _input.Screen
+                    && (x.DetailId == null || x.DetailId == _input.DetailId)
+                    && x.CreatedDate >= _input.FromDate
+                    && x.CreatedDate <= _input.ToDate
                 ).ToList().Count();
 
                 return new BaseResponse<RS_ViewLogModel>()
@@ -67,7 +68,15 @@ namespace PVG.Application.Services.ViewLogService
         {
             try
             {
-                var id = Guid.NewGuid();
+                if (_input == null)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
 
                 var createNew = new ViewLog()
                 {
@@ -83,6 +92,9 @@ namespace PVG.Application.Services.ViewLogService
                     ModifiedDate = DateTime.Now,
 
                     IP = _input?.IP == null ? "" : _input.IP,
+                    DetailId = _input.DetailId,
+                    NumberOfTimes = 1,
+                    Screen = _input.Screen
                 };
 
                 await _viewLogRepository.CreateAsync(createNew);

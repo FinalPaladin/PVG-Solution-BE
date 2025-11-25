@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PVG.Application.Services.EmailService;
@@ -8,6 +9,7 @@ using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
+using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
 using System.Collections.Generic;
 using static PVG.Domain.Enums.UserEnum;
@@ -18,6 +20,7 @@ namespace PVG.Application.Services.RequestCustomerService
     {
         private readonly ILogger<RequestCustomerService> _logger;
         private readonly IRequestCustomerRepository _requestCustomerRepository;
+        private readonly IRequestCustomerDetailRepository _requestCustomerDetailRepository;
         private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
@@ -25,12 +28,14 @@ namespace PVG.Application.Services.RequestCustomerService
         public RequestCustomerService(
             ILogger<RequestCustomerService> logger,
             IRequestCustomerRepository requestCustomerRepository,
+            IRequestCustomerDetailRepository requestCustomerDetailRepository,
             IMapper mapper,
             IEmailService emailService,
             IUserService userService)
         {
             _logger = logger;
             _requestCustomerRepository = requestCustomerRepository;
+            _requestCustomerDetailRepository = requestCustomerDetailRepository;
             _mapper = mapper;
             _emailService = emailService;
             _userService = userService;
@@ -70,58 +75,95 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                Guid? id = Guid.NewGuid();
-
-                var dataUpdate = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone && x.ProductId == _input.ProductId).ToListAsync();
-
-                if (dataUpdate != null && dataUpdate.Count > 0)
+                Guid? requestCode = Guid.NewGuid();
+                if (_input.RequestCode != null)
                 {
-                    id = dataUpdate.FirstOrDefault().RequestCode;
+                    var dataUpdate = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
+                    && x.ProductId == _input.ProductId
+                    && x.RequestCode == _input.RequestCode).FirstOrDefaultAsync();
+
+                    if (dataUpdate != null)
+                    {
+                        requestCode = dataUpdate.RequestCode;
+                    }
+
+                    await _requestCustomerRepository.UpdateAsync(dataUpdate);
+
+                }
+                else
+                {
+                    var dataCreate = new RequestCustomer()
+                    {
+                        CreatedBy = null,
+                        CreatedByName = "",
+                        CreatedDate = DateTime.Now,
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
+
+                        ProductId = _input.ProductId,
+                        RequestCode = requestCode,
+                        Phone = _input.Phone,
+                    };
+
+                    await _requestCustomerRepository.CreateAsync(dataCreate);
                 }
 
-                var dataCreate = new List<RequestCustomer>();
+                List<RequestCustomerDetail> dataDetail = new List<RequestCustomerDetail>(),
+                    detailUpdate = new List<RequestCustomerDetail>(),
+                    detailCreate = new List<RequestCustomerDetail>();
 
-                foreach (var rc in _input.Data)
+                dataDetail = await _requestCustomerDetailRepository.FindByCondition(x => x.IsDeleted == false
+                && x.RequestCode == _input.RequestCode).ToListAsync();
+
+                if(dataDetail == null)
                 {
-                    var iExist = dataUpdate.FindIndex(y => y.Key == rc.Key);
-                    if (iExist >= 0)
+                    dataDetail = new();
+                }
+
+                foreach (var ddu in _input.Data)
+                {
+                    var data = dataDetail.Find(x => x.Key == ddu.Key);
+                    if (data != null)
                     {
-                        dataUpdate[iExist].Value = rc.Value;
+                        data.Value = ddu.Value;
+                        detailUpdate.Add(data);
                     }
                     else
                     {
-                        dataCreate.Add(
-                            new RequestCustomer()
-                            {
-                                CreatedBy = null,
-                                CreatedByName = "",
-                                CreatedDate = DateTime.Now,
-                                DeletedBy = null,
-                                DeletedByName = "",
-                                DeletedDate = DateTime.Now,
-                                IsDeleted = false,
-                                ModifiedBy = null,
-                                ModifiedByName = "",
-                                ModifiedDate = DateTime.Now,
+                        data = new RequestCustomerDetail()
+                        {
+                            CreatedBy = null,
+                            CreatedByName = "",
+                            CreatedDate = DateTime.Now,
+                            DeletedBy = null,
+                            DeletedByName = "",
+                            DeletedDate = DateTime.Now,
+                            IsDeleted = false,
+                            ModifiedBy = null,
+                            ModifiedByName = "",
+                            ModifiedDate = DateTime.Now,
 
-                                RequestCode = id,
-                                Key = rc.Key,
-                                Phone = _input.Phone,
-                                ProductId = _input.ProductId,
-                                Value = rc.Value,
-                            }
-                        );
+                            RequestCode = requestCode,
+                            Key = ddu.Key,
+                            Value = ddu.Value
+                        };
                     }
+                    detailCreate.Add(data);
                 }
 
-                if (dataCreate.Count > 0)
+                if (detailCreate.Count > 0)
                 {
                     string emailTitle = string.Format("Yêu cầu khách hàng số điện thoại: {0} - {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
 
                     //var sendEmail = await _emailService.SendEmailRequest(emailTitle, "");
 
-                    dataCreate.Add(
-                        new RequestCustomer()
+                    detailCreate.Add(
+                        new RequestCustomerDetail()
                         {
                             CreatedBy = null,
                             CreatedByName = "",
@@ -134,15 +176,13 @@ namespace PVG.Application.Services.RequestCustomerService
                             ModifiedByName = "",
                             ModifiedDate = DateTime.Now,
 
-                            RequestCode = id,
+                            RequestCode = requestCode,
                             Key = "IsSentEmail",
-                            Phone = _input.Phone,
-                            ProductId = _input.ProductId,
                             Value = "true",
                         }
                     );
-                    dataCreate.Add(
-                        new RequestCustomer()
+                    detailCreate.Add(
+                        new RequestCustomerDetail()
                         {
                             CreatedBy = null,
                             CreatedByName = "",
@@ -155,17 +195,15 @@ namespace PVG.Application.Services.RequestCustomerService
                             ModifiedByName = "",
                             ModifiedDate = DateTime.Now,
 
-                            RequestCode = id,
+                            RequestCode = requestCode,
                             Key = "EmailTitle",
-                            Phone = _input.Phone,
-                            ProductId = _input.ProductId,
                             Value = emailTitle,
                         }
                     );
                 }
 
-                await _requestCustomerRepository.CreateListAsync(dataCreate);
-                await _requestCustomerRepository.UpdateListAsync(dataUpdate);
+                await _requestCustomerDetailRepository.UpdateListAsync(detailUpdate);
+                await _requestCustomerDetailRepository.CreateListAsync(detailCreate);
                 await _requestCustomerRepository.SaveChangesAsync();
 
                 return new BaseResponse()
@@ -200,27 +238,11 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                var requestCutomersEntity = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone
+                var requestCutomerEntity = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone
                 && x.RequestCode == _input.RequestCode
-                && x.ProductId == _input.ProductId).ToListAsync();
+                && x.ProductId == _input.ProductId).FirstOrDefaultAsync();
 
-                var requestCutomers = _mapper.Map<List<RequestCustomerModel>>(requestCutomersEntity);
-
-                var data = requestCutomers
-                    .GroupBy(x => new { x.RequestCode, x.Phone, x.ProductId })
-                    .Select(g => new GetRequestCustomerModel()
-                    {
-                        RequestCode = g.Key.RequestCode,
-                        Phone = g.Key.Phone,
-                        ProductId = g.Key.ProductId,
-                        ListRequestCustomer = g.Select(item => new ObjRequestCustomerModel
-                        {
-                            Key = item.Key,
-                            Value = item.Value
-                        })
-                        .ToList()
-                    })
-                    .FirstOrDefault();
+                var data = _mapper.Map<RequestCustomerModel>(requestCutomerEntity);
 
                 return new BaseResponse<RS_GetRequestCustomerModel>()
                 {
@@ -245,13 +267,13 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        public async Task<BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>> Search(RQ_SearchRequestCustomerModel _input)
+        public async Task<BaseResponse<PaginationModel<List<RequestCustomerModel>>>> Search(RQ_SearchRequestCustomerModel _input)
         {
             try
             {
                 if (_input == null)
                 {
-                    return new BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>()
+                    return new BaseResponse<PaginationModel<List<RequestCustomerModel>>>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -269,33 +291,19 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 var requestCutomers = _mapper.Map<List<RequestCustomerModel>>(pagination.Items);
 
-                var data = requestCutomers
-                    .GroupBy(x => new { x.RequestCode, x.Phone, x.ProductId })
-                    .Select(g => new GetRequestCustomerModel()
-                    {
-                        RequestCode = g.Key.RequestCode,
-                        Phone = g.Key.Phone,
-                        ProductId = g.Key.ProductId,
-                        ListRequestCustomer = g
-                        .Select(item => new ObjRequestCustomerModel
-                        {
-                            Key = item.Key,
-                            Value = item.Value
-                        })
-                        .ToList()
-                    })
-                    .ToList();
+                if (requestCutomers == null)
+                    requestCutomers = new();
 
-                data.ForEach(c => c.CreatedDate = requestCutomers.FirstOrDefault(m => m.RequestCode == c.RequestCode)?.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss"));
+                //data.ForEach(c => c.CreatedDate = requestCutomers.FirstOrDefault(m => m.RequestCode == c.RequestCode)?.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss"));
 
-                return new BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>()
+                return new BaseResponse<PaginationModel<List<RequestCustomerModel>>>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
                     Message = "Lấy thông tin thành công",
                     Result = new()
                     {
-                        Items = data,
+                        Items = requestCutomers,
                         PageNumber = pagination.PageNumber,
                         PerPage = pagination.PerPage,
                         TotalItems = pagination.TotalItems,
@@ -305,7 +313,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
-                return new BaseResponse<PaginationModel<List<GetRequestCustomerModel>>>()
+                return new BaseResponse<PaginationModel<List<RequestCustomerModel>>>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -315,23 +323,10 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        public async Task<BaseResponse> DeleteKey(RQ_DeleteRequestCustomerModel _input)
+        public async Task<BaseResponse> DeleteDetail(RQ_DeleteRequestCustomerModel _input)
         {
             try
             {
-                var checkExist = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
-                    && x.Id == _input.Id).FirstOrDefaultAsync();
-
-                if (checkExist == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Yêu cầu của khách hàng không tồn tại",
-                    };
-                }
-
                 var isAdmin = await _userService.CheckAdmin(_input.UserDelete, UserAdminType.SystemAdmin);
 
                 if (isAdmin == null || !isAdmin.IsSuccess)
@@ -344,11 +339,38 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                checkExist.IsDeleted = true;
-                checkExist.DeletedBy = isAdmin.Result.Id;
-                checkExist.DeletedDate = DateTime.Now;
-                await _requestCustomerRepository.UpdateAsync(checkExist);
-                await _requestCustomerRepository.SaveChangesAsync();
+                var checkExist = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
+                    && x.RequestCode == _input.RequestCode).FirstOrDefaultAsync();
+
+                if (checkExist == null)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Yêu cầu của khách hàng không tồn tại",
+                    };
+                }
+
+                var checkExistDetail = await _requestCustomerDetailRepository.FindByCondition(x => x.RequestCode == checkExist.RequestCode
+                && !x.IsDeleted
+                && x.Id == _input.Id).FirstOrDefaultAsync();
+
+                if (checkExistDetail == null)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Yêu cầu của khách hàng không tồn tại",
+                    };
+                }
+
+                checkExistDetail.IsDeleted = true;
+                checkExistDetail.DeletedBy = isAdmin.Result.Id;
+                checkExistDetail.DeletedDate = DateTime.Now;
+                await _requestCustomerDetailRepository.UpdateAsync(checkExistDetail);
+                await _requestCustomerDetailRepository.SaveChangesAsync();
 
                 return new BaseResponse()
                 {

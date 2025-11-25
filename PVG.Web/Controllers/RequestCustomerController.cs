@@ -24,6 +24,7 @@ namespace PVG.Web.Controllers
         }
 
         [HttpGet]
+        [Route("get")]
         public async Task<IActionResult> GetData([FromBody] RQ_GetRequestCustomerModel _input)
         {
             var result = await _service.GetData(_input);
@@ -31,6 +32,7 @@ namespace PVG.Web.Controllers
         }
 
         [HttpPost]
+        [Route("save")]
         public async Task<IActionResult> Save([FromBody] RQ_SaveRequestCustomerModel _input)
         {
             return ReturnData(await _service.Save(_input));
@@ -38,9 +40,9 @@ namespace PVG.Web.Controllers
 
         [HttpDelete]
         [Route("key")]
-        public async Task<IActionResult> DeleteKey([FromBody] RQ_DeleteRequestCustomerModel _input)
+        public async Task<IActionResult> DeleteDetail([FromBody] RQ_DeleteRequestCustomerModel _input)
         {
-            return ReturnData(await _service.DeleteKey(_input));
+            return ReturnData(await _service.DeleteDetail(_input));
         }
 
         [HttpDelete]
