@@ -40,6 +40,7 @@ namespace PVG.Application.Services.UserService
             _userPermissionRepository = userPermissionRepository;
             _passwordHasher = passwordHasher;
             _tokenService = tokenService;
+            _authTokenRepository = authTokenRepository;
         }
 
         public async Task<BaseResponse> Login(RQ_UserLoginModel _input)
@@ -59,6 +60,10 @@ namespace PVG.Application.Services.UserService
                 var verifyPassword = _passwordHasher.VerifyHashedPassword(user, user.Password, _input.Password);
                 if (verifyPassword == PasswordVerificationResult.Failed)
                     return BadRequestResponse(ErrorCodeConst.ERROR_LOGIN_PASSWORD_WRONG, "Mật khẩu không đúng");
+
+                var oldToken = await _authTokenRepository.FindByCondition(c => c.UserId == user.Id).ToListAsync();
+                if (oldToken?.Count > 0)
+                    await _authTokenRepository.DeleteListAsync(oldToken);
 
                 var newToken = await _tokenService.CreateTokenAsync(user);
 
@@ -88,7 +93,6 @@ namespace PVG.Application.Services.UserService
                     return BadRequestResponse(ErrorCodeConst.ERROR_SESSION_NOT_FOUND, "Không tìm thấy phiên đăng nhập");
 
                 await _authTokenRepository.DeleteListAsync(authTokens);
-                await _authTokenRepository.SaveChangesAsync();
                 return SuccessResponse(true);
             }
             catch (Exception ex)
@@ -101,7 +105,7 @@ namespace PVG.Application.Services.UserService
         {
             // Check trùng userName
             var exists = await _userRepository.FindByCondition(u => u.UserName == userName).FirstOrDefaultAsync();
-            if (exists == null)
+            if (exists != null)
                 return BadRequestResponse(ErrorCodeConst.ERROR_REGISTER_ACCOUNT_EXISTED, "Tài khoản đã tồn tại");
 
             var user = new User
@@ -110,7 +114,9 @@ namespace PVG.Application.Services.UserService
                 UserName = userName,
                 FullName = fullName,
                 Actived = true,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                CreatedByName = "system",
+                ModifiedByName = "system"
             };
 
             // Hash password theo chuẩn Identity

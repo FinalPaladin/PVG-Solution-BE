@@ -247,8 +247,8 @@ namespace PVG.Infrastucture.Persistence
                     .IsRequired();
 
                 entity.Property(e => e.Password)
-                    .HasColumnType(ColumType.TypeVarchar("20"))
-                    .HasMaxLength(20)
+                    .HasColumnType(ColumType.TypeVarchar("255"))
+                    .HasMaxLength(255)
                     .IsRequired();
 
                 entity.Property(x => x.Actived)
