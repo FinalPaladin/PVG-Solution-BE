@@ -1,15 +1,21 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using PVG.Application.Services.PermissionService;
+using PVG.Application.Services.UserPermissionService;
 using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
+using PVG.Infrastucture.Entities;
+using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
+using PVG.Infrastucture.Repositories.UserPermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -21,14 +27,23 @@ namespace PVG.Application.Services.InitPageService
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
         private readonly IProductCategoryRepository _productCategoryRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IPermissionRepository _permissionRepository;
+        private readonly IUserPermissionRepository _userPermissionRepository;
 
         public InitPageService(IProductRepository productRepository,
             IProductCategoryRepository productCategoryRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IUserRepository userRepository,
+            IPermissionRepository permissionRepository,
+            IUserPermissionRepository userPermissionRepository)
         {
             _mapper = mapper;
             _productRepository = productRepository;
             _productCategoryRepository = productCategoryRepository;
+            _userRepository = userRepository;
+            _permissionRepository = permissionRepository;
+            _userPermissionRepository = userPermissionRepository;
         }
 
         public async Task<BaseResponse<ProductInitPageModel>> Product()
@@ -91,7 +106,85 @@ namespace PVG.Application.Services.InitPageService
         {
             try
             {
-                
+                var initUsers = new List<User>
+                {
+                    new User()
+                    {
+                        Actived = true,
+                        FullName = "System Admin",
+                        UserName = "systemadmin",
+                        Password = "pw123qwe"
+                    },
+                    new User()
+                    {
+                        Actived = true,
+                        FullName = "Marketing Admin",
+                        UserName = "mktadmin",
+                        Password = "p@ssw0rd8888"
+                    },
+                    new User()
+                    {
+                        Actived = true,
+                        FullName = "Sales Admin",
+                        UserName = "salesadmin",
+                        Password = "p@ssw0rd9999"
+                    }
+                };
+                await _userRepository.CreateListAsync(initUsers);
+                await _userRepository.SaveChangesAsync();
+
+                var initPermissions = new List<Permission>
+                {
+                    new Permission()
+                    {
+                        Id = 1,
+                        Code = "Sys_AD",                        
+                    },
+                    new Permission()
+                    {
+                        Id = 2,
+                        Code = "MKT_AD",
+                    },
+                    new Permission()
+                    {
+                        Id = 3,
+                        Code = "Sales_AD",
+                    }
+                };
+                await _permissionRepository.CreateListAsync(initPermissions);
+                await _permissionRepository.SaveChangesAsync();
+
+                var users = await _userRepository.FindAll().ToListAsync();
+
+                if(users == null || users.Count == 0)
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "",
+                    };
+
+                var initUserPermissions = new List<UserPermission>
+                {
+                    new UserPermission()
+                    {
+                        UserId = users.Find(x => x.UserName == "systemadmin")?.Id,
+                        PermissionId = 1,
+                    },
+                    new UserPermission()
+                    {
+                        UserId = users.Find(x => x.UserName == "mktadmin")?.Id,
+                        PermissionId = 2,
+                    },
+                    new UserPermission()
+                    {
+                        UserId = users.Find(x => x.UserName == "salesadmin")?.Id,
+                        PermissionId = 3,
+                    }
+                };
+                await _userPermissionRepository.CreateListAsync(initUserPermissions);
+                await _userPermissionRepository.SaveChangesAsync();
+
                 return new BaseResponse()
                 {
                     IsSuccess = true,
