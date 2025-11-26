@@ -26,9 +26,7 @@ namespace PVG.Application.Services.TokenService
                 ExpiresAt = DateTime.UtcNow.AddDays(30),
                 IsRevoked = false
             };
-
             await _authTokenRepository.CreateAsync(authToken);
-            await _authTokenRepository.SaveChangesAsync();
 
             return token;
         }
