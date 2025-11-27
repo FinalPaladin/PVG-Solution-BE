@@ -4,9 +4,9 @@
     {
         public enum UserAdminType
         {
-            SystemAdmin,
-            SalesAdmin,
-            MarketingAdmin
+            SystemAdmin = 0,
+            SalesAdmin = 1,
+            MarketingAdmin = 2
         }
     }
 }

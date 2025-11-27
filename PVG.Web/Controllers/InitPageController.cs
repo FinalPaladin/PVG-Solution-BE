@@ -19,6 +19,14 @@ namespace PVG.Web.Controllers
         }
 
         [HttpGet]
+        [Route("System")]
+        public async Task<IActionResult> System()
+        {
+            var result = await _service.System();
+            return ReturnData(result);
+        }
+
+        [HttpGet]
         [Route("product")]
         public async Task<IActionResult> Product()
         {

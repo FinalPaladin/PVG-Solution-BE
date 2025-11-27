@@ -11,5 +11,6 @@ namespace PVG.Application.Services.InitPageService
     public interface IInitPageService
     {
         public Task<BaseResponse<ProductInitPageModel>> Product();
+        public Task<BaseResponse> System();
     }
 }

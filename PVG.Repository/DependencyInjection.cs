@@ -5,11 +5,15 @@ using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Persistence;
 using PVG.Infrastucture.Repositories.AuthTokenRepository;
 using PVG.Infrastucture.Repositories.ConfigurationRepository;
+using PVG.Infrastucture.Repositories.ImageRequestRepository;
 using PVG.Infrastucture.Repositories.NewRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
+using PVG.Infrastucture.Repositories.ProductDetailCategoryRepository;
+using PVG.Infrastucture.Repositories.ProductDetailRepository;
 using PVG.Infrastucture.Repositories.ProductInfoRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
+using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
 using PVG.Infrastucture.Repositories.SampleRepository;
 using PVG.Infrastucture.Repositories.UserPermissionRepository;
@@ -38,6 +42,10 @@ namespace PVG.Infrastucture
             services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IViewLogRepository, ViewLogRepository>();
+            services.AddScoped<IImageRequestRepository, ImageRequestRepository>();
+            services.AddScoped<IRequestCustomerDetailRepository, RequestCustomerDetailRepository>();
+            services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
+            services.AddScoped<IProductDetailCategoryRepository, ProductDetailCategoryRepository>();
             services.AddScoped<INewRepository, NewRepository>();
             services.AddScoped<IAuthTokenRepository, AuthTokenRepository>();
 

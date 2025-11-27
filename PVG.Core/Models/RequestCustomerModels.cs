@@ -2,6 +2,7 @@
 {
     public class RQ_SaveRequestCustomerModel
     {
+        public Guid? RequestCode { get; set; }
         public string Phone { get; set; }
         public Guid? ProductId { get; set; }
         public List<SaveRequestCustomerModel> Data { get; set; } = new();
@@ -24,7 +25,7 @@
 
     public class RS_GetRequestCustomerModel
     {
-        public GetRequestCustomerModel Data { get; set; } = new();
+        public RequestCustomerModel Data { get; set; } = new();
     }
 
     public class GetRequestCustomerModel
@@ -32,11 +33,10 @@
         public Guid? RequestCode { get; set; }
         public string Phone { get; set; }
         public Guid? ProductId { get; set; }
-        public List<ObjRequestCustomerModel> ListRequestCustomer { get; set; } = new();
         public string? CreatedDate { get; set; }
     }
 
-    public class ObjRequestCustomerModel
+    public class RequestCustomerDetailModel
     {
         public string Key { get; set; }
         public string Value { get; set; }
@@ -47,10 +47,14 @@
         public Guid? Id { get; set; }
         public Guid? RequestCode { get; set; }
         public string Phone { get; set; }
-        public string Key { get; set; }
-        public string Value { get; set; }
         public Guid? ProductId { get; set; }
         public DateTime CreatedDate { get; set; }
+        public string? strCreatedDate { 
+            get {
+                return this.CreatedDate == null ? "" : this.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss");
+            }
+        }
+        public List<RequestCustomerDetailModel> Details { get; set; } = new();
     }
 
     public class RQ_DeleteRequestCustomerModel

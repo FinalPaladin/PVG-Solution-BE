@@ -31,7 +31,7 @@ namespace PVG.Application.Services.EmailService
                 {
                     fromName = configs.Find(x => x.Key == "EmailFromName")?.Value;
                     fromEmail = configs.Find(x => x.Key == "EmailSend")?.Value;
-                    password = configs.Find(x => x.Key == "EmailPassword")?.Value;
+                    password = configs.Find(x => x.Key == "EmailSendPassword")?.Value;
                     toEmail = configs.Find(x => x.Key == "EmailReceive")?.Value;
                     smtpHost = configs.Find(x => x.Key == "EmailSmtpHost")?.Value;
                     port = int.Parse(configs.Find(x => x.Key == "EmailPort")?.Value);
