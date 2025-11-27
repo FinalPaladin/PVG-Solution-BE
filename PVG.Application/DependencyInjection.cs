@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using PVG.Application.Mappings;
+using PVG.Application.Services.CloudflareR2Service;
 using PVG.Application.Services.ConfigurationService;
 using PVG.Application.Services.EmailService;
 using PVG.Application.Services.InitPageService;
@@ -50,6 +51,7 @@ namespace PVG.Application
             services.AddScoped<INewService, NewService>();
             services.AddScoped<IInitPageService, InitPageService>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ICloudflareR2Service, CloudflareR2Service>();
 
             return services;
         }
