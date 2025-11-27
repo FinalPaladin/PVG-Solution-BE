@@ -18,13 +18,13 @@ namespace PVG.Web.Controllers
             _service = service;
         }
 
-        //[HttpGet]
-        //[Route("System")]
-        //public async Task<IActionResult> System()
-        //{
-        //    var result = await _service.System();
-        //    return ReturnData(result);
-        //}
+        [HttpGet]
+        [Route("System")]
+        public async Task<IActionResult> System()
+        {
+            var result = await _service.System();
+            return ReturnData(result);
+        }
 
         [HttpGet]
         [Route("product")]

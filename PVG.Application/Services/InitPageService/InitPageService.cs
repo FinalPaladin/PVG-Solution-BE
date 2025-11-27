@@ -7,6 +7,7 @@ using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
+using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
@@ -30,13 +31,15 @@ namespace PVG.Application.Services.InitPageService
         private readonly IUserRepository _userRepository;
         private readonly IPermissionRepository _permissionRepository;
         private readonly IUserPermissionRepository _userPermissionRepository;
+        private readonly IConfigurationRepository _configurationRepository;
 
         public InitPageService(IProductRepository productRepository,
             IProductCategoryRepository productCategoryRepository,
             IMapper mapper,
             IUserRepository userRepository,
             IPermissionRepository permissionRepository,
-            IUserPermissionRepository userPermissionRepository)
+            IUserPermissionRepository userPermissionRepository,
+            IConfigurationRepository configurationRepository)
         {
             _mapper = mapper;
             _productRepository = productRepository;
@@ -44,6 +47,7 @@ namespace PVG.Application.Services.InitPageService
             _userRepository = userRepository;
             _permissionRepository = permissionRepository;
             _userPermissionRepository = userPermissionRepository;
+            _configurationRepository = configurationRepository;
         }
 
         public async Task<BaseResponse<ProductInitPageModel>> Product()
@@ -184,6 +188,62 @@ namespace PVG.Application.Services.InitPageService
                 };
                 await _userPermissionRepository.CreateListAsync(initUserPermissions);
                 await _userPermissionRepository.SaveChangesAsync();
+
+                var initConfigs = new List<Configuration>
+                {
+                    new Configuration()
+                    {
+                        Key = "EmailFromName",
+                        Value = "PVG Service",
+                    },
+                    new Configuration()
+                    {
+                        Key = "EmailSend",
+                        Value = "customer.form.request@gmail.com",
+                    },
+                    new Configuration()
+                    {
+                        Key = "EmailSendPassword",
+                        Value = "zqls zmir wxxx yvnw",
+                    },
+                    new Configuration()
+                    {
+                        Key = "EmailReceive",
+                        Value = "customer.service.csone@gmail.com",
+                    },
+                    new Configuration()
+                    {
+                        Key = "EmailSmtpHost",
+                        Value = "smtp.gmail.com",
+                    },
+                    new Configuration()
+                    {
+                        Key = "EmailPort",
+                        Value = "587",
+                    },
+                    new Configuration()
+                    {
+                        Key = "SDTSales",
+                        Value = "",
+                    },
+                    new Configuration()
+                    {
+                        Key = "Logo",
+                        Value = "",
+                    },
+                    new Configuration()
+                    {
+                        Key = "ImgHome",
+                        Value = "",
+                    },
+                    new Configuration()
+                    {
+                        Key = "ImgBackground",
+                        Value = "",
+                    },
+                };
+                await _configurationRepository.CreateListAsync(initConfigs);
+                await _configurationRepository.SaveChangesAsync();
 
                 return new BaseResponse()
                 {

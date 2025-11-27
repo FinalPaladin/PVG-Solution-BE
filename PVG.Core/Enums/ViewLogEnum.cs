@@ -10,11 +10,11 @@ namespace PVG.Domain.Enums
     {
         public enum ScreenView
         {
-            Home,
-            Products,
-            ProductDetail,
-            News,
-            NewDetail
+            Home = 0,
+            Products = 1,
+            ProductDetail = 2,
+            News = 3,
+            NewDetail = 4
         }
     }
 }

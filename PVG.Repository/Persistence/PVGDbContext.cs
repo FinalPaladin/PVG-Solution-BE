@@ -64,6 +64,8 @@ namespace PVG.Infrastucture.Persistence
 
             modelBuilder.Entity<Product>(entity =>
             {
+                entity.HasKey(e => e.Id);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -97,6 +99,8 @@ namespace PVG.Infrastucture.Persistence
 
             modelBuilder.Entity<ProductCategory>(entity =>
             {
+                entity.HasKey(e => e.Id);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -115,6 +119,8 @@ namespace PVG.Infrastucture.Persistence
 
             modelBuilder.Entity<ProductInfo>(entity =>
             {
+                entity.HasKey(e => e.Id);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -147,6 +153,8 @@ namespace PVG.Infrastucture.Persistence
 
             modelBuilder.Entity<RequestCustomer>(entity =>
             {
+                entity.HasKey(e => e.RequestCode);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -167,6 +175,8 @@ namespace PVG.Infrastucture.Persistence
             #region RequestCustomerDetail
             modelBuilder.Entity<RequestCustomerDetail>(entity =>
             {
+                entity.HasKey(e => e.Id);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -193,6 +203,8 @@ namespace PVG.Infrastucture.Persistence
 
             modelBuilder.Entity<Configuration>(entity =>
             {
+                entity.HasKey(e => e.Key);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -215,8 +227,8 @@ namespace PVG.Infrastucture.Persistence
             modelBuilder.Entity<Permission>(entity =>
             {
                 entity.Property(e => e.Id)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
+                    .HasColumnType("int")
+                    .ValueGeneratedOnAdd()
                     .IsRequired();
 
                 entity.Property(e => e.Code)
@@ -284,6 +296,8 @@ namespace PVG.Infrastucture.Persistence
 
             modelBuilder.Entity<ViewLog>(entity =>
             {
+                entity.HasKey(e => e.Id);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -301,6 +315,8 @@ namespace PVG.Infrastucture.Persistence
 
             modelBuilder.Entity<New>(entity =>
             {
+                entity.HasKey(e => e.Id);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -326,6 +342,8 @@ namespace PVG.Infrastucture.Persistence
 
             modelBuilder.Entity<ImageRequest>(entity =>
             {
+                entity.HasKey(e => e.Id);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)
@@ -348,6 +366,8 @@ namespace PVG.Infrastucture.Persistence
             #region ProductDetail
             modelBuilder.Entity<ProductDetail>(entity =>
             {
+                entity.HasKey(e => e.Id);
+
                 entity.Property(e => e.Id)
                     .HasColumnType(ColumType.TypeVarchar("36"))
                     .HasMaxLength(36)

@@ -4,9 +4,9 @@
     {
         public enum NewStatus
         {
-            Created,
-            Proposed,
-            Approved
+            Created = 0,
+            Proposed = 1,
+            Approved = 2
         }
     }
 }

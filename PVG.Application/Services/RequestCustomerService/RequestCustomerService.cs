@@ -157,9 +157,9 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 if (detailCreate.Count > 0)
                 {
-                    string emailTitle = string.Format("Yêu cầu khách hàng số điện thoại: {0} - {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
+                    string emailTitle = string.Format("Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
 
-                    //var sendEmail = await _emailService.SendEmailRequest(emailTitle, "");
+                    var sendEmail = await _emailService.SendEmailRequest(emailTitle, "");
 
                     detailCreate.Add(
                         new RequestCustomerDetail()
@@ -454,10 +454,16 @@ namespace PVG.Application.Services.RequestCustomerService
             {
                 var listAllowShow = new List<string> { "address", "phone", "fullname", "redBookAddress" };
 
-                var request = await _requestCustomerRepository.FindByCondition(c => c.RequestCode == _requestCode && listAllowShow.Contains(c.Key)).ToListAsync();
+                var request = await _requestCustomerRepository.FindByCondition(c => c.RequestCode == _requestCode).ToListAsync();
                 if (request?.Count > 0)
                 {
                     var data = _mapper.Map<List<RequestCustomerModel>>(request);
+                    if (data != null)
+                    {
+                        data.ForEach(async x =>
+                            x.Details = _mapper.Map<List<RequestCustomerDetailModel>>(await _requestCustomerDetailRepository.FindByCondition(x => listAllowShow.Contains(x.Key)).ToListAsync())
+                        );
+                    }
                     return SuccessResponse(data);
                 }
                 else
