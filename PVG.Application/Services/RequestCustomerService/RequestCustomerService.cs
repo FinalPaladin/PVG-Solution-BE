@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PVG.Application.Services.EmailService;
 using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Models;
+using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
@@ -20,22 +22,21 @@ namespace PVG.Application.Services.RequestCustomerService
         private readonly ILogger<RequestCustomerService> _logger;
         private readonly IRequestCustomerRepository _requestCustomerRepository;
         private readonly IRequestCustomerDetailRepository _requestCustomerDetailRepository;
-        private readonly IMapper _mapper;
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
 
         public RequestCustomerService(
+            IOptions<AppSettings> options,
+            IMapper mapper,
             ILogger<RequestCustomerService> logger,
             IRequestCustomerRepository requestCustomerRepository,
             IRequestCustomerDetailRepository requestCustomerDetailRepository,
-            IMapper mapper,
             IEmailService emailService,
-            IUserService userService)
+            IUserService userService) : base(options, mapper)
         {
             _logger = logger;
             _requestCustomerRepository = requestCustomerRepository;
             _requestCustomerDetailRepository = requestCustomerDetailRepository;
-            _mapper = mapper;
             _emailService = emailService;
             _userService = userService;
         }

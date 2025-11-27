@@ -22,8 +22,8 @@ namespace PVG.Web.Controllers
 
         [HttpPost]
         [Route("logout")]
-        public async Task<IActionResult> Logout(string _userName)
-            => ReturnData(await _service.Logout(_userName));
+        public async Task<IActionResult> Logout(string userName)
+            => ReturnData(await _service.Logout(userName));
 
         [HttpPost]
         [Route("register")]

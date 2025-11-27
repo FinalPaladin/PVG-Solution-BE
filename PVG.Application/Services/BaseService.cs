@@ -1,15 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Models;
+using PVG.Domain.Settings;
 
 namespace PVG.Application.Services
 {
     public class BaseService
     {
-        public BaseService()
-        { }
+        protected readonly AppSettings _appSettings;
+        protected readonly IMapper _mapper;
+
+        public BaseService(IOptions<AppSettings> settings, IMapper mapper)
+        {
+            _appSettings = settings.Value;
+            _mapper = mapper;
+        }
 
         protected BaseResponse SuccessResponse(object? data, string message = "")
         {
