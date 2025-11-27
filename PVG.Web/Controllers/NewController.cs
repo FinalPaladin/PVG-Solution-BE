@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PVG.Application.Services.ConfigurationService;
 using PVG.Application.Services.NewService;
-using PVG.Application.Services.ProductService;
-using PVG.Application.Services.RequestCustomerService;
-using PVG.Core.BaseModels;
 using PVG.Domain.Models;
-using System.Threading.Tasks;
 
 namespace PVG.Web.Controllers
 {
@@ -13,7 +8,8 @@ namespace PVG.Web.Controllers
     [ApiController]
     public class NewController : PVGControllerBase
     {
-        INewService _service;
+        private INewService _service;
+
         public NewController(INewService service)
         {
             _service = service;
