@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PVG.Application.Services.PermissionService;
 using PVG.Application.Services.UserPermissionService;
@@ -32,6 +33,7 @@ namespace PVG.Application.Services.InitPageService
         private readonly IPermissionRepository _permissionRepository;
         private readonly IUserPermissionRepository _userPermissionRepository;
         private readonly IConfigurationRepository _configurationRepository;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
         public InitPageService(IProductRepository productRepository,
             IProductCategoryRepository productCategoryRepository,
@@ -39,7 +41,8 @@ namespace PVG.Application.Services.InitPageService
             IUserRepository userRepository,
             IPermissionRepository permissionRepository,
             IUserPermissionRepository userPermissionRepository,
-            IConfigurationRepository configurationRepository)
+            IConfigurationRepository configurationRepository,
+            IPasswordHasher<User> passwordHasher)
         {
             _mapper = mapper;
             _productRepository = productRepository;
@@ -48,6 +51,7 @@ namespace PVG.Application.Services.InitPageService
             _permissionRepository = permissionRepository;
             _userPermissionRepository = userPermissionRepository;
             _configurationRepository = configurationRepository;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<BaseResponse<ProductInitPageModel>> Product()
@@ -110,6 +114,16 @@ namespace PVG.Application.Services.InitPageService
         {
             try
             {
+                var usersExist = await _userRepository.FindAll().ToListAsync();
+
+                if (usersExist != null && usersExist.Count > 0)
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "",
+                    };
+
                 var initUsers = new List<User>
                 {
                     new User()
@@ -134,6 +148,12 @@ namespace PVG.Application.Services.InitPageService
                         Password = "p@ssw0rd9999"
                     }
                 };
+                foreach (var user in initUsers)
+                {
+                    var passhash = _passwordHasher.HashPassword(user, user.Password);
+                    user.Password = passhash;
+                }
+
                 await _userRepository.CreateListAsync(initUsers);
                 await _userRepository.SaveChangesAsync();
 
@@ -142,7 +162,7 @@ namespace PVG.Application.Services.InitPageService
                     new Permission()
                     {
                         Id = 1,
-                        Code = "Sys_AD",                        
+                        Code = "SYS_AD",                        
                     },
                     new Permission()
                     {
@@ -152,7 +172,7 @@ namespace PVG.Application.Services.InitPageService
                     new Permission()
                     {
                         Id = 3,
-                        Code = "Sales_AD",
+                        Code = "SALES_AD",
                     }
                 };
                 await _permissionRepository.CreateListAsync(initPermissions);
@@ -160,14 +180,13 @@ namespace PVG.Application.Services.InitPageService
 
                 var users = await _userRepository.FindAll().ToListAsync();
 
-                if(users == null || users.Count == 0)
+                if (users == null || users.Count == 0)
                     return new BaseResponse()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "",
                     };
-
                 var initUserPermissions = new List<UserPermission>
                 {
                     new UserPermission()
@@ -189,57 +208,158 @@ namespace PVG.Application.Services.InitPageService
                 await _userPermissionRepository.CreateListAsync(initUserPermissions);
                 await _userPermissionRepository.SaveChangesAsync();
 
+                var sysADId = initUsers.Find(x => x.UserName == "systemadmin")?.Id;
                 var initConfigs = new List<Configuration>
                 {
                     new Configuration()
                     {
                         Key = "EmailFromName",
                         Value = "PVG Service",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "EmailSend",
                         Value = "customer.form.request@gmail.com",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "EmailSendPassword",
                         Value = "zqls zmir wxxx yvnw",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "EmailReceive",
                         Value = "customer.service.csone@gmail.com",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "EmailSmtpHost",
                         Value = "smtp.gmail.com",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "EmailPort",
                         Value = "587",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "SDTSales",
                         Value = "",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "Logo",
                         Value = "",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "ImgHome",
                         Value = "",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                     new Configuration()
                     {
                         Key = "ImgBackground",
                         Value = "",
+                        CreatedBy = sysADId,
+                        CreatedDate = DateTime.Now,
+                        CreatedByName = "System Admin",
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
                     },
                 };
                 await _configurationRepository.CreateListAsync(initConfigs);
