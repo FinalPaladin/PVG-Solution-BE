@@ -162,7 +162,7 @@ namespace PVG.Application.Services.InitPageService
                     new Permission()
                     {
                         Id = 1,
-                        Code = "Sys_AD",                        
+                        Code = "SYS_AD",                        
                     },
                     new Permission()
                     {
@@ -172,7 +172,7 @@ namespace PVG.Application.Services.InitPageService
                     new Permission()
                     {
                         Id = 3,
-                        Code = "Sales_AD",
+                        Code = "SALES_AD",
                     }
                 };
                 await _permissionRepository.CreateListAsync(initPermissions);
