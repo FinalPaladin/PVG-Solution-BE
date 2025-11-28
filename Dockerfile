@@ -4,8 +4,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 RUN apt-get update && apt-get install -y tzdata
 ENV TZ="Asia/Ho_Chi_Minh"
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+
+# Kestrel listen port 7138
+EXPOSE 7138
+ENV ASPNETCORE_URLS=http://0.0.0.0:7138
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
