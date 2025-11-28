@@ -1,4 +1,7 @@
-﻿using PVG.Infrastucture.Entities;
+﻿using AutoMapper;
+using Microsoft.Extensions.Options;
+using PVG.Domain.Settings;
+using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.AuthTokenRepository;
 using System.Security.Cryptography;
 
@@ -8,7 +11,12 @@ namespace PVG.Application.Services.TokenService
     {
         private readonly IAuthTokenRepository _authTokenRepository;
 
-        public TokenService(IAuthTokenRepository authTokenRepository)
+        public TokenService(
+            IOptions<AppSettings> options,
+            IMapper mapper, 
+            IAuthTokenRepository authTokenRepository
+            ) 
+            : base(options, mapper)
         {
             _authTokenRepository = authTokenRepository;
         }

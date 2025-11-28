@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PVG.Application.Services.TokenService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Models;
+using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.AuthTokenRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
@@ -18,24 +20,25 @@ namespace PVG.Application.Services.UserService
     public class UserService : BaseService, IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IMapper _mapper;
         private readonly IPermissionRepository _permissionRepository;
         private readonly IUserPermissionRepository _userPermissionRepository;
         private readonly IAuthTokenRepository _authTokenRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ITokenService _tokenService;
 
-        public UserService(IUserRepository userRepository,
+        public UserService(
+            IOptions<AppSettings> options,
             IMapper mapper,
+
+            IUserRepository userRepository,
             IPermissionRepository permissionRepository,
             IUserPermissionRepository userPermissionRepository,
             IAuthTokenRepository authTokenRepository,
             IPasswordHasher<User> passwordHasher,
             ITokenService tokenService
-            )
+            ) : base(options, mapper)
         {
             _userRepository = userRepository;
-            _mapper = mapper;
             _permissionRepository = permissionRepository;
             _userPermissionRepository = userPermissionRepository;
             _passwordHasher = passwordHasher;
