@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using PVG.Application.Services.CloudflareR2Service;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace PVG.Application.Services.ConfigurationService
@@ -20,14 +22,17 @@ namespace PVG.Application.Services.ConfigurationService
         private readonly IConfigurationRepository _configurationRepository;
         private readonly IMapper _mapper;
         private readonly IUserRepository _userReponsitory;
+        private readonly ICloudflareR2Service _cloudflareR2Service;
 
         public ConfigurationService(IConfigurationRepository configurationRepository,
             IMapper mapper,
-            IUserRepository userReponsitory)
+            IUserRepository userReponsitory,
+            ICloudflareR2Service cloudflareR2Service)
         {
             _configurationRepository = configurationRepository;
             _mapper = mapper;
             _userReponsitory = userReponsitory;
+            _cloudflareR2Service = cloudflareR2Service;
         }
 
         public async Task<BaseResponse<RS_GetAllConfigurationModel>> GetAllData()
@@ -86,7 +91,7 @@ namespace PVG.Application.Services.ConfigurationService
                 }
                 
 
-                if (_input.Data == null && _input?.Data.Count == 0)
+                if (_input.Data == null || string.IsNullOrEmpty(_input.Data))
                 {
                     return new BaseResponse()
                     {
@@ -101,7 +106,7 @@ namespace PVG.Application.Services.ConfigurationService
                 var dataUpdate = await _configurationRepository.FindAll().ToListAsync();
                 var dataCreate = new List<Configuration>();
 
-                var userEntity = await _userReponsitory.FindByCondition(x => x.Id == _input.CreateUserId).FirstOrDefaultAsync();
+                var userEntity = await _userReponsitory.FindByCondition(x => x.UserName == _input.CreateUser && x.Actived).FirstOrDefaultAsync();
 
                 if (userEntity == null)
                 {
@@ -113,9 +118,25 @@ namespace PVG.Application.Services.ConfigurationService
                     };
                 }
 
-                foreach (var rc in _input.Data)
+                List<ConfigurationModel> data = JsonSerializer.Deserialize<List<ConfigurationModel>>(_input.Data);
+                foreach (var rc in data)
                 {
                     var iExist = dataUpdate.FindIndex(y => y.Key == rc.Key);
+
+                    var updateImg = _input.DataImage.Find(x => x.Key == rc.Key);
+                    if(updateImg != null)
+                    {
+                        var pubKey = await _cloudflareR2Service.UpImage(rc.Value, updateImg.ImgFile);
+                        if(!string.IsNullOrEmpty(pubKey))
+                        {
+                            rc.Value = pubKey;
+                        }
+                        else
+                        {
+                            rc.Value = "";
+                        }
+                    }
+
                     if (iExist >= 0)
                     {
                         dataUpdate[iExist].Value = rc.Value;
@@ -153,7 +174,7 @@ namespace PVG.Application.Services.ConfigurationService
                 return new BaseResponse()
                 {
                     IsSuccess = true,
-                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusCode = StatusCodes.Status200OK,
                     Message = "Save data completed",
                 };
             }
@@ -167,6 +188,7 @@ namespace PVG.Application.Services.ConfigurationService
                 };
             }
         }
+
 
     }
 }

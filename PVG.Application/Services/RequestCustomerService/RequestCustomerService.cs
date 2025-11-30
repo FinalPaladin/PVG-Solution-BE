@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PVG.Application.Services.CloudflareR2Service;
 using PVG.Application.Services.EmailService;
 using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
@@ -11,8 +12,10 @@ using PVG.Domain.Constants;
 using PVG.Domain.Models;
 using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
+using PVG.Infrastucture.Repositories.ImageRequestRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
+using System.Text.Json;
 using static PVG.Domain.Enums.UserEnum;
 
 namespace PVG.Application.Services.RequestCustomerService
@@ -24,6 +27,8 @@ namespace PVG.Application.Services.RequestCustomerService
         private readonly IRequestCustomerDetailRepository _requestCustomerDetailRepository;
         private readonly IEmailService _emailService;
         private readonly IUserService _userService;
+        private readonly ICloudflareR2Service _cloudflareR2Service;
+        private readonly IImageRequestRepository _imageRequestRepository;
 
         public RequestCustomerService(
             IOptions<AppSettings> options,
@@ -32,13 +37,16 @@ namespace PVG.Application.Services.RequestCustomerService
             IRequestCustomerRepository requestCustomerRepository,
             IRequestCustomerDetailRepository requestCustomerDetailRepository,
             IEmailService emailService,
-            IUserService userService) : base(options, mapper)
+            IUserService userService,
+            ICloudflareR2Service cloudflareR2Service,
+            IImageRequestRepository imageRequestRepository) : base(options, mapper)
         {
             _logger = logger;
             _requestCustomerRepository = requestCustomerRepository;
             _requestCustomerDetailRepository = requestCustomerDetailRepository;
             _emailService = emailService;
-            _userService = userService;
+            _cloudflareR2Service = cloudflareR2Service;
+            _imageRequestRepository = imageRequestRepository;
         }
 
         public async Task<BaseResponse> Save(RQ_SaveRequestCustomerModel _input)
@@ -55,7 +63,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                if (_input.Data == null && _input.Data.Count == 0)
+                if (_input.Data == null || string.IsNullOrEmpty(_input.Data))
                 {
                     return new BaseResponse()
                     {
@@ -120,13 +128,72 @@ namespace PVG.Application.Services.RequestCustomerService
                 dataDetail = await _requestCustomerDetailRepository.FindByCondition(x => x.IsDeleted == false
                 && x.RequestCode == _input.RequestCode).ToListAsync();
 
+                //if(_input.DataImage != null)
+                //{
+                //    string key = "";
+                //    var imageRequest = await _imageRequestRepository.FindByCondition(x => !x.IsDeleted && x.RequestCode == requestCode).FirstOrDefaultAsync();
+                //    if(imageRequest != null)
+                //    {
+                //        key = imageRequest.Url;
+                //    }
+
+                //    var pubKey = await _cloudflareR2Service.UpImage(key, _input.DataImage);
+
+                //    if (string.IsNullOrEmpty(pubKey))
+                //    {
+                //        pubKey = "";
+                //    }
+
+                //    if(imageRequest == null)
+                //    {
+                //        await _imageRequestRepository.CreateAsync(new ImageRequest()
+                //        {
+                //            CreatedBy = null,
+                //            CreatedByName = "",
+                //            CreatedDate = DateTime.Now,
+                //            DeletedBy = null,
+                //            DeletedByName = "",
+                //            DeletedDate = DateTime.Now,
+                //            IsDeleted = false,
+                //            ModifiedBy = null,
+                //            ModifiedByName = "",
+                //            ModifiedDate = DateTime.Now,
+
+                //            RequestCode = requestCode,
+                //            Url = pubKey,
+                //        });
+                //    }
+                //    else
+                //    {
+                //        imageRequest.Url = pubKey;
+                //        await _imageRequestRepository.UpdateAsync(imageRequest);
+                //    }
+                //    await _imageRequestRepository.SaveChangesAsync();
+                //}
+
                 if(dataDetail == null)
                 {
                     dataDetail = new();
                 }
 
-                foreach (var ddu in _input.Data)
+                string row = @"
+                                <tr>
+                                    <td style=""font-weight: bold; padding: 6px 0;"">{0}:</td>
+                                    <td style=""padding: 6px 0;"">{1}</td>
+                                </tr>
+                            ";
+                string htmlBody = @"
+                                    <h4>Chi tiết yêu cầu vay từ khách hàng</h4>
+                                    <table style=""width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;"">
+                                        {0}
+                                    </table>
+                                    ";
+
+                string rows = "";
+                List<SaveRequestCustomerModel> dataRC = JsonSerializer.Deserialize<List<SaveRequestCustomerModel>>(_input.Data);
+                foreach (var ddu in dataRC)
                 {
+                    rows += string.Format(row, ddu.Name, ddu.Value);
                     var data = dataDetail.Find(x => x.Key == ddu.Key);
                     if (data != null)
                     {
@@ -152,15 +219,15 @@ namespace PVG.Application.Services.RequestCustomerService
                             Key = ddu.Key,
                             Value = ddu.Value
                         };
+                        detailCreate.Add(data);
                     }
-                    detailCreate.Add(data);
                 }
 
                 if (detailCreate.Count > 0)
                 {
                     string emailTitle = string.Format("Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
 
-                    var sendEmail = await _emailService.SendEmailRequest(emailTitle, "");
+                    var sendEmail = await _emailService.SendEmailRequest(emailTitle, string.Format(htmlBody, rows));
 
                     detailCreate.Add(
                         new RequestCustomerDetail()
@@ -205,6 +272,8 @@ namespace PVG.Application.Services.RequestCustomerService
                 await _requestCustomerDetailRepository.UpdateListAsync(detailUpdate);
                 await _requestCustomerDetailRepository.CreateListAsync(detailCreate);
                 await _requestCustomerRepository.SaveChangesAsync();
+
+
 
                 return new BaseResponse()
                 {
