@@ -80,6 +80,7 @@ namespace PVG.Application.Services.ProductInfoService
                 {
                     var dataCreate = new ProductInfo()
                     {
+                        Id = Guid.NewGuid(),
                         CreatedBy = userEntity.Id,
                         CreatedByName = userEntity.FullName,
                         CreatedDate = DateTime.Now,

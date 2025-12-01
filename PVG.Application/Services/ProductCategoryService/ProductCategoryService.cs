@@ -76,6 +76,7 @@ namespace PVG.Application.Services.ProductCategoryService
                 {
                     var dataCreate = new ProductCategory()
                     {
+                        Id = Guid.NewGuid(),
                         CreatedBy = userEntity.Id,
                         CreatedByName = userEntity.FullName,
                         CreatedDate = DateTime.Now,

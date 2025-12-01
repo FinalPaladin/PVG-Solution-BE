@@ -84,6 +84,7 @@ namespace PVG.Application.Services.NewService
                 {
                     var dataCreate = new New()
                     {
+                        Id = Guid.NewGuid(),
                         CreatedBy = userEntity.Id,
                         CreatedByName = userEntity.FullName,
                         CreatedDate = DateTime.Now,

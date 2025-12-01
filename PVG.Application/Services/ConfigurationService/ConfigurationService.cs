@@ -53,6 +53,20 @@ namespace PVG.Application.Services.ConfigurationService
 
                 var data = _mapper.Map<List<ConfigurationModel>>(configurationsEntity);
 
+                var configs = configurationsEntity.Where(x => x.IsImage).ToList();
+
+                if(configs != null && configs.Count > 0)
+                {
+                    foreach (var item in configs)
+                    {
+                        var index = data.FindIndex(x => x.Key == item.Key);
+                        if (index < 0)
+                            continue;
+
+                        data[index].Value = _cloudflareR2Service.GetPublicUrl(item.Value);
+                    }
+                }
+
                 return new BaseResponse<RS_GetAllConfigurationModel>()
                 {
                     IsSuccess = true,
@@ -101,8 +115,6 @@ namespace PVG.Application.Services.ConfigurationService
                     };
                 }
 
-                var id = Guid.NewGuid();
-
                 var dataUpdate = await _configurationRepository.FindAll().ToListAsync();
                 var dataCreate = new List<Configuration>();
 
@@ -121,15 +133,17 @@ namespace PVG.Application.Services.ConfigurationService
                 List<ConfigurationModel> data = JsonSerializer.Deserialize<List<ConfigurationModel>>(_input.Data);
                 foreach (var rc in data)
                 {
+                    bool isImage = false;
                     var iExist = dataUpdate.FindIndex(y => y.Key == rc.Key);
 
                     var updateImg = _input.DataImage.Find(x => x.Key == rc.Key);
                     if(updateImg != null)
                     {
-                        var pubKey = await _cloudflareR2Service.UpImage(rc.Value, updateImg.ImgFile);
-                        if(!string.IsNullOrEmpty(pubKey))
+                        isImage = true;
+                        var key = await _cloudflareR2Service.UpImage(rc.Value, updateImg.ImgFile);
+                        if(!string.IsNullOrEmpty(key))
                         {
-                            rc.Value = pubKey;
+                            rc.Value = key;
                         }
                         else
                         {
@@ -139,6 +153,7 @@ namespace PVG.Application.Services.ConfigurationService
 
                     if (iExist >= 0)
                     {
+                        dataUpdate[iExist].IsImage = isImage;
                         dataUpdate[iExist].Value = rc.Value;
                         dataUpdate[iExist].ModifiedBy = userEntity.Id;
                         dataUpdate[iExist].ModifiedByName = userEntity.FullName;
@@ -149,6 +164,7 @@ namespace PVG.Application.Services.ConfigurationService
                         dataCreate.Add(
                             new Configuration()
                             {
+                                Id = Guid.NewGuid(),
                                 CreatedBy = userEntity.Id,
                                 CreatedByName = userEntity.FullName,
                                 CreatedDate = DateTime.Now,
@@ -160,6 +176,7 @@ namespace PVG.Application.Services.ConfigurationService
                                 ModifiedByName = "",
                                 ModifiedDate = DateTime.Now,
 
+                                IsImage = isImage,
                                 Key = rc.Key,
                                 Value = rc.Value,
                             }

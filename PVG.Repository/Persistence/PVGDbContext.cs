@@ -169,6 +169,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("20"))
                     .HasMaxLength(20)
                     .IsRequired();
+
+                entity.Property(e => e.FullName)
+                    .HasColumnType(ColumType.TypeVarchar("100"))
+                    .HasCharSet("utf8mb4")
+                    .HasMaxLength(100);
             });
             #endregion
 
