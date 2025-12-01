@@ -102,6 +102,7 @@ namespace PVG.Application.Services.RequestCustomerService
                 {
                     var dataCreate = new RequestCustomer()
                     {
+                        Id = Guid.NewGuid(),
                         CreatedBy = null,
                         CreatedByName = "",
                         CreatedDate = DateTime.Now,
@@ -116,6 +117,8 @@ namespace PVG.Application.Services.RequestCustomerService
                         ProductId = _input.ProductId,
                         RequestCode = requestCode,
                         Phone = _input.Phone,
+                        FullName = _input.FullName,
+                        IsProcessed = false,
                     };
 
                     await _requestCustomerRepository.CreateAsync(dataCreate);
@@ -128,50 +131,51 @@ namespace PVG.Application.Services.RequestCustomerService
                 dataDetail = await _requestCustomerDetailRepository.FindByCondition(x => x.IsDeleted == false
                 && x.RequestCode == _input.RequestCode).ToListAsync();
 
-                //if(_input.DataImage != null)
-                //{
-                //    string key = "";
-                //    var imageRequest = await _imageRequestRepository.FindByCondition(x => !x.IsDeleted && x.RequestCode == requestCode).FirstOrDefaultAsync();
-                //    if(imageRequest != null)
-                //    {
-                //        key = imageRequest.Url;
-                //    }
+                if (_input.DataImage != null && _input.DataImage.Count > 0)
+                {
+                    var imagesRequest = await _imageRequestRepository.FindByCondition(x => !x.IsDeleted && x.RequestCode == requestCode).ToListAsync();
+                    if (imagesRequest == null || imagesRequest.Count == 0)
+                    {
+                        imagesRequest = new List<ImageRequest>();
+                    }
+                    else
+                    {
+                        foreach (ImageRequest ir in imagesRequest)
+                        {
+                            await _imageRequestRepository.DeleteAsync(ir);
+                            await _cloudflareR2Service.DeleteAsync(ir.Url);
+                        }
+                        await _imageRequestRepository.SaveChangesAsync();
+                    }
 
-                //    var pubKey = await _cloudflareR2Service.UpImage(key, _input.DataImage);
+                    foreach (var img in _input.DataImage)
+                    {
+                        var key = await _cloudflareR2Service.UpImage("", img.ImgFile);
+                        if (!string.IsNullOrEmpty(key))
+                        {
+                            await _imageRequestRepository.CreateAsync(new ImageRequest()
+                            {
+                                Id = Guid.NewGuid(),
+                                CreatedBy = null,
+                                CreatedByName = "",
+                                CreatedDate = DateTime.Now,
+                                DeletedBy = null,
+                                DeletedByName = "",
+                                DeletedDate = DateTime.Now,
+                                IsDeleted = false,
+                                ModifiedBy = null,
+                                ModifiedByName = "",
+                                ModifiedDate = DateTime.Now,
 
-                //    if (string.IsNullOrEmpty(pubKey))
-                //    {
-                //        pubKey = "";
-                //    }
+                                RequestCode = requestCode,
+                                Url = key,
+                            });
+                        }
+                    }
+                    await _imageRequestRepository.SaveChangesAsync();
+                }
 
-                //    if(imageRequest == null)
-                //    {
-                //        await _imageRequestRepository.CreateAsync(new ImageRequest()
-                //        {
-                //            CreatedBy = null,
-                //            CreatedByName = "",
-                //            CreatedDate = DateTime.Now,
-                //            DeletedBy = null,
-                //            DeletedByName = "",
-                //            DeletedDate = DateTime.Now,
-                //            IsDeleted = false,
-                //            ModifiedBy = null,
-                //            ModifiedByName = "",
-                //            ModifiedDate = DateTime.Now,
-
-                //            RequestCode = requestCode,
-                //            Url = pubKey,
-                //        });
-                //    }
-                //    else
-                //    {
-                //        imageRequest.Url = pubKey;
-                //        await _imageRequestRepository.UpdateAsync(imageRequest);
-                //    }
-                //    await _imageRequestRepository.SaveChangesAsync();
-                //}
-
-                if(dataDetail == null)
+                if (dataDetail == null)
                 {
                     dataDetail = new();
                 }
@@ -190,8 +194,8 @@ namespace PVG.Application.Services.RequestCustomerService
                                     ";
 
                 string rows = "";
-                //List<SaveRequestCustomerModel> dataRC = JsonSerializer.Deserialize<List<SaveRequestCustomerModel>>(_input.Data);
-                foreach (var ddu in _input.Data)
+                List<SaveRequestCustomerModel> dataRC = JsonSerializer.Deserialize<List<SaveRequestCustomerModel>>(_input.Data);
+                foreach (var ddu in dataRC)
                 {
                     rows += string.Format(row, ddu.Name, ddu.Value);
                     var data = dataDetail.Find(x => x.Key == ddu.Key);
@@ -204,6 +208,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     {
                         data = new RequestCustomerDetail()
                         {
+                            Id = Guid.NewGuid(),
                             CreatedBy = null,
                             CreatedByName = "",
                             CreatedDate = DateTime.Now,
@@ -225,13 +230,14 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 if (detailCreate.Count > 0)
                 {
-                    string emailTitle = string.Format("Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
+                    string emailTitle = string.Format("[{2}]Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"), requestCode);
 
                     var sendEmail = await _emailService.SendEmailRequest(emailTitle, string.Format(htmlBody, rows));
 
                     detailCreate.Add(
                         new RequestCustomerDetail()
                         {
+                            Id = Guid.NewGuid(),
                             CreatedBy = null,
                             CreatedByName = "",
                             CreatedDate = DateTime.Now,
@@ -251,6 +257,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     detailCreate.Add(
                         new RequestCustomerDetail()
                         {
+                            Id = Guid.NewGuid(),
                             CreatedBy = null,
                             CreatedByName = "",
                             CreatedDate = DateTime.Now,

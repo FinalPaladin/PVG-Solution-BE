@@ -119,7 +119,7 @@ namespace PVG.Application.Services.CloudflareR2Service
             var result = await Upload3S(stream, _file.FileName, _file.ContentType);
             if (!string.IsNullOrEmpty(result))
             {
-                newPubKey = GetPublicUrl(result);
+                newPubKey = result;
             }
 
             return newPubKey;

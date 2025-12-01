@@ -80,6 +80,7 @@ namespace PVG.Application.Services.ViewLogService
 
                 var createNew = new ViewLog()
                 {
+                    Id = Guid.NewGuid(),
                     CreatedBy = null,
                     CreatedByName = "",
                     CreatedDate = DateTime.Now,

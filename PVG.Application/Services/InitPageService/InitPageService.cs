@@ -128,6 +128,7 @@ namespace PVG.Application.Services.InitPageService
                 {
                     new User()
                     {
+                        Id = Guid.NewGuid(),
                         Actived = true,
                         FullName = "System Admin",
                         UserName = "systemadmin",
@@ -135,6 +136,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new User()
                     {
+                        Id = Guid.NewGuid(),
                         Actived = true,
                         FullName = "Marketing Admin",
                         UserName = "mktadmin",
@@ -142,6 +144,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new User()
                     {
+                        Id = Guid.NewGuid(),
                         Actived = true,
                         FullName = "Sales Admin",
                         UserName = "salesadmin",
@@ -149,12 +152,14 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new User()
                     {
+                        Id = Guid.NewGuid(),
                         Actived = true,
                         FullName = "IT Admin",
                         UserName = "itadmin",
                         Password = "itpgv"
                     }
                 };
+
                 foreach (var user in initUsers)
                 {
                     var passhash = _passwordHasher.HashPassword(user, user.Password);
@@ -198,21 +203,25 @@ namespace PVG.Application.Services.InitPageService
                 {
                     new UserPermission()
                     {
+                        Id = Guid.NewGuid(),
                         UserId = users.Find(x => x.UserName == "itadmin")?.Id,
                         PermissionId = 1,
                     },
                     new UserPermission()
                     {
+                        Id = Guid.NewGuid(),
                         UserId = users.Find(x => x.UserName == "systemadmin")?.Id,
                         PermissionId = 1,
                     },
                     new UserPermission()
                     {
+                        Id = Guid.NewGuid(),
                         UserId = users.Find(x => x.UserName == "mktadmin")?.Id,
                         PermissionId = 2,
                     },
                     new UserPermission()
                     {
+                        Id = Guid.NewGuid(),
                         UserId = users.Find(x => x.UserName == "salesadmin")?.Id,
                         PermissionId = 3,
                     }
@@ -225,6 +234,7 @@ namespace PVG.Application.Services.InitPageService
                 {
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "EmailFromName",
                         Value = "PVG Service",
                         CreatedBy = sysADId,
@@ -240,6 +250,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "EmailSend",
                         Value = "customer.form.request@gmail.com",
                         CreatedBy = sysADId,
@@ -255,6 +266,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "EmailSendPassword",
                         Value = "zqls zmir wxxx yvnw",
                         CreatedBy = sysADId,
@@ -270,6 +282,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "EmailReceive",
                         Value = "customer.service.csone@gmail.com",
                         CreatedBy = sysADId,
@@ -285,6 +298,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "EmailSmtpHost",
                         Value = "smtp.gmail.com",
                         CreatedBy = sysADId,
@@ -300,6 +314,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "EmailPort",
                         Value = "587",
                         CreatedBy = sysADId,
@@ -315,6 +330,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "SDTSales",
                         Value = "",
                         CreatedBy = sysADId,
@@ -330,6 +346,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "ImgLogo",
                         Value = "",
                         CreatedBy = sysADId,
@@ -345,6 +362,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "ImgHome",
                         Value = "",
                         CreatedBy = sysADId,
@@ -360,6 +378,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
+                        Id = Guid.NewGuid(),
                         Key = "ImgBackground",
                         Value = "",
                         CreatedBy = sysADId,
