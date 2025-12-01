@@ -8,8 +8,8 @@ namespace PVG.Domain.Models
         public Guid? RequestCode { get; set; }
         public string Phone { get; set; }
         public Guid? ProductId { get; set; }
-        [FromForm(Name = "dataJson")]
-        public string Data { get; set; }
+        //[FromForm(Name = "dataJson")]
+        public List<SaveRequestCustomerModel> Data { get; set; } = new();
         public List<ImageRequestCustomerModel> DataImage { get; set; } = new();
     }
 

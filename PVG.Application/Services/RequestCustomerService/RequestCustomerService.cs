@@ -63,7 +63,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                if (_input.Data == null || string.IsNullOrEmpty(_input.Data))
+                if (_input.Data == null)// || string.IsNullOrEmpty(_input.Data)
                 {
                     return new BaseResponse()
                     {
@@ -190,8 +190,8 @@ namespace PVG.Application.Services.RequestCustomerService
                                     ";
 
                 string rows = "";
-                List<SaveRequestCustomerModel> dataRC = JsonSerializer.Deserialize<List<SaveRequestCustomerModel>>(_input.Data);
-                foreach (var ddu in dataRC)
+                //List<SaveRequestCustomerModel> dataRC = JsonSerializer.Deserialize<List<SaveRequestCustomerModel>>(_input.Data);
+                foreach (var ddu in _input.Data)
                 {
                     rows += string.Format(row, ddu.Name, ddu.Value);
                     var data = dataDetail.Find(x => x.Key == ddu.Key);
