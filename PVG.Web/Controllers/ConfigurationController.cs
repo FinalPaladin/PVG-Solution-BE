@@ -28,7 +28,7 @@ namespace PVG.Web.Controllers
 
         [HttpPost]
         [Route("save")]
-        public async Task<IActionResult> Save([FromBody] RQ_SaveConfigurationModel _input)
+        public async Task<IActionResult> Save([FromForm] RQ_SaveConfigurationModel _input)
         {
             return ReturnData(await _service.Save(_input));
         }

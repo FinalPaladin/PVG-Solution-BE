@@ -146,6 +146,13 @@ namespace PVG.Application.Services.InitPageService
                         FullName = "Sales Admin",
                         UserName = "salesadmin",
                         Password = "p@ssw0rd9999"
+                    },
+                    new User()
+                    {
+                        Actived = true,
+                        FullName = "IT Admin",
+                        UserName = "itadmin",
+                        Password = "itpgv"
                     }
                 };
                 foreach (var user in initUsers)
@@ -189,6 +196,11 @@ namespace PVG.Application.Services.InitPageService
                     };
                 var initUserPermissions = new List<UserPermission>
                 {
+                    new UserPermission()
+                    {
+                        UserId = users.Find(x => x.UserName == "itadmin")?.Id,
+                        PermissionId = 1,
+                    },
                     new UserPermission()
                     {
                         UserId = users.Find(x => x.UserName == "systemadmin")?.Id,
@@ -318,7 +330,7 @@ namespace PVG.Application.Services.InitPageService
                     },
                     new Configuration()
                     {
-                        Key = "Logo",
+                        Key = "ImgLogo",
                         Value = "",
                         CreatedBy = sysADId,
                         CreatedDate = DateTime.Now,

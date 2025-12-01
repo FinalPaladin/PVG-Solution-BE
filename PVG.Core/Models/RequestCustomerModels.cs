@@ -1,19 +1,30 @@
-﻿namespace PVG.Domain.Models
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace PVG.Domain.Models
 {
     public class RQ_SaveRequestCustomerModel
     {
         public Guid? RequestCode { get; set; }
         public string Phone { get; set; }
         public Guid? ProductId { get; set; }
-        public List<SaveRequestCustomerModel> Data { get; set; } = new();
+        [FromForm(Name = "dataJson")]
+        public string Data { get; set; }
+        public List<ImageRequestCustomerModel> DataImage { get; set; } = new();
     }
 
     public class SaveRequestCustomerModel
     {
         public string Key { get; set; }
         public string Value { get; set; }
+        public string Name { get; set; }
     }
 
+    public class ImageRequestCustomerModel
+    {
+        public string Key { get; set; }
+        public IFormFile ImgFile { get; set; }
+    }
     public class RQ_SearchRequestCustomerModel
     {
         public Guid? RequestCode { get; set; }
