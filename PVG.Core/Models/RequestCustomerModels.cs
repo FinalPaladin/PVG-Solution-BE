@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
 
 namespace PVG.Domain.Models
 {
@@ -16,10 +17,12 @@ namespace PVG.Domain.Models
 
     public class SaveRequestCustomerModel
     {
+        [JsonPropertyName("key")]
         public string Key { get; set; }
+        [JsonPropertyName("value")]
         public string Value { get; set; }
+        [JsonPropertyName("name")]
         public string Name { get; set; }
-        public string FullName { get; set; }
     }
 
     public class ImageRequestCustomerModel
