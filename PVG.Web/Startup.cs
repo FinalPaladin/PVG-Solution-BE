@@ -24,11 +24,13 @@ namespace PVG.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var allowOrigins = _configuration.GetSection("AppSettings:CorsSettings:AllowedOrigins").Get<string[]>();
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", builder => //_policyName
                 {
-                    builder.WithOrigins("http://localhost:5173")
+                    builder.WithOrigins(allowOrigins!)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials()
@@ -137,6 +139,13 @@ namespace PVG.Web
 
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "PVG Services v1"); c.RoutePrefix = "swagger"; });
+
+            // Add this block to perform migration using the application's service provider
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<PVGDbContext>();
+                dbContext.Database.Migrate();
+            }
 
             app.UseEndpoints(endpoints =>
             {
