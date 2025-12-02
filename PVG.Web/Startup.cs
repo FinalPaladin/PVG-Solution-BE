@@ -24,11 +24,13 @@ namespace PVG.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var allowOrigins = _configuration.GetSection("AppSettings:CorsSettings:AllowedOrigins").Get<string[]>();
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", builder => //_policyName
                 {
-                    builder.WithOrigins("http://localhost:5173")
+                    builder.WithOrigins(allowOrigins!)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials()
