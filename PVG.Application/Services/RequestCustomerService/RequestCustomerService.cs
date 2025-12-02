@@ -531,18 +531,13 @@ namespace PVG.Application.Services.RequestCustomerService
         {
             try
             {
-                var listAllowShow = new List<string> { "address", "phone", "fullname", "redBookAddress" };
+                var listAllowShow = new List<string> { "address", "phone", "fullname", "redBookAddress", "imageKeys" };
 
-                var request = await _requestCustomerRepository.FindByCondition(c => c.RequestCode == _requestCode).ToListAsync();
-                if (request?.Count > 0)
+                var detailDb = await _requestCustomerDetailRepository.FindByCondition(c => c.RequestCode == _requestCode).ToListAsync();
+                if (detailDb?.Count > 0)
                 {
-                    var data = _mapper.Map<List<RequestCustomerModel>>(request);
-                    if (data != null)
-                    {
-                        data.ForEach(async x =>
-                            x.Details = _mapper.Map<List<RequestCustomerDetailModel>>(await _requestCustomerDetailRepository.FindByCondition(x => listAllowShow.Contains(x.Key)).ToListAsync())
-                        );
-                    }
+                    var data = _mapper.Map<List<RequestCustomerDetailModel>>(detailDb.Where(c => listAllowShow.Contains(c.Key)));
+
                     return SuccessResponse(data);
                 }
                 else
