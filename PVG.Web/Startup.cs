@@ -137,7 +137,10 @@ namespace PVG.Web
 
             //app.UseCors(_policyName);
 
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = "api/swagger/{documentName}/swagger.json";
+            });
             app.UseSwaggerUI(c => 
             { 
                 c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "PVG Services v1"); 
