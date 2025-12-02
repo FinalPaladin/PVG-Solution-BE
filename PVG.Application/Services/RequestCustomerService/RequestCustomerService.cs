@@ -167,6 +167,7 @@ namespace PVG.Application.Services.RequestCustomerService
                                 ModifiedByName = "",
                                 ModifiedDate = DateTime.Now,
 
+                                Content = "",
                                 RequestCode = requestCode,
                                 Url = key,
                             });
@@ -360,7 +361,8 @@ namespace PVG.Application.Services.RequestCustomerService
                 IQueryable<RequestCustomer> query = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
                     && (string.IsNullOrEmpty(_input.Phone) || x.Phone.Contains(_input.Phone))
                     && (_input.ProductId == null || x.ProductId == _input.ProductId)
-                    && (_input.RequestCode == null || x.ProductId == _input.RequestCode)
+                    && (_input.RequestCode == null || x.ProductId == _input.RequestCode
+                    && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower())))
                 ).OrderByDescending(x => x.CreatedDate).AsQueryable();
 
                 var pagination = await _requestCustomerRepository.OffsetPagination<RequestCustomer>(query, _input.Page, _input.PageSize);
