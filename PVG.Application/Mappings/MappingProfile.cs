@@ -23,6 +23,7 @@ namespace PVG.Application.Mappings
             CreateMap<ProductCategory, ProductCategoryModel>().ReverseMap();
             CreateMap<ProductInfo, ProductInfoModel>().ReverseMap();
             CreateMap<New, NewModel>().ReverseMap();
+            CreateMap<RequestCustomerDetailModel, RequestCustomerDetail>().ReverseMap();
         }
     }
 }
