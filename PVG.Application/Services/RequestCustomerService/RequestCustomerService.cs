@@ -532,17 +532,15 @@ namespace PVG.Application.Services.RequestCustomerService
                 var detailDb = await _requestCustomerDetailRepository.FindByCondition(c => c.RequestCode == _requestCode).ToListAsync();
                 if (detailDb?.Count > 0)
                 {
-                    var data = _mapper.Map<List<RequestCustomerDetailModel>>(detailDb.Where(c => listAllowShow.Contains(c.Key)));
+                    var data = _mapper.Map<List<RequestCustomerDetailModel>>(detailDb.Where(c => listAllowShow.Contains(c.Key)).ToList());
 
-                    if (detailDb.Any(c => c.Key.Equals("imageKeys") && !string.IsNullOrEmpty(c.Value)))
-                    {
-                        var imageKeys = detailDb.FirstOrDefault(c => c.Key.Equals("imageKeys"))?.Value.Split(',').ToList() ?? new List<string>();
-                        data.AddRange(imageKeys.Select((value, index) => new RequestCustomerDetailModel
+                    var imgs = await _imageRequestRepository.FindByCondition(c => c.RequestCode == _requestCode && !c.IsDeleted).ToListAsync();
+                    if (imgs?.Count > 0)
+                        data.AddRange(imgs.Select((value, index) => new RequestCustomerDetailModel
                         {
                             Key = $"image{index + 1}",
-                            Value = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{value}",
+                            Value = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{value.Url}",
                         }));
-                    }
 
                     return SuccessResponse(data);
                 }

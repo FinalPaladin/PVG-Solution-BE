@@ -23,7 +23,9 @@ namespace PVG.Application.Mappings
             CreateMap<ProductCategory, ProductCategoryModel>().ReverseMap();
             CreateMap<ProductInfo, ProductInfoModel>().ReverseMap();
             CreateMap<New, NewModel>().ReverseMap();
-            CreateMap<RequestCustomerDetailModel, RequestCustomerDetail>().ReverseMap();
+            CreateMap<RequestCustomerDetail, RequestCustomerDetailModel>()
+                .ForMember(des => des.CreatedDate, act => act.MapFrom(src => src.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss")))
+                .ReverseMap();
         }
     }
 }
