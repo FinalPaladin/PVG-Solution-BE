@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -96,7 +95,6 @@ namespace PVG.Application.Services.RequestCustomerService
                     }
 
                     await _requestCustomerRepository.UpdateAsync(dataUpdate);
-
                 }
                 else
                 {
@@ -280,8 +278,6 @@ namespace PVG.Application.Services.RequestCustomerService
                 await _requestCustomerDetailRepository.UpdateListAsync(detailUpdate);
                 await _requestCustomerDetailRepository.CreateListAsync(detailCreate);
                 await _requestCustomerRepository.SaveChangesAsync();
-
-
 
                 return new BaseResponse()
                 {
@@ -533,16 +529,21 @@ namespace PVG.Application.Services.RequestCustomerService
             {
                 var listAllowShow = new List<string> { "address", "phone", "fullname", "redBookAddress" };
 
-                var request = await _requestCustomerRepository.FindByCondition(c => c.RequestCode == _requestCode).ToListAsync();
-                if (request?.Count > 0)
+                var detailDb = await _requestCustomerDetailRepository.FindByCondition(c => c.RequestCode == _requestCode).ToListAsync();
+                if (detailDb?.Count > 0)
                 {
-                    var data = _mapper.Map<List<RequestCustomerModel>>(request);
-                    if (data != null)
+                    var data = _mapper.Map<List<RequestCustomerDetailModel>>(detailDb.Where(c => listAllowShow.Contains(c.Key)));
+
+                    if (detailDb.Any(c => c.Key.Equals("imageKeys") && !string.IsNullOrEmpty(c.Value)))
                     {
-                        data.ForEach(async x =>
-                            x.Details = _mapper.Map<List<RequestCustomerDetailModel>>(await _requestCustomerDetailRepository.FindByCondition(x => listAllowShow.Contains(x.Key)).ToListAsync())
-                        );
+                        var imageKeys = detailDb.FirstOrDefault(c => c.Key.Equals("imageKeys"))?.Value.Split(',').ToList() ?? new List<string>();
+                        data.AddRange(imageKeys.Select((value, index) => new RequestCustomerDetailModel
+                        {
+                            Key = $"image{index + 1}",
+                            Value = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{value}",
+                        }));
                     }
+
                     return SuccessResponse(data);
                 }
                 else

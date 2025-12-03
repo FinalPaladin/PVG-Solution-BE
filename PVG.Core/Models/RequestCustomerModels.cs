@@ -35,7 +35,7 @@ namespace PVG.Domain.Models
         public Guid? RequestCode { get; set; }
         public Guid? ProductId { get; set; }
         public string? Phone { get; set; }
-        public string FullName { get; set; }
+        public string? FullName { get; set; }
         public bool IsProcessed { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;

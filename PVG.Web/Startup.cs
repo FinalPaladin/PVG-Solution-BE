@@ -137,8 +137,15 @@ namespace PVG.Web
 
             //app.UseCors(_policyName);
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "PVG Services v1"); c.RoutePrefix = "swagger"; });
+            app.UseSwagger(c =>
+            {
+                c.RouteTemplate = "api/swagger/{documentName}/swagger.json";
+            });
+            app.UseSwaggerUI(c => 
+            { 
+                c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "PVG Services v1"); 
+                c.RoutePrefix = "api/swagger"; 
+            });
 
             // Add this block to perform migration using the application's service provider
             using (var scope = app.ApplicationServices.CreateScope())
