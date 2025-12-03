@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
+using PVG.Domain.Models;
 using PVG.Infrastucture.Entities.BaseEntities;
 using System.Data;
 using System.Linq.Expressions;
@@ -70,5 +71,13 @@ namespace PVG.Infrastucture.Domain
         Task EndTransactionAsync();
 
         Task RollbackTransactionAsync();
+
+        PaginationModel Paging<T>(List<T> items, int page, int pageSize);
+
+        IQueryable<T> Paging<T>(IQueryable<T> query, bool isPaging, int currentPage, int perPage);
+
+        List<T> Paging<T>(List<T> query, bool isPaging, int currentPage, int perPage);
+
+        Task<PaginationModel> OffsetPagination<T>(IQueryable<T> query, int page, int pageSize);
     }
 }

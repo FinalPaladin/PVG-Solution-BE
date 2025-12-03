@@ -6,7 +6,9 @@ namespace PVG.Web.Extensions
     {
         public static IServiceCollection AddConfigureAppSetting(this IServiceCollection services, IConfiguration configuration)
         {
-            services.Configure<SampleSetting>(configuration.GetSection("SampleSetting"));
+            services.Configure<AppSettings>(configuration.GetSection("AppSettings"),
+                o => o.BindNonPublicProperties = true);
+
             return services;
         }
     }

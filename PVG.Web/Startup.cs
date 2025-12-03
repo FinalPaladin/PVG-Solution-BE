@@ -24,19 +24,21 @@ namespace PVG.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            var allowOrigins = _configuration.GetSection("AppSettings:CorsSettings:AllowedOrigins").Get<string[]>();
 
             services.AddCors(options =>
             {
-                options.AddPolicy(_policyName, builder =>
+                options.AddPolicy("AllowAll", builder => //_policyName
                 {
-                    builder.WithOrigins()
+                    builder.WithOrigins(allowOrigins!)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials()
                         .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
                 });
             });
+
+            services.AddControllers();
 
             // add config appsettings
             services.AddConfigureAppSetting(_configuration);
@@ -131,10 +133,19 @@ namespace PVG.Web
             app.UseHealthChecks("/health");
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseCors(_policyName);
+            app.UseCors("AllowAll"); // ⚠️ Quan trọng: đặt trước Authorization
+
+            //app.UseCors(_policyName);
 
             app.UseSwagger();
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "PVG Services v1"); c.RoutePrefix = "swagger"; });
+
+            // Add this block to perform migration using the application's service provider
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<PVGDbContext>();
+                dbContext.Database.Migrate();
+            }
 
             app.UseEndpoints(endpoints =>
             {

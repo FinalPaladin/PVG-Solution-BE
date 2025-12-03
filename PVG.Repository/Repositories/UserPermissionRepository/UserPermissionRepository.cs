@@ -18,10 +18,5 @@ namespace PVG.Infrastucture.Repositories.UserPermissionRepository
         {
             dbContext = _dbContext;
         }
-
-        public async Task<UserPermission> GetById(Guid _id)
-        {
-            return await dbContext.Set<UserPermission>().FirstOrDefaultAsync(x => x.Id.Equals(_id));
-        }
     }
 }

@@ -1,42 +1,59 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PVG.Application.Services.RequestCustomerService;
-using PVG.Core.BaseModels;
 using PVG.Domain.Models;
-using System.Threading.Tasks;
 
 namespace PVG.Web.Controllers
 {
-    [Route("api/request_customer")]
+    [Route("api/request")]
     [ApiController]
-    public class RequestCustomerController: PVGControllerBase
+    public class RequestCustomerController : PVGControllerBase
     {
-        IRequestCustomerService requestCustomerService;
-        public RequestCustomerController(IRequestCustomerService _requestCustomerService)
+        private IRequestCustomerService _service;
+
+        public RequestCustomerController(IRequestCustomerService service)
         {
-            requestCustomerService = _requestCustomerService;
+            _service = service;
         }
 
         [HttpGet]
-        [Route("GetAllData")]
-        public async Task<IActionResult> GetAllData()
+        [Route("search")]
+        public async Task<IActionResult> Search([FromQuery] RQ_SearchRequestCustomerModel _input)
         {
-            var result = await requestCustomerService.GetAllData();
+            var result = await _service.Search(_input);
             return ReturnData(result);
         }
 
         [HttpGet]
-        [Route("GetData/{_input}")]
-        public async Task<IActionResult> GetData(string _input)
+        [Route("get")]
+        public async Task<IActionResult> GetData([FromBody] RQ_GetRequestCustomerModel _input)
         {
-            var result = await requestCustomerService.GetData(_input);
+            var result = await _service.GetData(_input);
             return ReturnData(result);
         }
 
         [HttpPost]
-        [Route("Save")]
-        public async Task<IActionResult> Save([FromBody] RQ_SaveRequestCustomerModel _input)
+        [Route("save")]
+        public async Task<IActionResult> Save([FromForm] RQ_SaveRequestCustomerModel _input)
         {
-            return ReturnData(await requestCustomerService.Save(_input));
+            return ReturnData(await _service.Save(_input));
         }
+
+        [HttpDelete]
+        [Route("key")]
+        public async Task<IActionResult> DeleteDetail([FromBody] RQ_DeleteRequestCustomerModel _input)
+        {
+            return ReturnData(await _service.DeleteDetail(_input));
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] RQ_DeleteRequestCustomerModel _input)
+        {
+            return ReturnData(await _service.Delete(_input));
+        }
+
+        [HttpGet]
+        [Route("{requestCode}")]
+        public async Task<ObjectResult> GetRequestCustomerById(Guid requestCode)
+            => ReturnData(await _service.GetRequestDetail(requestCode));
     }
 }

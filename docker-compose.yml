@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: pvg-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123qwe
+      MYSQL_DATABASE: pvg_sln_vaythuechap
+      # charset cho chuẩn UTF8
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - pvg_mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    networks:
+      - pvg_back_net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile     # chính là Dockerfile t đã chỉnh cho PVG.Web
+    container_name: pvg-backend
+    depends_on:
+      - mysql
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      TZ: Asia/Ho_Chi_Minh
+    ports:
+      - "7138:7138"
+    restart: unless-stopped
+    networks:
+      - pvg_back_net
+
+networks:
+  pvg_back_net:
+    driver: bridge
+
+volumes:
+  pvg_mysql_data:

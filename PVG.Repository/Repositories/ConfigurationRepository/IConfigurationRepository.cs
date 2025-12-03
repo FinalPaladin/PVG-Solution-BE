@@ -10,6 +10,5 @@ namespace PVG.Infrastucture.Repositories.ConfigurationRepository
 {
     public interface IConfigurationRepository : IRepositoryBase<Configuration, Guid>
     {
-        public Task<Configuration> GetById(Guid _id);
     }
 }
