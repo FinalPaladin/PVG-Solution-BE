@@ -183,13 +183,13 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 string row = @"
                                 <tr>
-                                    <td style=""font-weight: bold; padding: 6px 0;"">{0}:</td>
-                                    <td style=""padding: 6px 0;"">{1}</td>
+                                    <td style=""border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #B5FFC0;"">{0}:</td>
+                                    <td style=""border: 1px solid; padding: 6px 0;"">{1}</td>
                                 </tr>
                             ";
                 string htmlBody = @"
                                     <h4>Chi tiết yêu cầu vay từ khách hàng</h4>
-                                    <table style=""width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;"">
+                                    <table style=""border: 1px solid; width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;"">
                                         {0}
                                     </table>
                                     ";

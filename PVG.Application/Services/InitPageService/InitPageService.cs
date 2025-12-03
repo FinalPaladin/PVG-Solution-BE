@@ -247,6 +247,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = false,
                     },
                     new Configuration()
                     {
@@ -263,6 +264,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = false,
                     },
                     new Configuration()
                     {
@@ -279,6 +281,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = false,
                     },
                     new Configuration()
                     {
@@ -295,6 +298,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = false,
                     },
                     new Configuration()
                     {
@@ -311,6 +315,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = false,
                     },
                     new Configuration()
                     {
@@ -327,6 +332,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = false,
                     },
                     new Configuration()
                     {
@@ -343,6 +349,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = false,
                     },
                     new Configuration()
                     {
@@ -359,6 +366,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = true,
                     },
                     new Configuration()
                     {
@@ -375,6 +383,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = true,
                     },
                     new Configuration()
                     {
@@ -391,6 +400,7 @@ namespace PVG.Application.Services.InitPageService
                         ModifiedBy = null,
                         ModifiedByName = "",
                         ModifiedDate = DateTime.Now,
+                        IsImage = true,
                     },
                 };
                 await _configurationRepository.CreateListAsync(initConfigs);

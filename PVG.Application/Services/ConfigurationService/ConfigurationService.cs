@@ -47,7 +47,7 @@ namespace PVG.Application.Services.ConfigurationService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Data not found",
+                        Message = "Dữ liệu chưa được khởi tạo",
                     };
                 }
 
@@ -137,17 +137,24 @@ namespace PVG.Application.Services.ConfigurationService
                     var iExist = dataUpdate.FindIndex(y => y.Key == rc.Key);
 
                     var updateImg = _input.DataImage.Find(x => x.Key == rc.Key);
-                    if(updateImg != null)
+                    if (updateImg != null)
                     {
                         isImage = true;
                         var key = await _cloudflareR2Service.UpImage(rc.Value, updateImg.ImgFile);
-                        if(!string.IsNullOrEmpty(key))
+                        if (!string.IsNullOrEmpty(key))
                         {
                             rc.Value = key;
                         }
                         else
                         {
                             rc.Value = "";
+                        }
+                    }
+                    else
+                    {
+                        if (dataUpdate[iExist].IsImage)
+                        {
+                            continue;
                         }
                     }
 

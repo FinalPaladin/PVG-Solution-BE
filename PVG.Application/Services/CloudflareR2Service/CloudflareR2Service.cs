@@ -100,29 +100,26 @@ namespace PVG.Application.Services.CloudflareR2Service
             return "";
         }
 
-        public async Task<string> UpImage(string _publicKey, IFormFile _file)
+        public async Task<string> UpImage(string _key, IFormFile _file)
         {
-            string newPubKey = "";
-
             if(_file == null)
             {
-                return newPubKey;
+                return "";
             }
 
-            if(!string.IsNullOrEmpty(_publicKey))
+            if(!string.IsNullOrEmpty(_key))
             {
-                var keyObj = _publicKey.Substring($"{_appSettings.CloudflareR2.PublicBaseUrl}/".Length);
-                await DeleteAsync(keyObj);
+                await DeleteAsync(_key);
             }
 
             await using var stream = _file.OpenReadStream();
             var result = await Upload3S(stream, _file.FileName, _file.ContentType);
             if (!string.IsNullOrEmpty(result))
             {
-                newPubKey = result;
+                return result;
             }
 
-            return newPubKey;
+            return "";
         }
     }
 }
