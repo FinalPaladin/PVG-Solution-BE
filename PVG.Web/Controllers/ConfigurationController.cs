@@ -18,6 +18,14 @@ namespace PVG.Web.Controllers
         }
 
         [HttpGet]
+        [Route("getbykey/{_input}")]
+        public async Task<IActionResult> GetByKey(string _input)
+        {
+            var result = await _service.GetByKey(_input);
+            return ReturnData(result);
+        }
+
+        [HttpGet]
         [Route("getall")]
         public async Task<IActionResult> GetAllData()
         {

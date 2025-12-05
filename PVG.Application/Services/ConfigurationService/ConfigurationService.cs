@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PVG.Application.Services.ConfigurationService
 {
@@ -33,6 +34,53 @@ namespace PVG.Application.Services.ConfigurationService
             _mapper = mapper;
             _userReponsitory = userReponsitory;
             _cloudflareR2Service = cloudflareR2Service;
+        }
+
+        public async Task<BaseResponse<ConfigurationModel>> GetByKey(string _input)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(_input))
+                {
+                    return new BaseResponse<ConfigurationModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+                var configRepository = _configurationRepository.FindByCondition(x => x.IsDeleted && x.Key == _input);
+
+                if (configRepository == null)
+                {
+                    return new BaseResponse<ConfigurationModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Không tìm thấy"
+                    };
+                }
+
+                var data = _mapper.Map<ConfigurationModel>(configRepository);
+
+                return new BaseResponse<ConfigurationModel>()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Lấy thông tin thành công",
+                    Result = data
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<ConfigurationModel>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                    Result = new(),
+                };
+            }
         }
 
         public async Task<BaseResponse<RS_GetAllConfigurationModel>> GetAllData()

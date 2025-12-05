@@ -86,4 +86,10 @@ namespace PVG.Domain.Models
         public string Phone { get; set; }
         public Guid? ProductId { get; set; }
     }
+
+    public class RequestCustomerHeaderReport
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+    }
 }

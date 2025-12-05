@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeKit;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using PVG.Application.Services.CloudflareR2Service;
 using PVG.Application.Services.EmailService;
 using PVG.Application.Services.UserService;
@@ -14,6 +17,9 @@ using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.ImageRequestRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
+using System;
+using System.ComponentModel;
+using System.Drawing;
 using System.Text.Json;
 using static PVG.Domain.Enums.UserEnum;
 
@@ -179,24 +185,9 @@ namespace PVG.Application.Services.RequestCustomerService
                     dataDetail = new();
                 }
 
-                string row = @"
-                                <tr>
-                                    <td style=""border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #B5FFC0;"">{0}:</td>
-                                    <td style=""border: 1px solid; padding: 6px 0;"">{1}</td>
-                                </tr>
-                            ";
-                string htmlBody = @"
-                                    <h4>Chi tiết yêu cầu vay từ khách hàng</h4>
-                                    <table style=""border: 1px solid; width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;"">
-                                        {0}
-                                    </table>
-                                    ";
-
-                string rows = "";
                 List<SaveRequestCustomerModel> dataRC = JsonSerializer.Deserialize<List<SaveRequestCustomerModel>>(_input.Data);
                 foreach (var ddu in dataRC)
                 {
-                    rows += string.Format(row, ddu.Name, ddu.Value);
                     var data = dataDetail.Find(x => x.Key == ddu.Key);
                     if (data != null)
                     {
@@ -229,9 +220,16 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 if (detailCreate.Count > 0)
                 {
-                    string emailTitle = string.Format("[{2}]Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"), requestCode);
+                    string emailTitle = string.Format("[Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
 
-                    var sendEmail = await _emailService.SendEmailRequest(emailTitle, string.Format(htmlBody, rows));
+                    List<IFormFile> attacheds = new List<IFormFile>();
+
+                    foreach(var item in _input.DataImage)
+                    {
+                        attacheds.Add(item.ImgFile);
+                    }
+
+                    var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(_input.FullName, _input.Phone, dataRC), attacheds);
 
                     detailCreate.Add(
                         new RequestCustomerDetail()
@@ -359,6 +357,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     && (_input.ProductId == null || x.ProductId == _input.ProductId)
                     && (_input.RequestCode == null || x.ProductId == _input.RequestCode
                     && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower())))
+                    && x.IsProcessed == _input.IsProcessed
                 ).OrderByDescending(x => x.CreatedDate).AsQueryable();
 
                 var pagination = await _requestCustomerRepository.OffsetPagination<RequestCustomer>(query, _input.Page, _input.PageSize);
@@ -523,6 +522,55 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
+        private string GenBodyEmail(string _fullName, string _phone, List<SaveRequestCustomerModel> _data)
+        {
+            string title = @"<tr>
+                                <td colspan=2 style=""border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #36C920; padding:5px; width: 40%;""><b>{0}</b></td>
+                            </tr>";
+            string row = @"
+                            <tr>
+                                <td style=""border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #B5FFC0; padding:5px; width: 40%;"">{0}:</td>
+                                <td style=""border: 1px solid; padding: 5px;"">{1}</td>
+                            </tr>
+                        ";
+
+            string content = "";
+
+            foreach (var item in ConstRequestCustomer.ListRC)
+            {
+                switch (item.Name)
+                {
+                    case "title":
+                        content += string.Format(row, item.Name, item.Name);
+                        break;
+                    case "Phone":
+                        content += string.Format(row, item.Name, _phone);
+                        break;
+                    case "FullName":
+                        content += string.Format(row, item.Name, _fullName);
+                        break;
+                    default:
+                        content += string.Format(row, item.Name, GetValueByKey(_data, item.Value));
+                        break;
+                }                
+            }
+
+            return string.Format(@"
+                    <h4>Chi tiết yêu cầu vay từ khách hàng</h4>
+                    <table style=""border: 1px solid; max-width: 80%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;"">8                        {0}
+                    </table>
+                    ", content);
+        }
+
+        private string GetValueByKey(List<SaveRequestCustomerModel> _data, string _key)
+        {
+            var obj = _data.Find(x => x.Key.ToLower() == _key.ToLower());
+
+            if (obj != null)
+                return obj.Value;
+            return "";
+        }
+
         public async Task<BaseResponse> GetRequestDetail(Guid _requestCode)
         {
             try
@@ -553,6 +601,204 @@ namespace PVG.Application.Services.RequestCustomerService
             {
                 _logger.LogError("GetRequestDetail: {0}", ex.Message);
                 return CatchErrorResponse(ex);
+            }
+        }
+
+        public async Task<BaseResponse<byte[]>> ExportExcel(RQ_SearchRequestCustomerModel _input)
+        {
+            try
+            {
+                OfficeOpenXml.ExcelPackage.License.SetNonCommercialPersonal("PVG Solution");
+                byte[] fileBytes = null;
+
+                var headers = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
+                    && (string.IsNullOrEmpty(_input.Phone) || x.Phone.Contains(_input.Phone))
+                    && (_input.ProductId == null || x.ProductId == _input.ProductId)
+                    && (_input.RequestCode == null || x.ProductId == _input.RequestCode
+                    && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower())))
+                    && x.IsProcessed == _input.IsProcessed
+                ).OrderByDescending(x => x.CreatedDate).ToListAsync();
+
+                var requestCodes = headers.Select(x => x.RequestCode).ToList();
+
+                var details = await _requestCustomerDetailRepository.FindByCondition(x => requestCodes.Contains(x.RequestCode)).ToListAsync();
+
+                using (ExcelPackage package = new ExcelPackage())
+                {
+                    var ws = package.Workbook.Worksheets.Add("Report");
+
+                    ExcelHeaderTop(ws, "A1:I1");
+                    ExcelHeaderTop(ws, "J1:M1");
+                    ExcelHeaderTop(ws, "N1:S1");
+                    ExcelHeaderTop(ws, "T1:X1");
+                    ExcelHeaderTop(ws, "Y1:Z1");
+
+                    ws.Cells["A1"].Value = ConstRequestCustomer.RC_PersonalInformation_Name;
+                    ws.Cells["J1"].Value = ConstRequestCustomer.RC_ContactInformation_Name;
+                    ws.Cells["N1"].Value = ConstRequestCustomer.RC_JobInformation_Name;
+                    ws.Cells["T1"].Value = ConstRequestCustomer.RC_CreditInformation_Name;
+                    ws.Cells["Y1"].Value = ConstRequestCustomer.RC_OtherInformation_Name;
+
+                    var headerReports = ConstRequestCustomer.ListRC.Where(x => x.Value != "title").ToList();
+
+                    int row = 2;
+                    for (int i = 0; i < headerReports.Count; i++)
+                    {
+                        ExcelHeader(ws, row, i + 1);
+                        ws.Cells[row, i + 1].Value = headerReports[i].Name;
+                    }
+
+                    foreach (var head in headers)
+                    {
+                        row++;
+                        var detail = details.Where(x => x.RequestCode == head.RequestCode && !x.IsDeleted).ToList();
+                        for (int i = 0; i < headerReports.Count; i++)
+                        {
+                            string value = "";
+                            switch(headerReports[i].Value)
+                            {
+                                case "Phone":
+                                    value = head.Phone;
+                                    break;
+                                case "FullName":
+                                    value = head.FullName;
+                                    break;
+                                default:
+                                    var dt = detail.Find(x => x.Key.ToLower() == headerReports[i].Value.ToLower());
+                                    if (dt != null)
+                                        value = dt.Value;
+                                    break;
+                            }
+
+                            ExcelBody(ws, row, i + 1);
+                            ws.Cells[row, i + 1].Value = value;
+                        }
+                    }
+
+                    fileBytes = package.GetAsByteArray();
+                }
+
+                return new BaseResponse<byte[]>()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Result = fileBytes
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<byte[]>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        private void ExcelHeaderTop(ExcelWorksheet ws, string _colMerge)
+        {
+            string bgColor = "#36C920";
+            var header = ws.Cells[_colMerge];
+            header.Merge = true;
+            header.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            //header.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(0, 102, 204));
+            header.Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml(bgColor));
+            header.Style.Font.Color.SetColor(Color.White);
+            header.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            header.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            header.Style.Font.Size = 12;
+            header.Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
+            header.Style.Font.Bold = true;
+        }
+
+        private void ExcelHeader(ExcelWorksheet ws, int _row, int _col)
+        {
+            var bgColor = "#B5FFC0";
+            var header = ws.Cells[_row, _col];
+            header.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            header.Style.Fill.BackgroundColor.SetColor(ColorTranslator.FromHtml(bgColor));
+            header.Style.Font.Color.SetColor(Color.Black);
+            header.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            header.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            header.Style.Font.Size = 12;
+            header.Style.Font.Bold = true;
+            header.Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
+            header.AutoFitColumns();
+        }
+        private void ExcelBody(ExcelWorksheet ws, int _row, int _col)
+        {
+            var header = ws.Cells[_row, _col];
+            header.Style.Font.Size = 12;
+            header.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            header.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            header.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            header.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            // Nếu muốn đổi màu border
+            header.Style.Border.Top.Color.SetColor(Color.Black);
+            header.Style.Border.Bottom.Color.SetColor(Color.Black);
+            header.Style.Border.Left.Color.SetColor(Color.Black);
+            header.Style.Border.Right.Color.SetColor(Color.Black);
+        }
+
+        public async Task<BaseResponse> Processed(Guid _input)
+        {
+            try
+            {
+                if (_input == null)
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Dữ liệu truyền vào không đúng",
+                    };
+
+                var request = await _requestCustomerRepository.FindByCondition(x => x.RequestCode == _input).FirstOrDefaultAsync();
+
+                if(request == null)
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Yêu cầu không tồn tại",
+                    };
+
+                if(!request.IsDeleted)
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Yêu cầu đã bị xóa",
+                    };
+
+                if(request.IsProcessed)
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Yêu cầu đã được hoàn tất trước đó",
+                    };
+
+                request.IsProcessed = true;
+                await _requestCustomerRepository.UpdateAsync(request);
+                await _requestCustomerRepository.SaveChangesAsync();
+
+                return new BaseResponse()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Xử lý yêu cầu khách hàng thành công",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
             }
         }
     }

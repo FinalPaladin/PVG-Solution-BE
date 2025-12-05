@@ -16,5 +16,9 @@ namespace PVG.Application.Services.RequestCustomerService
         public Task<BaseResponse> Delete(RQ_DeleteRequestCustomerModel _input);
 
         Task<BaseResponse> GetRequestDetail(Guid _requestCode);
+
+        public Task<BaseResponse<byte[]>> ExportExcel(RQ_SearchRequestCustomerModel _input);
+
+        public Task<BaseResponse> Processed(Guid _input);
     }
 }
