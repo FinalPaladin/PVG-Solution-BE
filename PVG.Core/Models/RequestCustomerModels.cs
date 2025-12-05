@@ -50,6 +50,7 @@ namespace PVG.Domain.Models
     {
         public string Key { get; set; }
         public string Value { get; set; }
+        public string CreatedDate { get; set; }
     }
 
     public class RequestCustomerModel
