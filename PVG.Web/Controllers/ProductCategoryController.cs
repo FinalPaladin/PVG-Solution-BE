@@ -19,13 +19,10 @@ namespace PVG.Web.Controllers
             _service = service;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("search")]
-        public async Task<IActionResult> Search([FromBody] RQ_SearchProductCategoryModel _input)
-        {
-            var result = await _service.Search(_input);
-            return ReturnData(result);
-        }
+        public async Task<IActionResult> Search([FromQuery] RQ_SearchProductCategoryModel _input)
+            => ReturnData(await _service.Search(_input));
 
         [HttpPost]
         [Route("get")]
