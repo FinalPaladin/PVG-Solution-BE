@@ -309,11 +309,34 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                var requestCutomerEntity = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false && x.Phone == _input.Phone
-                && x.RequestCode == _input.RequestCode
-                && x.ProductId == _input.ProductId).FirstOrDefaultAsync();
+                var requestCutomerEntity = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
+                && x.RequestCode == _input.RequestCode).FirstOrDefaultAsync();
+
+                if (requestCutomerEntity == null)
+                    return new BaseResponse<RS_GetRequestCustomerModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Yêu cầu khách hàng không tồn tại"
+                    };
 
                 var data = _mapper.Map<RequestCustomerModel>(requestCutomerEntity);
+
+                var requestCustomerDetailEntity = await _requestCustomerDetailRepository.FindByCondition(x => !x.IsDeleted
+                && x.RequestCode == _input.RequestCode).ToListAsync();
+
+                var details = new List<RequestCustomerDetailModel>();
+
+                if(requestCustomerDetailEntity != null)
+                    details = _mapper.Map<List<RequestCustomerDetailModel>>(requestCustomerDetailEntity);
+
+                var imgs = await _imageRequestRepository.FindByCondition(c => c.RequestCode == _input.RequestCode && !c.IsDeleted).ToListAsync();
+                if (imgs?.Count > 0)
+                    details.AddRange(imgs.Select((value, index) => new RequestCustomerDetailModel
+                    {
+                        Key = $"image{index + 1}",
+                        Value = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{value.Url}",
+                    }));
 
                 return new BaseResponse<RS_GetRequestCustomerModel>()
                 {
@@ -322,7 +345,8 @@ namespace PVG.Application.Services.RequestCustomerService
                     Message = "Lấy thông tin thành công",
                     Result = new()
                     {
-                        Data = data
+                        Data = data,
+                        Details = details
                     },
                 };
             }
@@ -543,12 +567,6 @@ namespace PVG.Application.Services.RequestCustomerService
                     case "title":
                         content += string.Format(row, item.Name, item.Name);
                         break;
-                    case "Phone":
-                        content += string.Format(row, item.Name, _phone);
-                        break;
-                    case "FullName":
-                        content += string.Format(row, item.Name, _fullName);
-                        break;
                     default:
                         content += string.Format(row, item.Name, GetValueByKey(_data, item.Value));
                         break;
@@ -653,21 +671,9 @@ namespace PVG.Application.Services.RequestCustomerService
                         for (int i = 0; i < headerReports.Count; i++)
                         {
                             string value = "";
-                            switch(headerReports[i].Value)
-                            {
-                                case "Phone":
-                                    value = head.Phone;
-                                    break;
-                                case "FullName":
-                                    value = head.FullName;
-                                    break;
-                                default:
-                                    var dt = detail.Find(x => x.Key.ToLower() == headerReports[i].Value.ToLower());
-                                    if (dt != null)
-                                        value = dt.Value;
-                                    break;
-                            }
-
+                            var dt = detail.Find(x => x.Key.ToLower() == headerReports[i].Value.ToLower());
+                            if (dt != null)
+                                value = dt.Value;
                             ExcelBody(ws, row, i + 1);
                             ws.Cells[row, i + 1].Value = value;
                         }
@@ -762,7 +768,7 @@ namespace PVG.Application.Services.RequestCustomerService
                         Message = "Yêu cầu không tồn tại",
                     };
 
-                if(!request.IsDeleted)
+                if(request.IsDeleted)
                     return new BaseResponse()
                     {
                         IsSuccess = false,

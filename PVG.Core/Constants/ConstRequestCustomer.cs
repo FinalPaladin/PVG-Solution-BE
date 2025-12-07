@@ -9,6 +9,8 @@ namespace PVG.Domain.Constants
 {
     public static class ConstRequestCustomer
     {
+        public const string RC_FullName = "FullName";
+        public const string RC_Phone = "Phone";
         public const string RC_BirthDay = "BirthDay";
         public const string RC_Age = "Age";
         public const string RC_Gender = "Gender";
@@ -18,7 +20,7 @@ namespace PVG.Domain.Constants
         public const string RC_DateOfIssue = "DateOfIssue";
         public const string RC_Nationality = "Nationality";
         public const string RC_Email = "Email";
-        public const string RC_CurrentAdress = "CurrentAdress";
+        public const string RC_CurrentAdress = "Address";
         public const string RC_MaritalStatus = "MaritalStatus";
         public const string RC_CompanyName = "CompanyName";
         public const string RC_JobTitle = "JobTitle";
@@ -30,7 +32,7 @@ namespace PVG.Domain.Constants
         public const string RC_OutstandingLoansAtOtherBanks = "OutstandingLoansAtOtherBanks";
         public const string RC_LoanAmountRequested = "LoanAmountRequested";
         public const string RC_Collateral = "Collateral";
-        public const string RC_PropertyAddress = "PropertyAddress";
+        public const string RC_PropertyAddress = "RedBookAddress";
         public const string RC_LoanProductType = "LoanProductType";
         public const string RC_ImageLink = "ImageLink";
 

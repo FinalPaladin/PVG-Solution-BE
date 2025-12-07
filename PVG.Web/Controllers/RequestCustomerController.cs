@@ -24,8 +24,8 @@ namespace PVG.Web.Controllers
             return ReturnData(result);
         }
 
-        [HttpGet]
-        [Route("get")]
+        [HttpPost]
+        [Route("getdata")]
         public async Task<IActionResult> GetData([FromBody] RQ_GetRequestCustomerModel _input)
         {
             var result = await _service.GetData(_input);
@@ -76,6 +76,6 @@ namespace PVG.Web.Controllers
         [HttpGet]
         [Route("processed/{_input}")]
         public async Task<IActionResult> Processed(Guid _input)
-             => ReturnData(await _service.GetRequestDetail(_input));
+             => ReturnData(await _service.Processed(_input));
     }
 }

@@ -44,6 +44,7 @@ namespace PVG.Domain.Models
     public class RS_GetRequestCustomerModel
     {
         public RequestCustomerModel Data { get; set; } = new();
+        public List<RequestCustomerDetailModel> Details { get; set; } = new();
     }
 
     public class RequestCustomerDetailModel
@@ -84,8 +85,6 @@ namespace PVG.Domain.Models
     public class RQ_GetRequestCustomerModel
     {
         public Guid? RequestCode { get; set; }
-        public string Phone { get; set; }
-        public Guid? ProductId { get; set; }
     }
 
     public class RequestCustomerHeaderReport
