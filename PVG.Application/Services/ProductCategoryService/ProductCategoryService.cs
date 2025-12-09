@@ -113,13 +113,13 @@ namespace PVG.Application.Services.ProductCategoryService
             }
         }
 
-        public async Task<BaseResponse<RS_SearchProductCategoryModel>> Search(RQ_SearchProductCategoryModel _input)
+        public async Task<BaseResponse> Search(RQ_SearchProductCategoryModel _input)
         {
             try
             {
                 if (_input == null)
                 {
-                    return new BaseResponse<RS_SearchProductCategoryModel>()
+                    return new BaseResponse()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -135,27 +135,24 @@ namespace PVG.Application.Services.ProductCategoryService
 
                 var data = _mapper.Map<List<ProductCategoryModel>>(pagination.Items);
 
-                return new BaseResponse<RS_SearchProductCategoryModel>()
+                return new BaseResponse()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = "Lấy dữ liệu thành công",
-                    Result = new()
+                    Result = new
                     {
-                        Data = new()
-                        {
-                            Items = data,
-                            PageNumber = pagination.PageNumber,
-                            PerPage = pagination.PerPage,
-                            TotalItems = pagination.TotalItems,
-                            TotalPages = pagination.TotalPages,
-                        }
+                        Items = data,
+                        PageNumber = pagination.PageNumber,
+                        PerPage = pagination.PerPage,
+                        TotalItems = pagination.TotalItems,
+                        TotalPages = pagination.TotalPages,
                     }
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_SearchProductCategoryModel>()
+                return new()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status200OK,
@@ -164,13 +161,13 @@ namespace PVG.Application.Services.ProductCategoryService
             }
         }
 
-        public async Task<BaseResponse<RS_GetProductCategoryModel>> Get(RQ_GetProductCategoryModel _input)
+        public async Task<BaseResponse> Get(RQ_GetProductCategoryModel _input)
         {
             try
             {
                 if (_input == null)
                 {
-                    return new BaseResponse<RS_GetProductCategoryModel>()
+                    return new()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -182,20 +179,17 @@ namespace PVG.Application.Services.ProductCategoryService
 
                 var data = _mapper.Map<ProductCategoryModel>(productEntity);
 
-                return new BaseResponse<RS_GetProductCategoryModel>()
+                return new()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = "Lấy dữ liệu thành công",
-                    Result = new()
-                    {
-                        Data = data
-                    }
+                    Result = data
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_GetProductCategoryModel>()
+                return new()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status200OK,
