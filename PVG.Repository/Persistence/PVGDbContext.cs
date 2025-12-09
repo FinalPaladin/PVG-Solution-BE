@@ -111,6 +111,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(100)
                     .HasCharSet("utf8mb4")
                     .IsRequired();
+
+                entity.Property(e => e.Inactive)
+                   .HasColumnType("TINYINT(1)")
+                   .HasDefaultValue(false)
+                   .IsRequired();
             });
 
             #endregion ProductCategory
@@ -175,9 +180,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasCharSet("utf8mb4")
                     .HasMaxLength(100);
             });
-            #endregion
+
+            #endregion RequestCustomer
 
             #region RequestCustomerDetail
+
             modelBuilder.Entity<RequestCustomerDetail>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -202,7 +209,7 @@ namespace PVG.Infrastucture.Persistence
                     .HasCharSet("utf8mb4");
             });
 
-            #endregion RequestCustomer
+            #endregion RequestCustomerDetail
 
             #region Configuration
 
@@ -366,9 +373,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("500"))
                     .HasMaxLength(500);
             });
+
             #endregion ImageRequest
 
             #region ProductDetail
+
             modelBuilder.Entity<ProductDetail>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -392,9 +401,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("2000"))
                     .HasMaxLength(2000);
             });
-            #endregion
+
+            #endregion ProductDetail
 
             #region ProductDetailCategory
+
             modelBuilder.Entity<ProductDetailCategory>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -411,8 +422,9 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("2000"))
                     .HasMaxLength(2000);
             });
-            #endregion
-            
+
+            #endregion ProductDetailCategory
+
             #region AuthTokens
 
             modelBuilder.Entity<AuthToken>(entity =>

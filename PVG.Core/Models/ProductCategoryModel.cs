@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PVG.Domain.Models
+﻿namespace PVG.Domain.Models
 {
     public class ProductCategoryModel
     {
@@ -15,21 +9,16 @@ namespace PVG.Domain.Models
 
     public class RQ_SaveProductCategoryModel
     {
-        public Guid? CreateUserId { get; set; }
-        public Guid? Id { get; set; }
         public string Name { get; set; }
+        public bool Inactive { get; set; } = false;
+        public string CreatedBy { get; set; }
     }
 
     public class RQ_SearchProductCategoryModel
     {
-        public string Name { get; set; }
+        public string? keyword { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
-    }
-
-    public class RS_SearchProductCategoryModel
-    {
-        public PaginationModel<List<ProductCategoryModel>> Data { get; set; } = new();
     }
 
     public class RQ_GetProductCategoryModel
@@ -37,14 +26,8 @@ namespace PVG.Domain.Models
         public Guid? Id { get; set; }
     }
 
-    public class RS_GetProductCategoryModel
+    public class RQ_UpdateProductCategoryModel : RQ_SaveProductCategoryModel
     {
-        public ProductCategoryModel Data { get; set; } = new ProductCategoryModel();
-    }
-
-    public class RQ_DeleteProductCategoryModel
-    {
-        public Guid? DeleteUserId { get; set; }
         public Guid? Id { get; set; }
     }
 }

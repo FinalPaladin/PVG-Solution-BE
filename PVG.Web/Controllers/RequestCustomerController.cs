@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PVG.Application.Services.RequestCustomerService;
-using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 
 namespace PVG.Web.Controllers
@@ -58,13 +57,12 @@ namespace PVG.Web.Controllers
         public async Task<ObjectResult> GetRequestCustomerById(Guid requestCode)
             => ReturnData(await _service.GetRequestDetail(requestCode));
 
-
         [HttpGet]
         [Route("exportexcel")]
         public async Task<IActionResult> ExportExcel([FromQuery] RQ_SearchRequestCustomerModel _input)
         {
             var data = await _service.ExportExcel(_input);
-            
+
             var file = File(
                         data.Result,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
