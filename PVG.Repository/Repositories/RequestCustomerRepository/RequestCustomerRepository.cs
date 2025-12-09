@@ -21,5 +21,21 @@ namespace PVG.Infrastucture.Repositories.RequestCustomerRepository
         {
             dbContext = _dbContext;
         }
+
+        public async Task EditAsync(RequestCustomer entity)
+        {
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity));
+
+            var keyValue = entity.RequestCode; // PK MỚI
+
+            var exist = await dbContext.Set<RequestCustomer>()
+                .SingleOrDefaultAsync(x => x.RequestCode == keyValue);
+
+            if (exist == null)
+                throw new Exception($"Không tìm thấy entity có RequestCode = {keyValue}");
+
+            dbContext.Entry(exist).CurrentValues.SetValues(entity);
+        }
     }
 }

@@ -40,13 +40,14 @@ namespace PVG.Web.Controllers
         }
 
         [HttpDelete]
-        [Route("key")]
+        [Route("delete-detail")]
         public async Task<IActionResult> DeleteDetail([FromBody] RQ_DeleteRequestCustomerModel _input)
         {
             return ReturnData(await _service.DeleteDetail(_input));
         }
 
-        [HttpDelete]
+        [HttpPost]
+        [Route("delete")]
         public async Task<IActionResult> Delete([FromBody] RQ_DeleteRequestCustomerModel _input)
         {
             return ReturnData(await _service.Delete(_input));
@@ -73,9 +74,9 @@ namespace PVG.Web.Controllers
             return file;
         }
 
-        [HttpGet]
-        [Route("processed/{_input}")]
-        public async Task<IActionResult> Processed(Guid _input)
+        [HttpPost]
+        [Route("processed")]
+        public async Task<IActionResult> Processed([FromBody] RQ_ProcessedModel _input)
              => ReturnData(await _service.Processed(_input));
     }
 }

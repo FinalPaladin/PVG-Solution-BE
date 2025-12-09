@@ -34,7 +34,8 @@ namespace PVG.Domain.Constants
         public const string RC_Collateral = "Collateral";
         public const string RC_PropertyAddress = "RedBookAddress";
         public const string RC_LoanProductType = "LoanProductType";
-        public const string RC_ImageLink = "ImageLink";
+        public const string RC_OtherInfo = "OtherInfo";
+        public const string RC_OtherIncome = "OrderIncome";
 
         public const string RC_PersonalInformation_Name = "Thông Tin Cá Nhân";
         public const string RC_ContactInformation_Name = "Thông Tin Liên Lạc";
@@ -66,7 +67,8 @@ namespace PVG.Domain.Constants
         public const string RC_Collateral_Name = "Tài Sản Đảm Bảo";
         public const string RC_PropertyAddress_Name = "Địa chỉ Sổ Đỏ/Hồng";
         public const string RC_LoanProductType_Name = "Loại Sản Phẩm Vay";
-        public const string RC_ImageLink_Name = "Link Hình Ảnh CDN";
+        public const string RC_OtherInfo_Name = "Thông tin khác";
+        public const string RC_OtherIncome_Name = "Thu nhập khác";
 
         public static List<RequestCustomerHeaderReport> ListRC = [
                         new RequestCustomerHeaderReport(){Name = RC_PersonalInformation_Name, Value = "title"},
@@ -79,12 +81,12 @@ namespace PVG.Domain.Constants
                         new RequestCustomerHeaderReport(){Name = RC_PlaceOfIssue_Name, Value = RC_PlaceOfIssue},
                         new RequestCustomerHeaderReport(){Name = RC_DateOfIssue_Name, Value = RC_DateOfIssue},
                         new RequestCustomerHeaderReport(){Name = RC_Nationality_Name, Value = RC_Nationality},
+                        new RequestCustomerHeaderReport(){Name = RC_MaritalStatus_Name, Value = RC_MaritalStatus},
 
                         new RequestCustomerHeaderReport(){Name = RC_ContactInformation_Name, Value = "title"},
                         new RequestCustomerHeaderReport(){Name = RC_Phone_Name, Value = "Phone"},
                         new RequestCustomerHeaderReport(){Name = RC_Email_Name, Value = RC_Email},
                         new RequestCustomerHeaderReport(){Name = RC_CurrentAdress_Name, Value = RC_CurrentAdress},
-                        new RequestCustomerHeaderReport(){Name = RC_MaritalStatus_Name, Value = RC_MaritalStatus},
 
                         new RequestCustomerHeaderReport(){Name = RC_JobInformation_Name, Value = "title"},
                         new RequestCustomerHeaderReport(){Name = RC_CompanyName_Name, Value = RC_CompanyName},
@@ -100,10 +102,11 @@ namespace PVG.Domain.Constants
                         new RequestCustomerHeaderReport(){Name = RC_LoanAmountRequested_Name, Value = RC_LoanAmountRequested},
                         new RequestCustomerHeaderReport(){Name = RC_Collateral_Name, Value = RC_Collateral},
                         new RequestCustomerHeaderReport(){Name = RC_PropertyAddress_Name, Value = RC_PropertyAddress},
+                        new RequestCustomerHeaderReport(){Name = RC_OtherIncome_Name, Value = RC_OtherIncome},
+                        new RequestCustomerHeaderReport(){Name = RC_OtherInfo_Name, Value = RC_OtherInfo},
 
                         new RequestCustomerHeaderReport(){Name = RC_OtherInformation_Name, Value = "title"},
                         new RequestCustomerHeaderReport(){Name = RC_LoanProductType_Name, Value = RC_LoanProductType},
-                        new RequestCustomerHeaderReport(){Name = RC_ImageLink_Name, Value = RC_ImageLink}
                     ];
     }
 }

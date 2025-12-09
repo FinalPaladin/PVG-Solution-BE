@@ -19,6 +19,6 @@ namespace PVG.Application.Services.RequestCustomerService
 
         public Task<BaseResponse<byte[]>> ExportExcel(RQ_SearchRequestCustomerModel _input);
 
-        public Task<BaseResponse> Processed(Guid _input);
+        public Task<BaseResponse> Processed(RQ_ProcessedModel _input);
     }
 }

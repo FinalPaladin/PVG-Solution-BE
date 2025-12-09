@@ -21,8 +21,6 @@ namespace PVG.Domain.Models
         public string Key { get; set; }
         [JsonPropertyName("value")]
         public string Value { get; set; }
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
     }
 
     public class ImageRequestCustomerModel
@@ -76,10 +74,9 @@ namespace PVG.Domain.Models
     public class RQ_DeleteRequestCustomerModel
     {
         public string UserDelete { get; set; }
-        public Guid? Id { get; set; }
+        public Guid? IdDetail { get; set; }
+
         public Guid? RequestCode { get; set; }
-        public string Phone { get; set; }
-        public Guid? ProductId { get; set; }
     }
 
     public class RQ_GetRequestCustomerModel
@@ -91,5 +88,11 @@ namespace PVG.Domain.Models
     {
         public string Name { get; set; }
         public string Value { get; set; }
+    }
+
+    public class RQ_ProcessedModel
+    {
+        public Guid? RequestCode { get; set; }
+        public string UserName { get; set; }
     }
 }

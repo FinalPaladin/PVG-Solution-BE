@@ -17,6 +17,7 @@ using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.ImageRequestRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
+using PVG.Infrastucture.Repositories.UserRepository;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -34,6 +35,7 @@ namespace PVG.Application.Services.RequestCustomerService
         private readonly IUserService _userService;
         private readonly ICloudflareR2Service _cloudflareR2Service;
         private readonly IImageRequestRepository _imageRequestRepository;
+        private readonly IUserRepository _userRepository;
 
         public RequestCustomerService(
             IOptions<AppSettings> options,
@@ -44,7 +46,8 @@ namespace PVG.Application.Services.RequestCustomerService
             IEmailService emailService,
             IUserService userService,
             ICloudflareR2Service cloudflareR2Service,
-            IImageRequestRepository imageRequestRepository) : base(options, mapper)
+            IImageRequestRepository imageRequestRepository,
+            IUserRepository userRepository) : base(options, mapper)
         {
             _logger = logger;
             _requestCustomerRepository = requestCustomerRepository;
@@ -52,6 +55,7 @@ namespace PVG.Application.Services.RequestCustomerService
             _emailService = emailService;
             _cloudflareR2Service = cloudflareR2Service;
             _imageRequestRepository = imageRequestRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<BaseResponse> Save(RQ_SaveRequestCustomerModel _input)
@@ -100,7 +104,7 @@ namespace PVG.Application.Services.RequestCustomerService
                         requestCode = dataUpdate.RequestCode;
                     }
 
-                    await _requestCustomerRepository.UpdateAsync(dataUpdate);
+                    await _requestCustomerRepository.EditAsync(dataUpdate);
                 }
                 else
                 {
@@ -451,7 +455,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 var checkExistDetail = await _requestCustomerDetailRepository.FindByCondition(x => x.RequestCode == checkExist.RequestCode
                 && !x.IsDeleted
-                && x.Id == _input.Id).FirstOrDefaultAsync();
+                && x.Id == _input.IdDetail).FirstOrDefaultAsync();
 
                 if (checkExistDetail == null)
                 {
@@ -492,11 +496,9 @@ namespace PVG.Application.Services.RequestCustomerService
             try
             {
                 var checkExist = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
-                    && x.RequestCode == _input.RequestCode
-                    && x.Phone == _input.Phone
-                    && x.ProductId == _input.ProductId).ToListAsync();
+                    && x.RequestCode == _input.RequestCode).FirstOrDefaultAsync();
 
-                if (checkExist == null || checkExist.Count == 0)
+                if (checkExist == null)
                 {
                     return new BaseResponse()
                     {
@@ -518,14 +520,12 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                foreach (var rc in checkExist)
-                {
-                    rc.IsDeleted = true;
-                    rc.DeletedBy = isAdmin.Result.Id;
-                    rc.DeletedDate = DateTime.Now;
-                }
 
-                await _requestCustomerRepository.UpdateListAsync(checkExist);
+                checkExist.IsDeleted = true;
+                checkExist.DeletedBy = isAdmin.Result.Id;
+                checkExist.DeletedDate = DateTime.Now;
+
+                await _requestCustomerRepository.EditAsync(checkExist);
                 await _requestCustomerRepository.SaveChangesAsync();
 
                 return new BaseResponse()
@@ -549,7 +549,7 @@ namespace PVG.Application.Services.RequestCustomerService
         private string GenBodyEmail(string _fullName, string _phone, List<SaveRequestCustomerModel> _data)
         {
             string title = @"<tr>
-                                <td colspan=2 style=""border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #36C920; padding:5px; width: 40%;""><b>{0}</b></td>
+                                <td colspan=""2"" style=""border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #36C920; padding:5px; width: 40%;""><b>{0}</b></td>
                             </tr>";
             string row = @"
                             <tr>
@@ -565,7 +565,7 @@ namespace PVG.Application.Services.RequestCustomerService
                 switch (item.Name)
                 {
                     case "title":
-                        content += string.Format(row, item.Name, item.Name);
+                        content += string.Format(title, item.Name, item.Name);
                         break;
                     default:
                         content += string.Format(row, item.Name, GetValueByKey(_data, item.Value));
@@ -643,17 +643,17 @@ namespace PVG.Application.Services.RequestCustomerService
                 {
                     var ws = package.Workbook.Worksheets.Add("Report");
 
-                    ExcelHeaderTop(ws, "A1:I1");
-                    ExcelHeaderTop(ws, "J1:M1");
+                    ExcelHeaderTop(ws, "A1:J1");
+                    ExcelHeaderTop(ws, "K1:M1");
                     ExcelHeaderTop(ws, "N1:S1");
-                    ExcelHeaderTop(ws, "T1:X1");
-                    ExcelHeaderTop(ws, "Y1:Z1");
+                    ExcelHeaderTop(ws, "T1:Z1");
+                    ExcelHeaderTop(ws, "AA1:AA1");
 
                     ws.Cells["A1"].Value = ConstRequestCustomer.RC_PersonalInformation_Name;
-                    ws.Cells["J1"].Value = ConstRequestCustomer.RC_ContactInformation_Name;
+                    ws.Cells["K1"].Value = ConstRequestCustomer.RC_ContactInformation_Name;
                     ws.Cells["N1"].Value = ConstRequestCustomer.RC_JobInformation_Name;
                     ws.Cells["T1"].Value = ConstRequestCustomer.RC_CreditInformation_Name;
-                    ws.Cells["Y1"].Value = ConstRequestCustomer.RC_OtherInformation_Name;
+                    ws.Cells["AA1"].Value = ConstRequestCustomer.RC_OtherInformation_Name;
 
                     var headerReports = ConstRequestCustomer.ListRC.Where(x => x.Value != "title").ToList();
 
@@ -746,46 +746,60 @@ namespace PVG.Application.Services.RequestCustomerService
             header.Style.Border.Right.Color.SetColor(Color.Black);
         }
 
-        public async Task<BaseResponse> Processed(Guid _input)
+        public async Task<BaseResponse> Processed(RQ_ProcessedModel _input)
         {
             try
             {
                 if (_input == null)
+                {
                     return new BaseResponse()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Dữ liệu truyền vào không đúng",
                     };
+                }
 
-                var request = await _requestCustomerRepository.FindByCondition(x => x.RequestCode == _input).FirstOrDefaultAsync();
+                var request = await _requestCustomerRepository.FindByCondition(x => x.RequestCode == _input.RequestCode).FirstOrDefaultAsync();
 
-                if(request == null)
+                if (request == null)
+                {
                     return new BaseResponse()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Yêu cầu không tồn tại",
                     };
+                }
 
-                if(request.IsDeleted)
+                if (request.IsDeleted)
+                {
                     return new BaseResponse()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Yêu cầu đã bị xóa",
                     };
+                }
 
-                if(request.IsProcessed)
+                if (request.IsProcessed)
+                {
                     return new BaseResponse()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
                         Message = "Yêu cầu đã được hoàn tất trước đó",
                     };
+                }
+
+                var user = await _userRepository.FindByCondition(x => x.UserName == _input.UserName).FirstOrDefaultAsync();
 
                 request.IsProcessed = true;
-                await _requestCustomerRepository.UpdateAsync(request);
+                request.ModifiedByName = user.FullName;
+                request.ModifiedBy = user.Id;
+                request.ModifiedDate = DateTime.Now;
+
+                await _requestCustomerRepository.EditAsync(request);
                 await _requestCustomerRepository.SaveChangesAsync();
 
                 return new BaseResponse()
