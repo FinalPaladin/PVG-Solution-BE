@@ -6,6 +6,7 @@ using PVG.Infrastucture.Persistence;
 using PVG.Infrastucture.Repositories.AuthTokenRepository;
 using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.ImageRequestRepository;
+using PVG.Infrastucture.Repositories.MDataRepository;
 using PVG.Infrastucture.Repositories.NewRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
@@ -48,6 +49,7 @@ namespace PVG.Infrastucture
             services.AddScoped<IProductDetailCategoryRepository, ProductDetailCategoryRepository>();
             services.AddScoped<INewRepository, NewRepository>();
             services.AddScoped<IAuthTokenRepository, AuthTokenRepository>();
+            services.AddScoped<IMDataRepository, MDataRepository>();
 
             return services;
         }
