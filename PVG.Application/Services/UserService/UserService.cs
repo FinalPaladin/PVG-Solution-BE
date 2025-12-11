@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -70,9 +71,16 @@ namespace PVG.Application.Services.UserService
 
                 var newToken = await _tokenService.CreateTokenAsync(user);
 
+                string permission = "";
+                var permissions = await _permissionRepository.FindAll().ToListAsync();
+                var userpermisssion = await _userPermissionRepository.FindByCondition(x => x.UserId == user.Id).FirstOrDefaultAsync();
+                if(userpermisssion != null)
+                    permission = permissions.Find(x => x.Id == userpermisssion.PermissionId).Code;
+
                 return SuccessResponse(new
                 {
                     Token = newToken,
+                    Permission = permission,
                     FullName = user.UserName,
                     ExpireAt = DateTime.UtcNow.AddDays(30),
                 });
