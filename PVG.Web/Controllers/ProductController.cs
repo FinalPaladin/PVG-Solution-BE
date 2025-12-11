@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PVG.Application.Services.ConfigurationService;
 using PVG.Application.Services.ProductService;
-using PVG.Application.Services.RequestCustomerService;
-using PVG.Core.BaseModels;
 using PVG.Domain.Models;
-using System.Threading.Tasks;
 
 namespace PVG.Web.Controllers
 {
@@ -12,7 +8,8 @@ namespace PVG.Web.Controllers
     [ApiController]
     public class ProductController : PVGControllerBase
     {
-        IProductService _service;
+        private IProductService _service;
+
         public ProductController(IProductService service)
         {
             _service = service;
@@ -42,7 +39,7 @@ namespace PVG.Web.Controllers
 
         [HttpPost]
         [Route("delete")]
-        public async Task<IActionResult> Save([FromBody]RQ_DeleteProductModel _input)
+        public async Task<IActionResult> Save([FromBody] RQ_DeleteProductModel _input)
         {
             return ReturnData(await _service.Delete(_input));
         }

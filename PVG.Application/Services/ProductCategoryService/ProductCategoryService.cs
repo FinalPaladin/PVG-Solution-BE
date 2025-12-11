@@ -1,37 +1,35 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PVG.Core.BaseModels;
+using PVG.Domain.Constants;
 using PVG.Domain.Models;
+using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PVG.Application.Services.ProductCategoryService
 {
-    public class ProductCategoryService: IProductCategoryService
+    public class ProductCategoryService : BaseService, IProductCategoryService
     {
         private readonly IProductCategoryRepository _productCategoryRepository;
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
-        private readonly IUserRepository _userRepository;
 
-        public ProductCategoryService(IProductCategoryRepository productCategoryRepository,
-            IProductRepository productRepository,
+        public ProductCategoryService(
+            IOptions<AppSettings> options,
             IMapper mapper,
-            IUserRepository userRepository)
+
+            IProductCategoryRepository productCategoryRepository,
+            IProductRepository productRepository)
+            : base(options, mapper)
         {
             _productCategoryRepository = productCategoryRepository;
             _productRepository = productRepository;
             _mapper = mapper;
-            _userRepository = userRepository;
         }
 
         public async Task<BaseResponse> Save(RQ_SaveProductCategoryModel _input)
@@ -48,68 +46,22 @@ namespace PVG.Application.Services.ProductCategoryService
                     };
                 }
 
-                var id = Guid.NewGuid();
-
-                var dataUpdate = await _productCategoryRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
-
-                var userEntity = await _userRepository.FindByCondition(x => x.Id == _input.CreateUserId).FirstOrDefaultAsync();
-
-                if (userEntity == null)
+                var result = await _productCategoryRepository.CreateAsync(new ProductCategory()
                 {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Người dùng không tồn tại",
-                    };
-                }
+                    Id = Guid.NewGuid(),
+                    Name = _input.Name,
+                    Inactive = _input.Inactive,
+                    CreatedDate = DateTime.Now,
+                    ModifiedDate = DateTime.Now,
+                    CreatedByName = _input.CreatedBy,
+                    ModifiedByName = _input.CreatedBy,
+                });
 
-                if (dataUpdate != null)
-                {
-                    dataUpdate.Name = _input.Name;
-                    dataUpdate.ModifiedBy = userEntity.Id;
-                    dataUpdate.ModifiedByName = userEntity.FullName;
-                    dataUpdate.ModifiedDate = DateTime.Now;
-                    await _productCategoryRepository.UpdateAsync(dataUpdate);
-                }
-                else
-                {
-                    var dataCreate = new ProductCategory()
-                    {
-                        Id = Guid.NewGuid(),
-                        CreatedBy = userEntity.Id,
-                        CreatedByName = userEntity.FullName,
-                        CreatedDate = DateTime.Now,
-                        DeletedBy = null,
-                        DeletedByName = "",
-                        DeletedDate = DateTime.Now,
-                        IsDeleted = false,
-                        ModifiedBy = null,
-                        ModifiedByName = "",
-                        ModifiedDate = DateTime.Now,
-
-                        Name = _input.Name,
-                    };
-                    await _productCategoryRepository.CreateAsync(dataCreate);
-                }
-
-                await _productCategoryRepository.SaveChangesAsync();
-
-                return new BaseResponse()
-                {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Lưu dữ liệu thành công",
-                };
+                return SuccessResponse(result);
             }
             catch (Exception ex)
             {
-                return new BaseResponse()
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = ex.Message,
-                };
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
             }
         }
 
@@ -127,28 +79,13 @@ namespace PVG.Application.Services.ProductCategoryService
                     };
                 }
 
-                IQueryable<ProductCategory> query = _productCategoryRepository.FindByCondition(x => x.IsDeleted == false
-                    && (string.IsNullOrEmpty(_input.Name) || x.Name.Contains(_input.Name))
+                IQueryable<ProductCategory> query = _productCategoryRepository.FindByCondition(
+                    x => !x.Inactive
+                    && (string.IsNullOrEmpty(_input.keyword) || x.Name.Contains(_input.keyword))
                 ).AsQueryable();
 
-                var pagination = await _productCategoryRepository.OffsetPagination<ProductCategory>(query, _input.Page, _input.PageSize);
-
-                var data = _mapper.Map<List<ProductCategoryModel>>(pagination.Items);
-
-                return new BaseResponse()
-                {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Lấy dữ liệu thành công",
-                    Result = new
-                    {
-                        Items = data,
-                        PageNumber = pagination.PageNumber,
-                        PerPage = pagination.PerPage,
-                        TotalItems = pagination.TotalItems,
-                        TotalPages = pagination.TotalPages,
-                    }
-                };
+                var pagination = await OffsetPagination<ProductCategory>(query, _input.Page, _input.PageSize);
+                return SuccessResponse(pagination);
             }
             catch (Exception ex)
             {
@@ -198,58 +135,27 @@ namespace PVG.Application.Services.ProductCategoryService
             }
         }
 
-        public async Task<BaseResponse> Delete(RQ_DeleteProductCategoryModel _input)
+        public async Task<BaseResponse> Delete(Guid _id)
         {
             try
             {
+                if (string.IsNullOrEmpty(_id.ToString()))
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Dữ liệu đầu vào không hợp lệ");
 
-                if (_input == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Điều kiện nhập trống"
-                    };
-                }
-
-                var tableEntity = await _productCategoryRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
-
+                var tableEntity = await _productCategoryRepository.FindByCondition(x => x.Id == _id).FirstOrDefaultAsync();
                 if (tableEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Dữ liệu không tồn tại"
-                    };
-                }
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Dữ liệu không tồn tại");
 
                 var productEntity = await _productRepository.FindByCondition(x => x.IsDeleted == false && x.ProductCategoryId == tableEntity.Id).FirstOrDefaultAsync();
-
                 if (productEntity != null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Có sản phẩm trực thuộc còn tồn tại"
-                    };
-                }
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Danh mục có sản phẩm đang hiệu lực, không thể xóa");
 
-                tableEntity.IsDeleted = true;
-                tableEntity.DeletedDate = DateTime.Now;
-                tableEntity.DeletedBy = _input.DeleteUserId;
+                tableEntity.Inactive = true;
+                tableEntity.ModifiedDate = DateTime.Now;
 
                 await _productCategoryRepository.UpdateAsync(tableEntity);
-                await _productCategoryRepository.SaveChangesAsync();
 
-                return new BaseResponse()
-                {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Xóa dữ liệu thành công"
-                };
+                return SuccessResponse("Xóa dữ liệu thành công");
             }
             catch (Exception ex)
             {
@@ -259,6 +165,32 @@ namespace PVG.Application.Services.ProductCategoryService
                     StatusCode = StatusCodes.Status200OK,
                     Message = ex.Message,
                 };
+            }
+        }
+
+        public async Task<BaseResponse> Update(RQ_UpdateProductCategoryModel _input)
+        {
+            try
+            {
+                if (_input == null)
+                {
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Dữ liệu đầu vào không hợp lệ");
+                }
+                var dataUpdate = await _productCategoryRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefaultAsync();
+                if (dataUpdate == null)
+                {
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Dữ liệu không tồn tại");
+                }
+                dataUpdate.Name = _input.Name;
+                dataUpdate.Inactive = _input.Inactive;
+                dataUpdate.ModifiedDate = DateTime.Now;
+                await _productCategoryRepository.UpdateAsync(dataUpdate);
+                await _productCategoryRepository.SaveChangesAsync();
+                return SuccessResponse("Cập nhật dữ liệu thành công");
+            }
+            catch (Exception ex)
+            {
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
             }
         }
     }

@@ -6,6 +6,7 @@ using PVG.Application.Services.CloudflareR2Service;
 using PVG.Application.Services.ConfigurationService;
 using PVG.Application.Services.EmailService;
 using PVG.Application.Services.InitPageService;
+using PVG.Application.Services.MDataService;
 using PVG.Application.Services.NewService;
 using PVG.Application.Services.PermissionService;
 using PVG.Application.Services.ProductCategoryService;
@@ -52,6 +53,7 @@ namespace PVG.Application
             services.AddScoped<IInitPageService, InitPageService>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<ICloudflareR2Service, CloudflareR2Service>();
+            services.AddScoped<IMDataService, MDataService>();
 
             return services;
         }

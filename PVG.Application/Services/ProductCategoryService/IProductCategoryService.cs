@@ -11,6 +11,8 @@ namespace PVG.Application.Services.ProductCategoryService
 
         public Task<BaseResponse> Get(RQ_GetProductCategoryModel _input);
 
-        public Task<BaseResponse> Delete(RQ_DeleteProductCategoryModel _input);
+        public Task<BaseResponse> Delete(Guid _id);
+
+        Task<BaseResponse> Update(RQ_UpdateProductCategoryModel _input);
     }
 }

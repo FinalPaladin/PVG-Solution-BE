@@ -26,6 +26,9 @@ namespace PVG.Application.Mappings
             CreateMap<RequestCustomerDetail, RequestCustomerDetailModel>()
                 .ForMember(des => des.CreatedDate, act => act.MapFrom(src => src.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss")))
                 .ReverseMap();
+
+            CreateMap<MData, MDataModel>().ReverseMap();
+            CreateMap<MData, MDataResponseModel>().ReverseMap();
         }
     }
 }

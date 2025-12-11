@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PVG.Infrastucture.Persistence;
 
@@ -10,9 +11,11 @@ using PVG.Infrastucture.Persistence;
 namespace PVG.Infrastucture.Migrations
 {
     [DbContext(typeof(PVGDbContext))]
-    partial class PVGDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251209020513_UpdateProductCategoryInactive")]
+    partial class UpdateProductCategoryInactive
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -168,71 +171,6 @@ namespace PVG.Infrastucture.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ImageRequest");
-                });
-
-            modelBuilder.Entity("PVG.Infrastucture.Entities.MData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("CreatedByName")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Group")
-                        .HasColumnType("int");
-
-                    b.Property<string>("GroupName")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<bool>("Inactive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("ModifiedByName")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("SortId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<string>("Value_ENG")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MData", (string)null);
                 });
 
             modelBuilder.Entity("PVG.Infrastucture.Entities.New", b =>

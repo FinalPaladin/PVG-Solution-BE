@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PVG.Application.Services.PermissionService;
-using PVG.Application.Services.UserPermissionService;
-using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
@@ -14,17 +11,10 @@ using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.UserPermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PVG.Application.Services.InitPageService
 {
-    public class InitPageService: IInitPageService
+    public class InitPageService : IInitPageService
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
@@ -58,9 +48,9 @@ namespace PVG.Application.Services.InitPageService
         {
             try
             {
-                var productCategoriesEntity = await _productCategoryRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
+                var productCategoriesEntity = await _productCategoryRepository.FindByCondition(x => !x.Inactive).ToListAsync();
 
-                if(productCategoriesEntity == null || productCategoriesEntity.Count == 0)
+                if (productCategoriesEntity == null || productCategoriesEntity.Count == 0)
                 {
                     return new BaseResponse<ProductInitPageModel>()
                     {
@@ -174,7 +164,7 @@ namespace PVG.Application.Services.InitPageService
                     new Permission()
                     {
                         Id = 1,
-                        Code = "SYS_AD",                        
+                        Code = "SYS_AD",
                     },
                     new Permission()
                     {
@@ -422,6 +412,5 @@ namespace PVG.Application.Services.InitPageService
                 };
             }
         }
-
     }
 }

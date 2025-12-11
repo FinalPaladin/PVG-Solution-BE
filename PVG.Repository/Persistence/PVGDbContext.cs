@@ -33,6 +33,7 @@ namespace PVG.Infrastucture.Persistence
         public DbSet<ProductDetailCategory> ProductDetailCategory { get; set; }
         public DbSet<RequestCustomerDetail> RequestCustomerDetail { get; set; }
         public DbSet<AuthToken> AuthTokens { get; set; }
+        public DbSet<MData> MDatas { get; set; }
 
         #endregion Database Setting
 
@@ -111,6 +112,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasMaxLength(100)
                     .HasCharSet("utf8mb4")
                     .IsRequired();
+
+                entity.Property(e => e.Inactive)
+                   .HasColumnType("TINYINT(1)")
+                   .HasDefaultValue(false)
+                   .IsRequired();
             });
 
             #endregion ProductCategory
@@ -175,9 +181,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasCharSet("utf8mb4")
                     .HasMaxLength(100);
             });
-            #endregion
+
+            #endregion RequestCustomer
 
             #region RequestCustomerDetail
+
             modelBuilder.Entity<RequestCustomerDetail>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -202,7 +210,7 @@ namespace PVG.Infrastucture.Persistence
                     .HasCharSet("utf8mb4");
             });
 
-            #endregion RequestCustomer
+            #endregion RequestCustomerDetail
 
             #region Configuration
 
@@ -366,9 +374,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("500"))
                     .HasMaxLength(500);
             });
+
             #endregion ImageRequest
 
             #region ProductDetail
+
             modelBuilder.Entity<ProductDetail>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -392,9 +402,11 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("2000"))
                     .HasMaxLength(2000);
             });
-            #endregion
+
+            #endregion ProductDetail
 
             #region ProductDetailCategory
+
             modelBuilder.Entity<ProductDetailCategory>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -411,8 +423,9 @@ namespace PVG.Infrastucture.Persistence
                     .HasColumnType(ColumType.TypeVarchar("2000"))
                     .HasMaxLength(2000);
             });
-            #endregion
-            
+
+            #endregion ProductDetailCategory
+
             #region AuthTokens
 
             modelBuilder.Entity<AuthToken>(entity =>
@@ -435,6 +448,69 @@ namespace PVG.Infrastucture.Persistence
             });
 
             #endregion AuthTokens
+
+            #region MData
+
+            modelBuilder.Entity<MData>(entity =>
+            {
+                // Table name
+                entity.ToTable("MData");
+
+                // Primary Key
+                entity.HasKey(e => e.Id);
+
+                // Enum group -> int
+                entity.Property(e => e.Group)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                // GroupName
+                entity.Property(e => e.GroupName)
+                    .HasMaxLength(200);
+
+                // SortId
+                entity.Property(e => e.SortId)
+                    .IsRequired();
+
+                // Key
+                entity.Property(e => e.Key)
+                    .IsRequired()
+                    .HasMaxLength(200);
+
+                // Value
+                entity.Property(e => e.Value)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                // Value_ENG
+                entity.Property(e => e.Value_ENG)
+                    .HasMaxLength(500);
+
+                // Inactive
+                entity.Property(e => e.Inactive)
+                    .HasDefaultValue(false);
+
+                // Audit fields
+                entity.Property(e => e.CreatedBy);
+
+                entity.Property(e => e.CreatedByName)
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.CreatedDate)
+                    .IsRequired();
+
+                entity.Property(e => e.ModifiedBy);
+
+                entity.Property(e => e.ModifiedByName)
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.ModifiedDate);
+
+                entity.Property(e => e.IsDeleted)
+                    .HasDefaultValue(false);
+            });
+
+            #endregion MData
         }
 
         // Define DbSet properties for your entities
