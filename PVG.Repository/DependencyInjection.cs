@@ -7,7 +7,9 @@ using PVG.Infrastucture.Repositories.AuthTokenRepository;
 using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.ImageRequestRepository;
 using PVG.Infrastucture.Repositories.MDataRepository;
-using PVG.Infrastucture.Repositories.NewRepository;
+using PVG.Infrastucture.Repositories.NewsCategoryMappingRepository;
+using PVG.Infrastucture.Repositories.NewsCategoryRepository;
+using PVG.Infrastucture.Repositories.NewsRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductDetailCategoryRepository;
@@ -47,9 +49,11 @@ namespace PVG.Infrastucture
             services.AddScoped<IRequestCustomerDetailRepository, RequestCustomerDetailRepository>();
             services.AddScoped<IProductDetailRepository, ProductDetailRepository>();
             services.AddScoped<IProductDetailCategoryRepository, ProductDetailCategoryRepository>();
-            services.AddScoped<INewRepository, NewRepository>();
             services.AddScoped<IAuthTokenRepository, AuthTokenRepository>();
             services.AddScoped<IMDataRepository, MDataRepository>();
+            services.AddScoped<INewsRepository, NewsRepository>();
+            services.AddScoped<INewsCategoryRepository, NewsCategoryRepository>();
+            services.AddScoped<INewsCategoryMappingRepository, NewsCategoryMappingRepository>();
 
             return services;
         }
