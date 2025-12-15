@@ -1,39 +1,31 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
+using PVG.Domain.Constants;
 using PVG.Domain.Models;
+using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static PVG.Domain.Enums.NewEnum;
 using static PVG.Domain.Enums.UserEnum;
 
 namespace PVG.Application.Services.ProductService
 {
-    public class ProductService: IProductService
+    public class ProductService : BaseService, IProductService
     {
         private readonly IProductRepository _productRepository;
-        private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
 
-        public ProductService(IProductRepository productRepository,
-            IMapper mapper,
+        public ProductService(IOptions<AppSettings> options,
+            IMapper mapper, IProductRepository productRepository,
             IUserRepository userRepository,
-            IUserService userService)
+            IUserService userService) : base(options, mapper)
         {
             _productRepository = productRepository;
-            _mapper = mapper;
             _userRepository = userRepository;
             _userService = userService;
         }
@@ -43,14 +35,7 @@ namespace PVG.Application.Services.ProductService
             try
             {
                 if (_input == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Điều kiện nhập trống"
-                    };
-                }
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Điều kiện nhập trống");
 
                 var id = Guid.NewGuid();
 
@@ -59,14 +44,7 @@ namespace PVG.Application.Services.ProductService
                 var userEntity = await _userRepository.FindByCondition(x => x.UserName == _input.CreateUser && x.Actived).FirstOrDefaultAsync();
 
                 if (userEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Người dùng không tồn tại",
-                    };
-                }
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Người dùng không tồn tại.");
 
                 if (dataUpdate != null)
                 {
@@ -123,24 +101,17 @@ namespace PVG.Application.Services.ProductService
             }
         }
 
-        public async Task<BaseResponse<RS_SearchProductModel>> Search(RQ_SearchProductModel _input)
+        public async Task<BaseResponse> Search(RQ_SearchProductModel _input)
         {
             try
             {
                 if (_input == null)
-                {
-                    return new BaseResponse<RS_SearchProductModel>()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Dữ liệu đầu vào không hợp lệ"
-                    };
-                }
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Điều kiện nhập trống");
 
-                IQueryable<Product> query = _productRepository.FindByCondition(x => x.IsDeleted == false
+                var query = _productRepository.FindByCondition(x => x.IsDeleted == false
                     && (
                         ((_input.ProductCategoryId == null) && ((string.IsNullOrEmpty(_input.Name) || x.Name.Contains(_input.Name))
-                        && (string.IsNullOrEmpty(_input.Description) || x.Description.Contains(_input.Description)))) 
+                        && (string.IsNullOrEmpty(_input.Description) || x.Description.Contains(_input.Description))))
                         || (_input.ProductCategoryId == x.ProductCategoryId)
                     )
                 ).AsQueryable();
@@ -149,72 +120,60 @@ namespace PVG.Application.Services.ProductService
 
                 var data = _mapper.Map<List<ProductModel>>(pagination.Items);
 
-                return new BaseResponse<RS_SearchProductModel>()
+                return SuccessResponse(new
                 {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Lấy dữ liệu thành công",
-                    Result = new()
-                    {
-                        Data = new()
-                        {
-                            Items = data,
-                            PageNumber = pagination.PageNumber,
-                            PerPage = pagination.PerPage,
-                            TotalItems = pagination.TotalItems,
-                            TotalPages = pagination.TotalPages,
-                        }
-                    }
-                };
+                    Items = data,
+                    PageNumber = pagination.PageNumber,
+                    PerPage = pagination.PerPage,
+                    TotalItems = pagination.TotalItems,
+                    TotalPages = pagination.TotalPages,
+                });
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_SearchProductModel>()
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = ex.Message,
-                };
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
             }
         }
 
-        public async Task<BaseResponse<RS_GetProductModel>> Get(RQ_GetProductModel _input)
+        public async Task<BaseResponse> Create(RQ_SaveProductModel _input)
         {
             try
             {
                 if (_input == null)
-                {
-                    return new BaseResponse<RS_GetProductModel>()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Điều kiện nhập trống"
-                    };
-                }
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Điều kiện nhập trống");
+                
+                var productEntity = _mapper.Map<Product>(_input);
+                productEntity.Id = Guid.NewGuid();
+                productEntity.Name = _input.Name;
+
+                productEntity.Description = _input.Description;
+                productEntity.Image = _input.Image;
+                await _productRepository.CreateAsync(productEntity);
+
+                return SuccessResponse(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
+            }
+        }
+
+        public async Task<BaseResponse> Get(RQ_GetProductModel _input)
+        {
+            try
+            {
+                if (_input == null)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Điều kiện nhập trống");
 
                 var productEntity = _productRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefault();
 
                 var data = _mapper.Map<ProductModel>(productEntity);
 
-                return new BaseResponse<RS_GetProductModel>()
-                {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Lấy dữ liệu thành công",
-                    Result = new()
-                    {
-                        Data = data
-                    }
-                };
+                return SuccessResponse(data);
             }
             catch (Exception ex)
             {
-                return new BaseResponse<RS_GetProductModel>()
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = ex.Message,
-                };
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
             }
         }
 
@@ -222,28 +181,13 @@ namespace PVG.Application.Services.ProductService
         {
             try
             {
-
                 if (_input == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Điều kiện nhập trống"
-                    };
-                }
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Điều kiện nhập trống");
 
                 var productEntity = _productRepository.FindByCondition(x => x.Id == _input.Id).FirstOrDefault();
 
-                if(productEntity == null)
-                {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Sản phẩm không tồn tại"
-                    };
-                }
+                if (productEntity == null)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Sản phẩm không tồn tại");
 
                 var AD = UserAdminType.SystemAdmin;
 
@@ -251,12 +195,7 @@ namespace PVG.Application.Services.ProductService
 
                 if (isAdmin == null || !isAdmin.IsSuccess)
                 {
-                    return new BaseResponse()
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = string.Format("Phải là {0} mới đủ quyền xóa", nameof(AD)),
-                    };
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, string.Format("Phải là {0} mới đủ quyền xóa", nameof(AD)));
                 }
 
                 productEntity.IsDeleted = true;
@@ -266,21 +205,11 @@ namespace PVG.Application.Services.ProductService
                 await _productRepository.UpdateAsync(productEntity);
                 await _productRepository.SaveChangesAsync();
 
-                return new BaseResponse()
-                {
-                    IsSuccess = true,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Xóa dữ liệu thành công"
-                };
+                return SuccessResponse(true);
             }
             catch (Exception ex)
             {
-                return new BaseResponse()
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = ex.Message,
-                };
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
             }
         }
     }
