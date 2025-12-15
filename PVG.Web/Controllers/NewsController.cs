@@ -24,7 +24,6 @@ namespace PVG.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("v1/news/list/web")]
         public async Task<ObjectResult> GetNewsListWeb([FromQuery] DTOSearchNews searchNews)
         {
             if (searchNews.IsPaging)
@@ -45,7 +44,7 @@ namespace PVG.Web.Controllers
         /// <returns></returns>
         //[Authorize]
         [HttpGet]
-        [Route("v1/news/list/app")]
+        [Route("app")]
         public async Task<ObjectResult> GetNewsListMobile([FromQuery] DTOSearchNews searchNews)
         {
             if (searchNews.IsPaging)
@@ -69,7 +68,7 @@ namespace PVG.Web.Controllers
         //[Authorize(Roles = "CNT_MANAGENEWS")]
         //[Authorize(Roles = "NEWS_READ")]
         [HttpGet]
-        [Route("v1/news/{newsId}")]
+        [Route("{newsId}")]
         public async Task<ObjectResult> GetNewsWeb(Guid newsId)
         {
             if (newsId == Guid.Empty)
@@ -87,8 +86,8 @@ namespace PVG.Web.Controllers
         /// <returns></returns>
         //[Authorize]
         [HttpGet]
-        [Route("v1/news")]
-        public async Task<ObjectResult> GetNewsMobile([FromQuery] Guid newsId, [FromQuery] string slug)
+        [Route("app/{newsId}")]
+        public async Task<ObjectResult> GetNewsMobile(Guid newsId, [FromQuery] string slug)
         {
             if (newsId == Guid.Empty && string.IsNullOrWhiteSpace(slug))
             {
@@ -106,7 +105,7 @@ namespace PVG.Web.Controllers
         //[Authorize(Roles = "CNT_MANAGENEWS")]
         //[Authorize(Roles = "NEWS_CREATE")]
         [HttpPost]
-        [Route("v1/news/{categoryId}")]
+        [Route("newsCategory/{categoryId}")]
         public async Task<ObjectResult> CreateNews(Guid categoryId, [FromBody] DTONewsRequest newsRequest)
             => ReturnData(await _newsService.CreateNews(categoryId, newsRequest));
 
@@ -117,7 +116,7 @@ namespace PVG.Web.Controllers
         //[Authorize(Roles = "CNT_MANAGENEWS")]
         //[Authorize(Roles = "NEWS_UPDATE")]
         [HttpPut]
-        [Route("v1/news/{newsId}/category/{categoryId}")]
+        [Route("news/{newsId}/category/{categoryId}")]
         public async Task<ObjectResult> UpdateNews(Guid categoryId, Guid newsId, [FromBody] DTONewsRequest newsRequest)
         {
             if (newsId == Guid.Empty)
@@ -136,7 +135,7 @@ namespace PVG.Web.Controllers
         //[Authorize(Roles = "CNT_MANAGENEWS")]
         //[Authorize(Roles = "NEWS_DELETE")]
         [HttpDelete]
-        [Route("v1/news/{newsId}")]
+        [Route("{newsId}")]
         public async Task<ObjectResult> DeleteNews(Guid newsId)
         {
             if (newsId == Guid.Empty)
