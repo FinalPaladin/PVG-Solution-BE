@@ -1,6 +1,5 @@
 ﻿using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Persistence;
 
 namespace PVG.Infrastucture.Repositories.ImageRequestRepository
 {

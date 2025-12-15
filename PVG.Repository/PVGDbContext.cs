@@ -5,7 +5,7 @@ using PVG.Infrastucture.Entities;
 using System.Data;
 using System.Reflection;
 
-namespace PVG.Infrastucture.Persistence
+namespace PVG.Infrastucture
 {
     public class PVGDbContext : DbContext
     {
@@ -20,7 +20,6 @@ namespace PVG.Infrastucture.Persistence
 
         public DbSet<Product> Product { get; set; }
         public DbSet<ProductCategory> ProductCategory { get; set; }
-        public DbSet<ProductInfo> ProductInfo { get; set; }
         public DbSet<RequestCustomer> RequestCustomer { get; set; }
         public DbSet<Configuration> Configuration { get; set; }
         public DbSet<Permission> Permission { get; set; }
@@ -29,7 +28,6 @@ namespace PVG.Infrastucture.Persistence
         public DbSet<ViewLog> ViewLog { get; set; }
         public DbSet<ImageRequest> ImageRequest { get; set; }
         public DbSet<ProductDetail> ProductDetail { get; set; }
-        public DbSet<ProductDetailCategory> ProductDetailCategory { get; set; }
         public DbSet<RequestCustomerDetail> RequestCustomerDetail { get; set; }
         public DbSet<AuthToken> AuthTokens { get; set; }
         public DbSet<MData> MDatas { get; set; }
@@ -70,33 +68,99 @@ namespace PVG.Infrastucture.Persistence
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
+                      .ValueGeneratedNever();
 
                 entity.Property(e => e.ProductCategoryId)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
+                      .IsRequired();
 
                 entity.Property(e => e.Name)
-                    .HasColumnType(ColumType.TypeVarchar("100"))
-                    .HasMaxLength(100)
-                    .HasCharSet("utf8mb4")
-                    .IsRequired();
+                      .IsRequired()
+                      .HasMaxLength(255);
 
-                entity.Property(e => e.Description)
-                    .HasColumnType(ColumType.TypeVarchar("250"))
-                    .HasMaxLength(250)
-                    .HasCharSet("utf8mb4");
+                entity.Property(e => e.LoanAmountId)
+                      .IsRequired();
 
-                entity.Property(e => e.Image)
-                    .HasColumnType(ColumType.TypeVarchar("150"))
-                    .HasMaxLength(150)
-                    .IsRequired();
+                entity.Property(e => e.LoanTermId)
+                      .IsRequired();
+
+                entity.Property(e => e.ImageUrl)
+                      .IsRequired()
+                      .HasMaxLength(500);
+
+                entity.Property(e => e.Inactive)
+                      .HasDefaultValue(false);
+
+                // Audit
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.CreatedByName)
+                      .HasMaxLength(255);
+
+                entity.Property(e => e.CreatedDate)
+                      .IsRequired();
+
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.ModifiedByName)
+                      .HasMaxLength(255);
+
+                entity.Property(e => e.ModifiedDate);
             });
 
             #endregion Product
+
+            #region ProductDetail
+
+            modelBuilder.Entity<ProductDetail>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id)
+                      .ValueGeneratedNever();
+
+                entity.Property(e => e.ProductId)
+                      .IsRequired(false);
+
+                entity.Property(e => e.ProductDetailCategoryId)
+                      .IsRequired();
+
+                entity.Property(e => e.Title)
+                      .IsRequired()
+                      .HasMaxLength(255);
+
+                entity.Property(e => e.Content)
+                      .IsRequired()
+                      .HasColumnType("TEXT");
+
+                // Audit
+                entity.Property(e => e.CreatedBy);
+                entity.Property(e => e.CreatedByName)
+                      .HasMaxLength(255);
+
+                entity.Property(e => e.CreatedDate)
+                      .IsRequired();
+
+                entity.Property(e => e.ModifiedBy);
+                entity.Property(e => e.ModifiedByName)
+                      .HasMaxLength(255);
+
+                entity.Property(e => e.ModifiedDate);
+
+                // Soft delete
+                entity.Property(e => e.IsDeleted)
+                      .HasDefaultValue(false);
+
+                // Indexes
+                entity.HasIndex(e => e.ProductId);
+                entity.HasIndex(e => e.ProductDetailCategoryId);
+                entity.HasIndex(e => e.IsDeleted);
+
+                // Relationship
+                entity.HasOne<Product>()
+                      .WithMany()
+                      .HasForeignKey(e => e.ProductId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            #endregion ProductDetail
 
             #region ProductCategory
 
@@ -122,40 +186,6 @@ namespace PVG.Infrastucture.Persistence
             });
 
             #endregion ProductCategory
-
-            #region ProductInfo
-
-            modelBuilder.Entity<ProductInfo>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
-
-                entity.Property(e => e.ProductId)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
-
-                entity.Property(e => e.Type)
-                    .HasColumnType(ColumType.TypeVarchar("20"))
-                    .HasMaxLength(20)
-                    .IsRequired();
-
-                entity.Property(e => e.Description)
-                    .HasColumnType(ColumType.TypeVarchar("250"))
-                    .HasMaxLength(250)
-                    .HasCharSet("utf8mb4");
-
-                entity.Property(e => e.Content)
-                    .HasColumnType(ColumType.TypeVarchar("2000"))
-                    .HasMaxLength(2000)
-                    .HasCharSet("utf8mb4");
-            });
-
-            #endregion ProductInfo
 
             #region RequestCustomer
 
@@ -351,55 +381,6 @@ namespace PVG.Infrastucture.Persistence
             });
 
             #endregion ImageRequest
-
-            #region ProductDetail
-
-            modelBuilder.Entity<ProductDetail>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
-
-                entity.Property(e => e.ProductId)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
-
-                entity.Property(e => e.ProductDetailCategoryId)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
-
-                entity.Property(e => e.Content)
-                    .HasColumnType(ColumType.TypeVarchar("2000"))
-                    .HasMaxLength(2000);
-            });
-
-            #endregion ProductDetail
-
-            #region ProductDetailCategory
-
-            modelBuilder.Entity<ProductDetailCategory>(entity =>
-            {
-                entity.Property(e => e.Id)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
-
-                entity.Property(e => e.ProductId)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
-
-                entity.Property(e => e.Name)
-                    .HasColumnType(ColumType.TypeVarchar("2000"))
-                    .HasMaxLength(2000);
-            });
-
-            #endregion ProductDetailCategory
 
             #region AuthTokens
 

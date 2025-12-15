@@ -11,7 +11,6 @@ using PVG.Application.Services.NewsCategoryService;
 using PVG.Application.Services.NewsService;
 using PVG.Application.Services.PermissionService;
 using PVG.Application.Services.ProductCategoryService;
-using PVG.Application.Services.ProductInfoService;
 using PVG.Application.Services.ProductService;
 using PVG.Application.Services.RequestCustomerService;
 using PVG.Application.Services.SampleService;
@@ -45,7 +44,6 @@ namespace PVG.Application
             services.AddScoped<IConfigurationService, ConfigurationService>();
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
-            services.AddScoped<IProductInfoService, ProductInfoService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IUserPermissionService, UserPermissionService>();
             services.AddScoped<IUserService, UserService>();
