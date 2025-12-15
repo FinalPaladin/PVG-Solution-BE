@@ -383,8 +383,8 @@ namespace PVG.Application.Services.RequestCustomerService
                 IQueryable<RequestCustomer> query = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
                     && (string.IsNullOrEmpty(_input.Phone) || x.Phone.Contains(_input.Phone))
                     && (_input.ProductId == null || x.ProductId == _input.ProductId)
-                    && (_input.RequestCode == null || x.ProductId == _input.RequestCode
-                    && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower())))
+                    //&& (_input.RequestCode == null || x.ProductId == _input.RequestCode)
+                    && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower()))
                     && x.IsProcessed == _input.IsProcessed
                 ).OrderByDescending(x => x.CreatedDate).AsQueryable();
 
@@ -549,12 +549,12 @@ namespace PVG.Application.Services.RequestCustomerService
         private string GenBodyEmail(string _fullName, string _phone, List<SaveRequestCustomerModel> _data)
         {
             string title = @"<tr>
-                                <td colspan=""2"" style=""border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #36C920; padding:5px; width: 40%;""><b>{0}</b></td>
+                                <td colspan='2' style='border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #36C920; padding:5px; width: 40%;'><b>{0}</b></td>
                             </tr>";
             string row = @"
                             <tr>
-                                <td style=""border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #B5FFC0; padding:5px; width: 40%;"">{0}:</td>
-                                <td style=""border: 1px solid; padding: 5px;"">{1}</td>
+                                <td style='border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #B5FFC0; padding:5px; width: 40%;'>{0}:</td>
+                                <td style='border: 1px solid; padding: 5px;'>{1}</td>
                             </tr>
                         ";
 
@@ -575,8 +575,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
             return string.Format(@"
                     <h4>Chi tiết yêu cầu vay từ khách hàng</h4>
-                    <table style=""border: 1px solid; max-width: 80%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;"">8                        {0}
-                    </table>
+                    <table style='border: 1px solid; max-width: 80%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;'>{0}</table>
                     ", content);
         }
 

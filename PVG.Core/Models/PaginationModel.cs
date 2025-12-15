@@ -9,7 +9,7 @@
             PerPage = 0;
             PageNumber = 0;
         }
-
+        public bool IsPaging { get; set; } = true;
         public int TotalItems { get; set; }
         public int TotalPages { get; set; }
         public int PerPage { get; set; }
@@ -27,6 +27,7 @@
             PageNumber = 0;
         }
 
+        public bool IsPaging { get; set; } = true;
         public int TotalItems { get; set; }
         public int TotalPages { get; set; }
         public int PerPage { get; set; }

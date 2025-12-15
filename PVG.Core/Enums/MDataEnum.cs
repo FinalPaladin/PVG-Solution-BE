@@ -13,4 +13,11 @@ namespace PVG.Domain.Enums
         [Display(Name = "Chi tiết danh mục sản phẩm")]
         PRODUCT_CATEGORY_DETAIL = 4
     }
+
+    public enum NewsTypeEnum
+    {
+        News = 1,
+        FAQs = 2,
+        Slider = 3
+    }
 }

@@ -27,7 +27,6 @@ namespace PVG.Infrastucture.Persistence
         public DbSet<User> User { get; set; }
         public DbSet<UserPermission> UserPermission { get; set; }
         public DbSet<ViewLog> ViewLog { get; set; }
-        public DbSet<New> New { get; set; }
         public DbSet<ImageRequest> ImageRequest { get; set; }
         public DbSet<ProductDetail> ProductDetail { get; set; }
         public DbSet<ProductDetailCategory> ProductDetailCategory { get; set; }
@@ -323,33 +322,6 @@ namespace PVG.Infrastucture.Persistence
             });
 
             #endregion ViewLog
-
-            #region New
-
-            modelBuilder.Entity<New>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-
-                entity.Property(e => e.Id)
-                    .HasColumnType(ColumType.TypeVarchar("36"))
-                    .HasMaxLength(36)
-                    .IsRequired();
-
-                entity.Property(e => e.Content)
-                    .HasColumnType("mediumtext")
-                    .UseCollation("utf8mb4_unicode_ci");
-
-                entity.Property(e => e.Status)
-                    .HasConversion<int>()
-                    .HasColumnType("int");
-
-                entity.Property(e => e.Title)
-                    .HasColumnType(ColumType.TypeVarchar("250"))
-                    .HasMaxLength(250)
-                    .HasCharSet("utf8mb4");
-            });
-
-            #endregion New
 
             #region ImageRequest
 
