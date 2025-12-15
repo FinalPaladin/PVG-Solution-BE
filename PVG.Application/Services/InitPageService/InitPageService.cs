@@ -111,7 +111,7 @@ namespace PVG.Application.Services.InitPageService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "",
+                        Message = "Hàm khởi tạo đã chạy",
                     };
 
                 var initUsers = new List<User>

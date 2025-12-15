@@ -19,7 +19,7 @@ namespace PVG.Web.Controllers
         }
 
         [HttpGet]
-        [Route("System")]
+        [Route("system")]
         public async Task<IActionResult> System()
         {
             var result = await _service.System();
