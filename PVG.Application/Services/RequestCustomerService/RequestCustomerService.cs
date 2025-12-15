@@ -562,10 +562,10 @@ namespace PVG.Application.Services.RequestCustomerService
 
             foreach (var item in ConstRequestCustomer.ListRC)
             {
-                switch (item.Name)
+                switch (item.Value)
                 {
                     case "title":
-                        content += string.Format(title, item.Name, item.Name);
+                        content += string.Format(title, item.Name);
                         break;
                     default:
                         content += string.Format(row, item.Name, GetValueByKey(_data, item.Value));
@@ -573,10 +573,11 @@ namespace PVG.Application.Services.RequestCustomerService
                 }                
             }
 
-            return string.Format(@"
+            string result = string.Format(@"
                     <h4>Chi tiết yêu cầu vay từ khách hàng</h4>
                     <table style='border: 1px solid; max-width: 80%; border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px;'>{0}</table>
                     ", content);
+            return result;
         }
 
         private string GetValueByKey(List<SaveRequestCustomerModel> _data, string _key)
