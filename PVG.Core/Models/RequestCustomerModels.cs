@@ -4,6 +4,17 @@ using System.Text.Json.Serialization;
 
 namespace PVG.Domain.Models
 {
+    public class RQ_InserRequestCustomerModel
+    {
+        public Guid? RequestCode { get; set; }
+        public string Phone { get; set; }
+        public Guid? ProductId { get; set; }
+        public string FullName { get; set; }
+        public string Token { get; set; }
+        public List<SaveRequestCustomerModel> Data { get; set; }
+        public List<string> DataImage { get; set; } = new();
+    }
+
     public class RQ_SaveRequestCustomerModel
     {
         public Guid? RequestCode { get; set; }

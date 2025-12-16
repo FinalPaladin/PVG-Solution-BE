@@ -3,6 +3,7 @@
     public class AppSettings
     {
         public CloudflareSetting CloudflareR2 { get; set; }
+        public RecaptchaSetting Recaptcha { get; set; }
     }
 
     public class CloudflareSetting
@@ -13,5 +14,11 @@
         public string BucketName { get; set; }
         public string S3APIUrl { get; set; }
         public string PublicBaseUrl { get; set; }
+    }
+
+    public class RecaptchaSetting
+    {
+        public string Key { get; set; }
+        public string Url { get; set; }
     }
 }

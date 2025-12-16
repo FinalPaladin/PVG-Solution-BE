@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using PVG.Core.BaseModels;
+using PVG.Domain.Models;
 
 namespace PVG.Application.Services.CloudflareR2Service
 {
@@ -9,5 +10,7 @@ namespace PVG.Application.Services.CloudflareR2Service
         Task<BaseResponse> DeleteAsync(string objectKey);
         string GetPublicUrl(string objectKey);
         public Task<string> UpImage(string _publicKey, IFormFile _file);
+        public Task<IFormFile> GetImageAsFormFile(string imageUrl);
+        public Task<BaseResponse<RS_CloudflareUploadListImageModel>> UploadListImage(RQ_CloudflareUploadListImageModel _input);
     }
 }

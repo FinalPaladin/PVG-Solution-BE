@@ -6,8 +6,10 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Org.BouncyCastle.Ocsp;
 using PVG.Application.Services.CloudflareR2Service;
 using PVG.Application.Services.EmailService;
+using PVG.Application.Services.RecaptchaService;
 using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
@@ -20,9 +22,11 @@ using PVG.Infrastucture.Repositories.RequestCustomerRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
 using System;
 using System.ComponentModel;
+using System.Data;
 using System.Drawing;
 using System.Text.Json;
 using static PVG.Domain.Enums.UserEnum;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PVG.Application.Services.RequestCustomerService
 {
@@ -36,6 +40,7 @@ namespace PVG.Application.Services.RequestCustomerService
         private readonly ICloudflareR2Service _cloudflareR2Service;
         private readonly IImageRequestRepository _imageRequestRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IRecaptchaService _recaptchaService;
 
         public RequestCustomerService(
             IOptions<AppSettings> options,
@@ -47,7 +52,8 @@ namespace PVG.Application.Services.RequestCustomerService
             IUserService userService,
             ICloudflareR2Service cloudflareR2Service,
             IImageRequestRepository imageRequestRepository,
-            IUserRepository userRepository) : base(options, mapper)
+            IUserRepository userRepository,
+            IRecaptchaService recaptchaService) : base(options, mapper)
         {
             _logger = logger;
             _requestCustomerRepository = requestCustomerRepository;
@@ -56,6 +62,7 @@ namespace PVG.Application.Services.RequestCustomerService
             _cloudflareR2Service = cloudflareR2Service;
             _imageRequestRepository = imageRequestRepository;
             _userRepository = userRepository;
+            _recaptchaService = recaptchaService;
         }
 
         public async Task<BaseResponse> Save(RQ_SaveRequestCustomerModel _input)
@@ -72,7 +79,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                if (_input.Data == null)// || string.IsNullOrEmpty(_input.Data)
+                if (_input.Data == null || string.IsNullOrEmpty(_input.Data))
                 {
                     return new BaseResponse()
                     {
@@ -279,6 +286,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 await _requestCustomerDetailRepository.UpdateListAsync(detailUpdate);
                 await _requestCustomerDetailRepository.CreateListAsync(detailCreate);
+                await _requestCustomerDetailRepository.SaveChangesAsync();
                 await _requestCustomerRepository.SaveChangesAsync();
 
                 return new BaseResponse()
@@ -730,6 +738,7 @@ namespace PVG.Application.Services.RequestCustomerService
             header.Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
             header.AutoFitColumns();
         }
+        
         private void ExcelBody(ExcelWorksheet ws, int _row, int _col)
         {
             var header = ws.Cells[_row, _col];
@@ -819,5 +828,212 @@ namespace PVG.Application.Services.RequestCustomerService
                 };
             }
         }
+
+        public async Task<BaseResponse> Insert(RQ_InserRequestCustomerModel _input)
+        {
+            try
+            {
+                if (_input == null)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+
+                if (_input.Data == null)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+
+                if (_input.ProductId == null || string.IsNullOrEmpty(_input.Phone))
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+
+                if (await _recaptchaService.Verify(_input.Token))
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Xác thực captcha thất bại",
+                    };
+                }
+
+                Guid requestCode = Guid.NewGuid();
+                var dataCreate = new RequestCustomer()
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedBy = null,
+                    CreatedByName = "",
+                    CreatedDate = DateTime.Now,
+                    DeletedBy = null,
+                    DeletedByName = "",
+                    DeletedDate = DateTime.Now,
+                    IsDeleted = false,
+                    ModifiedBy = null,
+                    ModifiedByName = "",
+                    ModifiedDate = DateTime.Now,
+
+                    ProductId = _input.ProductId,
+                    RequestCode = requestCode,
+                    Phone = _input.Phone,
+                    FullName = _input.FullName,
+                    IsProcessed = false,
+                };
+
+                await _requestCustomerRepository.CreateAsync(dataCreate);
+
+                if(_input.DataImage != null && _input.DataImage.Count > 0)
+                {
+                    foreach (var img in _input.DataImage)
+                    {
+                        if(string.IsNullOrEmpty(img))
+                            { continue; }
+
+                        await _imageRequestRepository.CreateAsync(new ImageRequest()
+                        {
+                            Id = Guid.NewGuid(),
+                            CreatedBy = null,
+                            CreatedByName = "",
+                            CreatedDate = DateTime.Now,
+                            DeletedBy = null,
+                            DeletedByName = "",
+                            DeletedDate = DateTime.Now,
+                            IsDeleted = false,
+                            ModifiedBy = null,
+                            ModifiedByName = "",
+                            ModifiedDate = DateTime.Now,
+
+                            Content = "",
+                            RequestCode = requestCode,
+                            Url = img,
+                        });
+                    }
+                }
+
+                List<RequestCustomerDetail> dataDetailCreate = new();
+
+                if (_input.Data != null && _input.Data.Count > 0)
+                {
+                    foreach (var dt in _input.Data)
+                    {
+                        RequestCustomerDetail data = new RequestCustomerDetail()
+                        {
+                            Id = Guid.NewGuid(),
+                            CreatedBy = null,
+                            CreatedByName = "",
+                            CreatedDate = DateTime.Now,
+                            DeletedBy = null,
+                            DeletedByName = "",
+                            DeletedDate = DateTime.Now,
+                            IsDeleted = false,
+                            ModifiedBy = null,
+                            ModifiedByName = "",
+                            ModifiedDate = DateTime.Now,
+
+                            RequestCode = requestCode,
+                            Key = dt.Key,
+                            Value = dt.Value
+                        };
+                        dataDetailCreate.Add(data);
+                    }
+                }
+
+                if (dataDetailCreate.Count > 0)
+                {
+                    string emailTitle = string.Format("[Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
+
+                    List<IFormFile> attacheds = new List<IFormFile>();
+
+                    foreach (var img in _input.DataImage)
+                    {
+                        string publicUrl = _cloudflareR2Service.GetPublicUrl(img);
+
+                        if(string.IsNullOrEmpty(publicUrl))
+                        { continue; }
+
+                        var fileImg = await _cloudflareR2Service.GetImageAsFormFile(publicUrl);
+
+                        attacheds.Add(fileImg);
+                    }
+
+                    var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(_input.FullName, _input.Phone, _input.Data), attacheds);
+
+                    dataDetailCreate.Add(
+                        new RequestCustomerDetail()
+                        {
+                            Id = Guid.NewGuid(),
+                            CreatedBy = null,
+                            CreatedByName = "",
+                            CreatedDate = DateTime.Now,
+                            DeletedBy = null,
+                            DeletedByName = "",
+                            DeletedDate = DateTime.Now,
+                            IsDeleted = false,
+                            ModifiedBy = null,
+                            ModifiedByName = "",
+                            ModifiedDate = DateTime.Now,
+
+                            RequestCode = requestCode,
+                            Key = "IsSentEmail",
+                            Value = "true",
+                        }
+                    );
+
+                    dataDetailCreate.Add(
+                        new RequestCustomerDetail()
+                        {
+                            Id = Guid.NewGuid(),
+                            CreatedBy = null,
+                            CreatedByName = "",
+                            CreatedDate = DateTime.Now,
+                            DeletedBy = null,
+                            DeletedByName = "",
+                            DeletedDate = DateTime.Now,
+                            IsDeleted = false,
+                            ModifiedBy = null,
+                            ModifiedByName = "",
+                            ModifiedDate = DateTime.Now,
+
+                            RequestCode = requestCode,
+                            Key = "EmailTitle",
+                            Value = emailTitle,
+                        }
+                    );
+                }
+
+                return new BaseResponse()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Lưu dữ liệu thành công",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+
     }
 }

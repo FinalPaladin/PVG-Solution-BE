@@ -76,5 +76,11 @@ namespace PVG.Web.Controllers
         [Route("processed")]
         public async Task<IActionResult> Processed([FromBody] RQ_ProcessedModel _input)
              => ReturnData(await _service.Processed(_input));
+
+        [HttpPost]
+        [Route("insert")]
+        public async Task<IActionResult> Insert([FromBody] RQ_InserRequestCustomerModel _input)
+            => ReturnData(await _service.Insert(_input));
+
     }
 }
