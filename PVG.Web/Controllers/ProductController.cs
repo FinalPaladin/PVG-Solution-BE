@@ -4,36 +4,54 @@ using PVG.Domain.Models;
 
 namespace PVG.Web.Controllers
 {
-    [Route("api/product")]
     [ApiController]
+    [Route("api/products")]
     public class ProductController : PVGControllerBase
     {
-        private IProductService _service;
+        private readonly IProductService _service;
 
         public ProductController(IProductService service)
         {
             _service = service;
         }
 
+        // =========================
+        // SEARCH (paging + filter)
+        // =========================
+        [HttpGet("search")]
+        public async Task<IActionResult> Search([FromQuery] ProductSearchRequest input)
+            => ReturnData(await _service.Search(input));
+
+        // =========================
+        // GET BY ID
+        // =========================
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetById(Guid id)
+            => ReturnData(await _service.GetById(id));
+
+        // =========================
+        // CREATE
+        // =========================
         [HttpPost]
-        [Route("search")]
-        public async Task<IActionResult> Search([FromQuery] RQ_SearchProductModel _input)
-           => ReturnData(await _service.Search(_input));
+        public async Task<IActionResult> Create([FromBody] ProductCreateRequest input)
+            => ReturnData(await _service.Create(input));
 
-        [HttpGet]
-        public async Task<IActionResult> Save([FromQuery] RQ_GetProductModel _input)
-            => ReturnData(await _service.Get(_input));
+        // =========================
+        // UPDATE
+        // =========================
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(
+            Guid id,
+            [FromBody] ProductUpdateRequest input)
+            => ReturnData(await _service.Update(id, input));
 
-        [HttpPost]
-        public async Task<IActionResult> Save([FromBody] RQ_SaveProductModel _input)
-            => ReturnData(await _service.Save(_input));
-
-
-
-        [HttpDelete]
-        public async Task<IActionResult> Save([FromBody] RQ_DeleteProductModel _input)
-        {
-            return ReturnData(await _service.Delete(_input));
-        }
+        // =========================
+        // DELETE
+        // =========================
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(
+            Guid id,
+            [FromQuery] string userName)
+            => ReturnData(await _service.Delete(id, userName));
     }
 }

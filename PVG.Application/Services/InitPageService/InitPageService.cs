@@ -62,7 +62,7 @@ namespace PVG.Application.Services.InitPageService
 
                 var productcategories = _mapper.Map<List<ProductCategoryModel>>(productCategoriesEntity);
 
-                var productsEntity = await _productRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
+                var productsEntity = await _productRepository.FindByCondition(x => !x.Inactive).ToListAsync();
 
                 if (productCategoriesEntity != null && productCategoriesEntity.Count > 0)
                 {
