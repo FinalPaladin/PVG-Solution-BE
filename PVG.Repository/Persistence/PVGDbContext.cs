@@ -33,6 +33,9 @@ namespace PVG.Infrastucture.Persistence
         public DbSet<RequestCustomerDetail> RequestCustomerDetail { get; set; }
         public DbSet<AuthToken> AuthTokens { get; set; }
         public DbSet<MData> MDatas { get; set; }
+        public DbSet<News> Newses { get; set; }
+        public DbSet<NewsCategory> NewsCategories { get; set; }
+        public DbSet<NewsCategoryMapping> NewsCategoryMappings { get; set; }
 
         #endregion Database Setting
 
@@ -483,6 +486,39 @@ namespace PVG.Infrastucture.Persistence
             });
 
             #endregion MData
+
+            #region News
+
+            modelBuilder.Entity<News>(entity =>
+            {
+                entity.ToTable("News");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
+
+            #endregion News
+
+            #region NewsCategory
+
+            modelBuilder.Entity<NewsCategory>(entity =>
+            {
+                entity.ToTable("NewsCategory");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
+
+            #endregion NewsCategory
+
+            #region NewsCategoryMapping
+
+            modelBuilder.Entity<NewsCategoryMapping>(entity =>
+            {
+                entity.ToTable("NewsCategoryMapping");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
+
+            #endregion NewsCategoryMapping
         }
 
         // Define DbSet properties for your entities

@@ -1,16 +1,20 @@
 ﻿using PVG.Domain.Enums;
-using PVG.Infrastucture.Entities.BaseEntities;
 
-namespace PVG.Infrastucture.Entities
+namespace PVG.Domain.Models
 {
-    public class MData : EntityBase<int>, IAudited, ISoftDelete
+    public class MDataModel
     {
         public MDataEnum_Group Group { get; set; }
-        public string? GroupName { get; set; }
         public int SortId { get; set; }
         public string Key { get; set; }
         public string Value { get; set; }
         public string? Value_ENG { get; set; }
+    }
+
+    public class MDataResponseModel : MDataModel
+    {
+        public int Id { get; set; }
+        public string? GroupName { get; set; }
         public bool Inactive { get; set; } = false;
         public Guid? CreatedBy { get; set; }
         public string? CreatedByName { get; set; }
