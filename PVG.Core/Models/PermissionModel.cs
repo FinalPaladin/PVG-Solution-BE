@@ -28,7 +28,7 @@ namespace PVG.Domain.Models
 
     public class RS_SearchPermissionModel
     {
-        public PaginationModel<List<PermissionModel>> Data { get; set; } = new();
+        public PaginationModel<PermissionModel> Data { get; set; } = new();
     }
 
     public class RQ_GetPermissionModel

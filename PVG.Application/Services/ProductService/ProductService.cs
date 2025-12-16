@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
+using PVG.Domain.Enums;
 using PVG.Domain.Models;
 using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
+using PVG.Infrastucture.Repositories.MDataRepository;
+using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductDetailRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
@@ -19,18 +23,26 @@ namespace PVG.Application.Services.ProductService
         private readonly IProductDetailRepository _productDetailRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
+        private readonly IProductCategoryRepository _productCategoryRepository;
+        private readonly IMDataRepository _mDataRepository;
 
-        public ProductService(IOptions<AppSettings> options,
+        public ProductService(
+            IOptions<AppSettings> options,
             IMapper mapper,
             IProductRepository productRepository,
             IProductDetailRepository productDetailRepository,
             IUserRepository userRepository,
-            IUserService userService) : base(options, mapper)
+            IUserService userService,
+            IProductCategoryRepository productCategoryRepository,
+            IMDataRepository mDataRepository
+            ) : base(options, mapper)
         {
             _productRepository = productRepository;
             _productDetailRepository = productDetailRepository;
             _userRepository = userRepository;
             _userService = userService;
+            _productCategoryRepository = productCategoryRepository;
+            _mDataRepository = mDataRepository;
         }
 
         public async Task<BaseResponse> Search(ProductSearchRequest _input)
@@ -46,9 +58,28 @@ namespace PVG.Application.Services.ProductService
                     && (string.IsNullOrEmpty(_input.FilterKeyword) || x.Name.Contains(_input.FilterKeyword))
                 ).AsQueryable();
 
-                var data = await OffsetPagination(query, _input.PageNumber, _input.PerPage);
+                var data = await OffsetPagination(query, _input.Page, _input.PageSize);
+                var products = new PaginationModel<ProductResponseModel>()
+                {
+                    IsPaging = data.IsPaging,
+                    PageNumber = data.PageNumber,
+                    PerPage = data.PerPage,
+                    TotalItems = data.TotalItems,
+                    TotalPages = data.TotalPages,
+                    Items = _mapper.Map<List<ProductResponseModel>>(data.Items),
+                };
 
-                return SuccessResponse(data);
+                var mData = await _mDataRepository.FindAll().ToListAsync();
+                var productCategories = await _productCategoryRepository.FindAll().ToListAsync();
+
+                products.Items.ForEach(product =>
+                {
+                    product.LoanAmount = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_AMOUNT && c.Key == product.LoanAmountId.ToString())?.Value ?? "";
+                    product.LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == product.LoanTermId.ToString())?.Value ?? "";
+                    product.ProductCategory = productCategories.FirstOrDefault(c => c.Id == product.ProductCategoryId)?.Name ?? "";
+                });
+
+                return SuccessResponse(products);
             }
             catch (Exception ex)
             {
@@ -60,11 +91,29 @@ namespace PVG.Application.Services.ProductService
         {
             try
             {
-                return SuccessResponse(_mapper.Map<ProductModel>(_productRepository.GetByIdAsync(_id)));
+                // 1️⃣ Lấy product
+                var productEntity = await _productRepository.GetByIdAsync(_id);
+
+                if (productEntity == null)
+                    return BadRequestResponse(
+                        ErrorCodeConst.ERROR_REQUEST_NOT_FOUND,
+                        "Sản phẩm không tồn tại"
+                    );
+
+                var detailEntities = await _productDetailRepository.FindByCondition(c => c.ProductId == _id).ToListAsync();
+
+                var productResponse = _mapper.Map<ProductResponseModel>(productEntity);
+                productResponse.ImageUrl = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{productResponse.ImageUrl}";
+                productResponse.Details = _mapper.Map<List<ProductDetailResponseModel>>(detailEntities);
+
+                return SuccessResponse(productResponse);
             }
             catch (Exception ex)
             {
-                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
+                return BadRequestResponse(
+                    ErrorCodeConst.ERROR_SYS_ERR,
+                    ex.Message
+                );
             }
         }
 
@@ -216,6 +265,63 @@ namespace PVG.Application.Services.ProductService
             catch (Exception ex)
             {
                 return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
+            }
+        }
+
+        public async Task<BaseResponse> InitProductsApp()
+        {
+            try
+            {
+                var categoriesDb = await _productCategoryRepository
+                    .FindAll()
+                    .ToListAsync();
+
+                var productsDb = await _productRepository
+                    .FindAll()
+                    .ToListAsync();
+
+                var categoriesRes = new List<object>
+                    {
+                        new
+                        {
+                            Id = string.Empty,
+                            Name = "Tất cả sản phẩm"
+                        }
+                    };
+
+                categoriesRes.AddRange(
+                    categoriesDb.Select(c => new
+                    {
+                        Id = c.Id.ToString(),
+                        Name = c.Name
+                    })
+                );
+
+                // 3️⃣ Map products
+                var mData = await _mDataRepository.FindAll().ToListAsync();
+
+                var productsRes = productsDb.Select(p => new
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    ProductCategoryId = p.ProductCategoryId,
+                    ImageUrl = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{p.ImageUrl}",
+                    LoanAmount = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_AMOUNT && c.Key == p.LoanAmountId.ToString())?.Value ?? "",
+                    LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == p.LoanTermId.ToString())?.Value ?? ""
+                }).ToList();
+
+                return SuccessResponse(new
+                {
+                    Categories = categoriesRes,
+                    Products = productsRes
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequestResponse(
+                    ErrorCodeConst.ERROR_SYS_ERR,
+                    ex.Message
+                );
             }
         }
     }
