@@ -89,12 +89,7 @@ namespace PVG.Application.Services.ProductCategoryService
             }
             catch (Exception ex)
             {
-                return new()
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = ex.Message,
-                };
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
             }
         }
 
@@ -126,12 +121,21 @@ namespace PVG.Application.Services.ProductCategoryService
             }
             catch (Exception ex)
             {
-                return new()
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
-                    Message = ex.Message,
-                };
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
+            }
+        }
+
+        public async Task<BaseResponse> GetAll()
+        {
+            try
+            {
+                var productCategoryEntities = await _productCategoryRepository.FindByCondition(x => !x.Inactive).ToListAsync();
+                var data = _mapper.Map<List<ProductCategoryModel>>(productCategoryEntities);
+                return SuccessResponse(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, ex.Message);
             }
         }
 
@@ -146,7 +150,7 @@ namespace PVG.Application.Services.ProductCategoryService
                 if (tableEntity == null)
                     return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Dữ liệu không tồn tại");
 
-                var productEntity = await _productRepository.FindByCondition(x => x.IsDeleted == false && x.ProductCategoryId == tableEntity.Id).FirstOrDefaultAsync();
+                var productEntity = await _productRepository.FindByCondition(x => !x.Inactive == false && x.ProductCategoryId == tableEntity.Id).FirstOrDefaultAsync();
                 if (productEntity != null)
                     return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Danh mục có sản phẩm đang hiệu lực, không thể xóa");
 

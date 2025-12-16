@@ -5,12 +5,14 @@ namespace PVG.Application.Services.ProductService
 {
     public interface IProductService
     {
-        public Task<BaseResponse> Save(RQ_SaveProductModel _input);
+        Task<BaseResponse> Search(ProductSearchRequest _input);
 
-        public Task<BaseResponse> Search(RQ_SearchProductModel _input);
+        Task<BaseResponse> GetById(Guid _id);
 
-        public Task<BaseResponse> Get(RQ_GetProductModel _input);
+        Task<BaseResponse> Create(ProductCreateRequest _input);
 
-        public Task<BaseResponse> Delete(RQ_DeleteProductModel _input);
+        Task<BaseResponse> Update(Guid _id, ProductUpdateRequest _input);
+
+        Task<BaseResponse> Delete(Guid _id, string _userName);
     }
 }

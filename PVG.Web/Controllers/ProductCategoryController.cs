@@ -24,6 +24,10 @@ namespace PVG.Web.Controllers
         public async Task<IActionResult> Get([FromQuery] RQ_GetProductCategoryModel _input)
             => ReturnData(await _service.Get(_input));
 
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+            => ReturnData(await _service.GetAll());
+
         [HttpPost]
         public async Task<IActionResult> Save([FromBody] RQ_SaveProductCategoryModel _input)
             => ReturnData(await _service.Save(_input));

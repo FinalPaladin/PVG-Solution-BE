@@ -30,11 +30,14 @@
     public class ProductCreateRequest : ProductModel
     {
         public string UserName { get; set; }
+        public List<ProductDetailModel> Details { get; set; } = new();
     }
 
-    public class ProductUpdateRequest : ProductCreateRequest
+    public class ProductUpdateRequest : ProductModel
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
+        public string UserName { get; set; }
+        public List<ProductDetailUpdateModel> Details { get; set; } = new();
     }
 
     public class ProductDetailModel
@@ -55,5 +58,10 @@
         public string? ModifiedByName { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public bool IsDeleted { get; set; }
+    }
+
+    public class ProductDetailUpdateModel : ProductDetailModel
+    {
+        public Guid? Id { get; set; }
     }
 }

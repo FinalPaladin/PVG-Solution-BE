@@ -117,7 +117,7 @@ namespace PVG.Infrastucture
                       .ValueGeneratedNever();
 
                 entity.Property(e => e.ProductId)
-                      .IsRequired(false);
+                      .IsRequired();
 
                 entity.Property(e => e.ProductDetailCategoryId)
                       .IsRequired();
@@ -152,12 +152,6 @@ namespace PVG.Infrastucture
                 entity.HasIndex(e => e.ProductId);
                 entity.HasIndex(e => e.ProductDetailCategoryId);
                 entity.HasIndex(e => e.IsDeleted);
-
-                // Relationship
-                entity.HasOne<Product>()
-                      .WithMany()
-                      .HasForeignKey(e => e.ProductId)
-                      .OnDelete(DeleteBehavior.SetNull);
             });
 
             #endregion ProductDetail
