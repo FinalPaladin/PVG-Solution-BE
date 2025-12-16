@@ -1,57 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PVG.Domain.Models
+﻿namespace PVG.Domain.Models
 {
     public class ProductModel
     {
-        public Guid? Id { get; set; }
-        public Guid? ProductCategoryId { get; set; }
+        public Guid ProductCategoryId { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
-        public string Image { get; set; }
+        public int LoanAmountId { get; set; }
+        public int LoanTermId { get; set; }
+        public string ImageUrl { get; set; }
+        public bool Inactive { get; set; } = false;
     }
 
-    public class RQ_SaveProductModel
+    public class ProductSearchRequest : PaginationModel
     {
-        public string CreateUser { get; set; }
-        public Guid? Id { get; set; }
+        public string FilterKeyword { get; set; }
         public Guid? ProductCategoryId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Image { get; set; }
     }
 
-    public class RQ_SearchProductModel
+    public class ProductResponseModel : ProductModel
     {
-        public Guid? ProductCategoryId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public int Page { get; set; } = 1;
-        public int PageSize { get; set; } = 10;
+        public Guid Id { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public string? CreatedByName { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public Guid? ModifiedBy { get; set; }
+        public string? ModifiedByName { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 
-    public class RS_SearchProductModel
+    public class ProductCreateRequest : ProductModel
     {
-        public PaginationModel<List<ProductModel>> Data { get; set; } = new();
+        public string UserName { get; set; }
     }
 
-    public class RQ_GetProductModel
+    public class ProductUpdateRequest : ProductCreateRequest
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
     }
 
-    public class RS_GetProductModel
+    public class ProductDetailModel
     {
-        public ProductModel Data { get; set; } = new ProductModel();
+        public int ProductDetailCategoryId { get; set; }
+        public string Title { get; set; }
+        public string Content { get; set; }
     }
 
-    public class RQ_DeleteProductModel
+    public class ProductDetailResponseModel : ProductDetailModel
     {
-        public string UserDelete { get; set; }
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
+        public Guid? CreatedBy { get; set; }
+        public string? CreatedByName { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public Guid? ModifiedBy { get; set; }
+        public string? ModifiedByName { get; set; }
+        public DateTime? ModifiedDate { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

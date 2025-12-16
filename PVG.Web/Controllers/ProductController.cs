@@ -17,28 +17,20 @@ namespace PVG.Web.Controllers
 
         [HttpPost]
         [Route("search")]
-        public async Task<IActionResult> Search([FromBody] RQ_SearchProductModel _input)
-        {
-            var result = await _service.Search(_input);
-            return ReturnData(result);
-        }
+        public async Task<IActionResult> Search([FromQuery] RQ_SearchProductModel _input)
+           => ReturnData(await _service.Search(_input));
+
+        [HttpGet]
+        public async Task<IActionResult> Save([FromQuery] RQ_GetProductModel _input)
+            => ReturnData(await _service.Get(_input));
 
         [HttpPost]
-        [Route("get")]
-        public async Task<IActionResult> Save([FromBody] RQ_GetProductModel _input)
-        {
-            return ReturnData(await _service.Get(_input));
-        }
-
-        [HttpPost]
-        [Route("save")]
         public async Task<IActionResult> Save([FromBody] RQ_SaveProductModel _input)
-        {
-            return ReturnData(await _service.Save(_input));
-        }
+            => ReturnData(await _service.Save(_input));
 
-        [HttpPost]
-        [Route("delete")]
+
+
+        [HttpDelete]
         public async Task<IActionResult> Save([FromBody] RQ_DeleteProductModel _input)
         {
             return ReturnData(await _service.Delete(_input));

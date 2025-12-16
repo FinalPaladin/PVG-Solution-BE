@@ -2,18 +2,11 @@
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Repositories.ProductInfoRepository;
 using PVG.Infrastucture.Repositories.ViewLogRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace PVG.Application.Services.ViewLogService
 {
-    public class ViewLogService: IViewLogService
+    public class ViewLogService : IViewLogService
     {
         private readonly IViewLogRepository _viewLogRepository;
 
@@ -59,7 +52,7 @@ namespace PVG.Application.Services.ViewLogService
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = ex.Message,
-                    Result = new() { View = 0}
+                    Result = new() { View = 0 }
                 };
             }
         }
