@@ -80,8 +80,7 @@ namespace PVG.Application.Services.ProductCategoryService
                 }
 
                 IQueryable<ProductCategory> query = _productCategoryRepository.FindByCondition(
-                    x => !x.Inactive
-                    && (string.IsNullOrEmpty(_input.keyword) || x.Name.Contains(_input.keyword))
+                    x => (string.IsNullOrEmpty(_input.keyword) || x.Name.Contains(_input.keyword))
                 ).AsQueryable();
 
                 var pagination = await OffsetPagination<ProductCategory>(query, _input.Page, _input.PageSize);
