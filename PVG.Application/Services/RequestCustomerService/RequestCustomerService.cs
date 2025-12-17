@@ -229,60 +229,60 @@ namespace PVG.Application.Services.RequestCustomerService
                     }
                 }
 
-                if (detailCreate.Count > 0)
-                {
-                    string emailTitle = string.Format("[Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
+                //if (detailCreate.Count > 0)
+                //{
+                //    string emailTitle = string.Format("[Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
 
-                    List<IFormFile> attacheds = new List<IFormFile>();
+                //    List<IFormFile> attacheds = new List<IFormFile>();
 
-                    foreach(var item in _input.DataImage)
-                    {
-                        attacheds.Add(item.ImgFile);
-                    }
+                //    foreach(var item in _input.DataImage)
+                //    {
+                //        attacheds.Add(item.ImgFile);
+                //    }
 
-                    var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(_input.FullName, _input.Phone, dataRC), attacheds);
+                //    var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(_input.FullName, _input.Phone, dataRC), attacheds);
 
-                    detailCreate.Add(
-                        new RequestCustomerDetail()
-                        {
-                            Id = Guid.NewGuid(),
-                            CreatedBy = null,
-                            CreatedByName = "",
-                            CreatedDate = DateTime.Now,
-                            DeletedBy = null,
-                            DeletedByName = "",
-                            DeletedDate = DateTime.Now,
-                            IsDeleted = false,
-                            ModifiedBy = null,
-                            ModifiedByName = "",
-                            ModifiedDate = DateTime.Now,
+                //    detailCreate.Add(
+                //        new RequestCustomerDetail()
+                //        {
+                //            Id = Guid.NewGuid(),
+                //            CreatedBy = null,
+                //            CreatedByName = "",
+                //            CreatedDate = DateTime.Now,
+                //            DeletedBy = null,
+                //            DeletedByName = "",
+                //            DeletedDate = DateTime.Now,
+                //            IsDeleted = false,
+                //            ModifiedBy = null,
+                //            ModifiedByName = "",
+                //            ModifiedDate = DateTime.Now,
 
-                            RequestCode = requestCode,
-                            Key = "IsSentEmail",
-                            Value = "true",
-                        }
-                    );
-                    detailCreate.Add(
-                        new RequestCustomerDetail()
-                        {
-                            Id = Guid.NewGuid(),
-                            CreatedBy = null,
-                            CreatedByName = "",
-                            CreatedDate = DateTime.Now,
-                            DeletedBy = null,
-                            DeletedByName = "",
-                            DeletedDate = DateTime.Now,
-                            IsDeleted = false,
-                            ModifiedBy = null,
-                            ModifiedByName = "",
-                            ModifiedDate = DateTime.Now,
+                //            RequestCode = requestCode,
+                //            Key = "IsSentEmail",
+                //            Value = "true",
+                //        }
+                //    );
+                //    detailCreate.Add(
+                //        new RequestCustomerDetail()
+                //        {
+                //            Id = Guid.NewGuid(),
+                //            CreatedBy = null,
+                //            CreatedByName = "",
+                //            CreatedDate = DateTime.Now,
+                //            DeletedBy = null,
+                //            DeletedByName = "",
+                //            DeletedDate = DateTime.Now,
+                //            IsDeleted = false,
+                //            ModifiedBy = null,
+                //            ModifiedByName = "",
+                //            ModifiedDate = DateTime.Now,
 
-                            RequestCode = requestCode,
-                            Key = "EmailTitle",
-                            Value = emailTitle,
-                        }
-                    );
-                }
+                //            RequestCode = requestCode,
+                //            Key = "EmailTitle",
+                //            Value = emailTitle,
+                //        }
+                //    );
+                //}
 
                 await _requestCustomerDetailRepository.UpdateListAsync(detailUpdate);
                 await _requestCustomerDetailRepository.CreateListAsync(detailCreate);
@@ -554,7 +554,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        private string GenBodyEmail(string _fullName, string _phone, List<SaveRequestCustomerModel> _data)
+        private string GenBodyEmail(string _fullName, string _phone, List<RequestCustomerDetailModel> _data)
         {
             string title = @"<tr>
                                 <td colspan='2' style='border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #36C920; padding:5px; width: 40%;'><b>{0}</b></td>
@@ -588,7 +588,7 @@ namespace PVG.Application.Services.RequestCustomerService
             return result;
         }
 
-        private string GetValueByKey(List<SaveRequestCustomerModel> _data, string _key)
+        private string GetValueByKey(List<RequestCustomerDetailModel> _data, string _key)
         {
             var obj = _data.Find(x => x.Key.ToLower() == _key.ToLower());
 
@@ -638,8 +638,8 @@ namespace PVG.Application.Services.RequestCustomerService
                 var headers = await _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
                     && (string.IsNullOrEmpty(_input.Phone) || x.Phone.Contains(_input.Phone))
                     && (_input.ProductId == null || x.ProductId == _input.ProductId)
-                    && (_input.RequestCode == null || x.ProductId == _input.RequestCode
-                    && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower())))
+                    && (_input.RequestCode == null || x.ProductId == _input.RequestCode)
+                    && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower()))
                     && x.IsProcessed == _input.IsProcessed
                 ).OrderByDescending(x => x.CreatedDate).ToListAsync();
 
@@ -829,13 +829,13 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        public async Task<BaseResponse> Insert(RQ_InserRequestCustomerModel _input)
+        public async Task<BaseResponse<RS_InserRequestCustomerModel>> Insert(RQ_InserRequestCustomerModel _input)
         {
             try
             {
                 if (_input == null)
                 {
-                    return new BaseResponse()
+                    return new BaseResponse<RS_InserRequestCustomerModel>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -845,7 +845,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 if (_input.Data == null)
                 {
-                    return new BaseResponse()
+                    return new BaseResponse<RS_InserRequestCustomerModel>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -855,7 +855,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 if (_input.ProductId == null || string.IsNullOrEmpty(_input.Phone))
                 {
-                    return new BaseResponse()
+                    return new BaseResponse<RS_InserRequestCustomerModel>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -865,7 +865,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 if (await _recaptchaService.Verify(_input.Token))
                 {
-                    return new BaseResponse()
+                    return new BaseResponse<RS_InserRequestCustomerModel>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
@@ -897,34 +897,6 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 await _requestCustomerRepository.CreateAsync(dataCreate);
 
-                if(_input.DataImage != null && _input.DataImage.Count > 0)
-                {
-                    foreach (var img in _input.DataImage)
-                    {
-                        if(string.IsNullOrEmpty(img))
-                            { continue; }
-
-                        await _imageRequestRepository.CreateAsync(new ImageRequest()
-                        {
-                            Id = Guid.NewGuid(),
-                            CreatedBy = null,
-                            CreatedByName = "",
-                            CreatedDate = DateTime.Now,
-                            DeletedBy = null,
-                            DeletedByName = "",
-                            DeletedDate = DateTime.Now,
-                            IsDeleted = false,
-                            ModifiedBy = null,
-                            ModifiedByName = "",
-                            ModifiedDate = DateTime.Now,
-
-                            Content = "",
-                            RequestCode = requestCode,
-                            Url = img,
-                        });
-                    }
-                }
-
                 List<RequestCustomerDetail> dataDetailCreate = new();
 
                 if (_input.Data != null && _input.Data.Count > 0)
@@ -953,74 +925,129 @@ namespace PVG.Application.Services.RequestCustomerService
                     }
                 }
 
-                if (dataDetailCreate.Count > 0)
+                return new BaseResponse<RS_InserRequestCustomerModel>()
                 {
-                    string emailTitle = string.Format("[Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", _input.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
-
-                    List<IFormFile> attacheds = new List<IFormFile>();
-
-                    foreach (var img in _input.DataImage)
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Lưu dữ liệu thành công",
+                    Result = new()
                     {
-                        string publicUrl = _cloudflareR2Service.GetPublicUrl(img);
+                        RequestCode = requestCode
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<RS_InserRequestCustomerModel>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
 
-                        if(string.IsNullOrEmpty(publicUrl))
+        public async Task<BaseResponse> SendEmailRequest(Guid _requestCode)
+        {
+            try
+            {
+                var request = await _requestCustomerRepository.FindByCondition(x => x.RequestCode == _requestCode).FirstOrDefaultAsync();
+
+                if (request == null)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Yêu cầu không tồn tại",
+                    };
+                }
+
+                string emailTitle = string.Format("[Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", request.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
+
+                List<IFormFile> attacheds = new List<IFormFile>();
+
+                var images = await _imageRequestRepository.FindByCondition(x => x.RequestCode == _requestCode).ToListAsync();
+
+                if(images != null)
+                {
+                    foreach (var img in images)
+                    {
+                        string publicUrl = _cloudflareR2Service.GetPublicUrl(img.Url);
+
+                        if (string.IsNullOrEmpty(publicUrl))
                         { continue; }
 
                         var fileImg = await _cloudflareR2Service.GetImageAsFormFile(publicUrl);
 
                         attacheds.Add(fileImg);
                     }
-
-                    var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(_input.FullName, _input.Phone, _input.Data), attacheds);
-
-                    dataDetailCreate.Add(
-                        new RequestCustomerDetail()
-                        {
-                            Id = Guid.NewGuid(),
-                            CreatedBy = null,
-                            CreatedByName = "",
-                            CreatedDate = DateTime.Now,
-                            DeletedBy = null,
-                            DeletedByName = "",
-                            DeletedDate = DateTime.Now,
-                            IsDeleted = false,
-                            ModifiedBy = null,
-                            ModifiedByName = "",
-                            ModifiedDate = DateTime.Now,
-
-                            RequestCode = requestCode,
-                            Key = "IsSentEmail",
-                            Value = "true",
-                        }
-                    );
-
-                    dataDetailCreate.Add(
-                        new RequestCustomerDetail()
-                        {
-                            Id = Guid.NewGuid(),
-                            CreatedBy = null,
-                            CreatedByName = "",
-                            CreatedDate = DateTime.Now,
-                            DeletedBy = null,
-                            DeletedByName = "",
-                            DeletedDate = DateTime.Now,
-                            IsDeleted = false,
-                            ModifiedBy = null,
-                            ModifiedByName = "",
-                            ModifiedDate = DateTime.Now,
-
-                            RequestCode = requestCode,
-                            Key = "EmailTitle",
-                            Value = emailTitle,
-                        }
-                    );
                 }
+
+                var details = await _requestCustomerDetailRepository.FindByCondition(x => x.RequestCode == _requestCode).ToListAsync();
+
+                var detailModel = _mapper.Map<List<RequestCustomerDetailModel>>(details);
+
+                var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(request.FullName, request.Phone, detailModel), attacheds);
+
+                if(sendEmail == null || !sendEmail.IsSuccessed)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = sendEmail.ErrMsg,
+                    };
+                }
+
+                List<RequestCustomerDetail> dataDetailCreate = new()
+                {
+                    new RequestCustomerDetail()
+                    {
+                        Id = Guid.NewGuid(),
+                        CreatedBy = null,
+                        CreatedByName = "",
+                        CreatedDate = DateTime.Now,
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
+
+                        RequestCode = _requestCode,
+                        Key = "IsSentEmail",
+                        Value = "true",
+                    },
+                    new RequestCustomerDetail()
+                    {
+                        Id = Guid.NewGuid(),
+                        CreatedBy = null,
+                        CreatedByName = "",
+                        CreatedDate = DateTime.Now,
+                        DeletedBy = null,
+                        DeletedByName = "",
+                        DeletedDate = DateTime.Now,
+                        IsDeleted = false,
+                        ModifiedBy = null,
+                        ModifiedByName = "",
+                        ModifiedDate = DateTime.Now,
+
+                        RequestCode = _requestCode,
+                        Key = "EmailTitle",
+                        Value = emailTitle,
+                    }
+                };
+
+                await _requestCustomerDetailRepository.CreateListAsync(dataDetailCreate);
+                await _requestCustomerDetailRepository.SaveChangesAsync();
 
                 return new BaseResponse()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Lưu dữ liệu thành công",
+                    Message = "Gửi yêu cầu thành công",
                 };
             }
             catch (Exception ex)
@@ -1034,6 +1061,133 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
+        public async Task<BaseResponse<RS_UploadImageRequestCustomerModel>> UploadImageRequestCustomer(RQ_UploadImageRequestCustomerModel _input)
+        {
+            try
+            {
+                if (_input == null)
+                {
+                    return new BaseResponse<RS_UploadImageRequestCustomerModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
 
+                if (_input.RequestCode == null)
+                {
+                    return new BaseResponse<RS_UploadImageRequestCustomerModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+
+                var img = await _cloudflareR2Service.UpImage("", _input.ImgFile);
+
+                if (string.IsNullOrEmpty(img))
+                {
+                    return new BaseResponse<RS_UploadImageRequestCustomerModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Tải ảnh lên thất bại"
+                    };
+                }
+
+                await _imageRequestRepository.CreateAsync(new ImageRequest()
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedBy = null,
+                    CreatedByName = "",
+                    CreatedDate = DateTime.Now,
+                    DeletedBy = null,
+                    DeletedByName = "",
+                    DeletedDate = DateTime.Now,
+                    IsDeleted = false,
+                    ModifiedBy = null,
+                    ModifiedByName = "",
+                    ModifiedDate = DateTime.Now,
+
+                    Content = "",
+                    RequestCode = _input.RequestCode,
+                    Url = img,
+                });
+                await _imageRequestRepository.SaveChangesAsync();
+
+                return new BaseResponse<RS_UploadImageRequestCustomerModel>()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Tải hình ảnh thành công",
+                    Result = new()
+                    {
+                        Key = img,
+                        PublicUrl = _cloudflareR2Service.GetPublicUrl(img)
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<RS_UploadImageRequestCustomerModel>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
+
+        public async Task<BaseResponse> RemoveImageRequestCustomer(RQ_RemoveImageRequestCustomerModel _input)
+        {
+            try
+            {
+                if (_input == null)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+
+                if (_input.RequestCode == null)
+                {
+                    return new BaseResponse()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Dữ liệu đầu vào không hợp lệ"
+                    };
+                }
+
+                var deleteimg = await _cloudflareR2Service.DeleteAsync(_input.Key);
+
+                var img = await _imageRequestRepository.FindByCondition(x => x.RequestCode == _input.RequestCode && x.Url == _input.Key).FirstOrDefaultAsync();
+
+                await _imageRequestRepository.DeleteAsync(img);
+                await _imageRequestRepository.SaveChangesAsync();
+
+
+                return new BaseResponse()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Xóa hình ảnh thành công",
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
     }
 }

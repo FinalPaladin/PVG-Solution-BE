@@ -12,6 +12,7 @@ using PVG.Application.Services.NewsService;
 using PVG.Application.Services.PermissionService;
 using PVG.Application.Services.ProductCategoryService;
 using PVG.Application.Services.ProductService;
+using PVG.Application.Services.RecaptchaService;
 using PVG.Application.Services.RequestCustomerService;
 using PVG.Application.Services.SampleService;
 using PVG.Application.Services.TokenService;
@@ -54,6 +55,7 @@ namespace PVG.Application
             services.AddScoped<IMDataService, MDataService>();
             services.AddScoped<INewsService, NewsService>();
             services.AddScoped<INewsCategoryService, NewsCategoryService>();
+            services.AddScoped<IRecaptchaService, RecaptchaService>();
 
             return services;
         }

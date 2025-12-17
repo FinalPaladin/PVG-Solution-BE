@@ -21,6 +21,12 @@ namespace PVG.Application.Services.RequestCustomerService
 
         public Task<BaseResponse> Processed(RQ_ProcessedModel _input);
 
-        public Task<BaseResponse> Insert(RQ_InserRequestCustomerModel _input);
+        public Task<BaseResponse<RS_InserRequestCustomerModel>> Insert(RQ_InserRequestCustomerModel _input);
+
+        public Task<BaseResponse> SendEmailRequest(Guid _requestCode);
+
+        public Task<BaseResponse<RS_UploadImageRequestCustomerModel>> UploadImageRequestCustomer(RQ_UploadImageRequestCustomerModel _input);
+
+        public Task<BaseResponse> RemoveImageRequestCustomer(RQ_RemoveImageRequestCustomerModel _input);
     }
 }

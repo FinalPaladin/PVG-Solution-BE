@@ -35,7 +35,7 @@ namespace PVG.Domain.Constants
         public const string RC_PropertyAddress = "RedBookAddress";
         public const string RC_LoanProductType = "LoanProductType";
         public const string RC_OtherInfo = "OtherInfo";
-        public const string RC_OtherIncome = "OrderIncome";
+        public const string RC_OtherIncome = "OtherIncome";
 
         public const string RC_PersonalInformation_Name = "Thông Tin Cá Nhân";
         public const string RC_ContactInformation_Name = "Thông Tin Liên Lạc";

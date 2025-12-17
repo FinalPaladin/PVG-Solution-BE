@@ -80,7 +80,24 @@ namespace PVG.Web.Controllers
         [HttpPost]
         [Route("insert")]
         public async Task<IActionResult> Insert([FromBody] RQ_InserRequestCustomerModel _input)
-            => ReturnData(await _service.Insert(_input));
+        {
+            return ReturnData(await _service.Insert(_input));
+        }
+
+        [HttpPost]
+        [Route("upload-img")]
+        public async Task<IActionResult> UploadImageRequestCustomer([FromForm] RQ_UploadImageRequestCustomerModel _input)
+            => ReturnData(await _service.UploadImageRequestCustomer(_input));
+
+        [HttpPost]
+        [Route("remove-img")]
+        public async Task<IActionResult> RemoveImageRequestCustomer([FromBody] RQ_RemoveImageRequestCustomerModel _input)
+            => ReturnData(await _service.RemoveImageRequestCustomer(_input));
+
+        [HttpPost]
+        [Route("send-email")]
+        public async Task<IActionResult> SendEmailRequest([FromBody] RQ_RemoveImageRequestCustomerModel _input)
+            => ReturnData(await _service.SendEmailRequest(_input.RequestCode));
 
     }
 }
