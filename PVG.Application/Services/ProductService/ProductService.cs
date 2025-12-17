@@ -100,7 +100,7 @@ namespace PVG.Application.Services.ProductService
                         "Sản phẩm không tồn tại"
                     );
 
-                var detailEntities = await _productDetailRepository.FindByCondition(c => c.ProductId == _id).ToListAsync();
+                var detailEntities = await _productDetailRepository.FindByCondition(c => c.ProductId == _id && !c.IsDeleted).ToListAsync();
 
                 var productResponse = _mapper.Map<ProductResponseModel>(productEntity);
                 productResponse.ImageUrl = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{productResponse.ImageUrl}";
@@ -171,7 +171,6 @@ namespace PVG.Application.Services.ProductService
                     );
 
                 var productEntity = await _productRepository.GetByIdAsync(_id);
-
                 if (productEntity == null)
                     return BadRequestResponse(
                         ErrorCodeConst.ERROR_REQUEST_NOT_FOUND,
@@ -182,44 +181,77 @@ namespace PVG.Application.Services.ProductService
                 // UPDATE PRODUCT
                 // =========================
                 _mapper.Map(_input, productEntity);
+
+                if (!string.IsNullOrEmpty(productEntity.ImageUrl)
+                    && productEntity.ImageUrl.Contains(_appSettings.CloudflareR2.PublicBaseUrl))
+                {
+                    productEntity.ImageUrl = productEntity.ImageUrl
+                        .Replace(_appSettings.CloudflareR2.PublicBaseUrl, "")
+                        .Replace("/", "");
+                }
+
                 productEntity.ModifiedByName = _input.UserName;
                 productEntity.ModifiedDate = DateTime.Now;
 
                 await _productRepository.UpdateAsync(productEntity);
 
                 // =========================
-                // UPDATE / INSERT DETAILS
+                // UPDATE / INSERT / SOFT DELETE DETAILS
                 // =========================
-                if (_input.Details != null && _input.Details.Any())
+                var inputDetails = _input.Details ?? new List<ProductDetailUpdateModel>();
+
+                // 1️⃣ Lấy toàn bộ detail hiện có của product
+                // With this corrected line:
+                var dbDetails = await _productDetailRepository
+                    .FindByCondition(x => x.ProductId == productEntity.Id && !x.IsDeleted)
+                    .ToListAsync();
+
+                // 2️⃣ Danh sách Id từ input
+                var inputDetailIds = inputDetails
+                    .Where(x => x.Id.HasValue)
+                    .Select(x => x.Id)
+                    .ToHashSet();
+
+                // 3️⃣ SOFT DELETE: DB có nhưng input không còn
+                var deleteDetails = dbDetails
+                    .Where(x => !inputDetailIds.Contains(x.Id))
+                    .ToList();
+
+                foreach (var del in deleteDetails)
                 {
-                    foreach (var detail in _input.Details)
+                    del.IsDeleted = true;
+                    del.ModifiedDate = DateTime.Now;
+                    del.ModifiedByName = _input.UserName;
+
+                    await _productDetailRepository.UpdateAsync(del);
+                }
+
+                // 4️⃣ UPDATE / INSERT
+                foreach (var detail in inputDetails)
+                {
+                    // 👉 UPDATE
+                    if (detail.Id.HasValue)
                     {
-                        // 👉 UPDATE
-                        if (detail.Id.HasValue)
-                        {
-                            var detailEntity = await _productDetailRepository
-                                .GetByIdAsync(detail.Id.Value);
+                        var detailEntity = dbDetails.FirstOrDefault(x => x.Id == detail.Id.Value);
+                        if (detailEntity == null)
+                            continue;
 
-                            if (detailEntity == null)
-                                continue; // hoặc throw nếu muốn strict
+                        _mapper.Map(detail, detailEntity);
+                        detailEntity.ModifiedByName = _input.UserName;
+                        detailEntity.ModifiedDate = DateTime.Now;
 
-                            _mapper.Map(detail, detailEntity);
-                            detailEntity.ModifiedByName = _input.UserName;
-                            detailEntity.ModifiedDate = DateTime.Now;
+                        await _productDetailRepository.UpdateAsync(detailEntity);
+                    }
+                    // 👉 INSERT
+                    else
+                    {
+                        var newDetail = _mapper.Map<ProductDetail>(detail);
+                        newDetail.Id = Guid.NewGuid();
+                        newDetail.ProductId = productEntity.Id;
+                        newDetail.CreatedByName = _input.UserName;
+                        newDetail.CreatedDate = DateTime.Now;
 
-                            await _productDetailRepository.UpdateAsync(detailEntity);
-                        }
-                        // 👉 INSERT
-                        else
-                        {
-                            var newDetail = _mapper.Map<ProductDetail>(detail);
-                            newDetail.Id = Guid.NewGuid();
-                            newDetail.ProductId = productEntity.Id;
-                            newDetail.CreatedByName = _input.UserName;
-                            newDetail.CreatedDate = DateTime.Now;
-
-                            await _productDetailRepository.CreateAsync(newDetail);
-                        }
+                        await _productDetailRepository.CreateAsync(newDetail);
                     }
                 }
 
