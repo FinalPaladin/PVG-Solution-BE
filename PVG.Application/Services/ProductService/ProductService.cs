@@ -53,8 +53,7 @@ namespace PVG.Application.Services.ProductService
                     return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Điều kiện nhập trống");
 
                 var query = _productRepository.FindByCondition(x =>
-                    !x.Inactive
-                    && (_input.ProductCategoryId == null || x.ProductCategoryId == _input.ProductCategoryId)
+                    (_input.ProductCategoryId == null || x.ProductCategoryId == _input.ProductCategoryId)
                     && (string.IsNullOrEmpty(_input.FilterKeyword) || x.Name.Contains(_input.FilterKeyword))
                 ).AsQueryable();
 
@@ -309,7 +308,7 @@ namespace PVG.Application.Services.ProductService
                     .ToListAsync();
 
                 var productsDb = await _productRepository
-                    .FindAll()
+                    .FindByCondition(c => !c.Inactive)
                     .ToListAsync();
 
                 var categoriesRes = new List<object>
