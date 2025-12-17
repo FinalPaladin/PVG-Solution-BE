@@ -31,6 +31,9 @@ namespace PVG.Application.Mappings
             CreateMap<MData, MDataModel>().ReverseMap();
             CreateMap<MData, MDataResponseModel>().ReverseMap();
 
+            CreateMap<ProductDetail, ProductDetailModel>().ReverseMap();
+            CreateMap<ProductDetail, ProductDetailResponseModel>().ReverseMap();
+
             CreateMap<ProductUpdateRequest, Product>()
                 .ForMember(x => x.Id, opt => opt.Ignore())
                 .ForMember(x => x.CreatedBy, opt => opt.Ignore())

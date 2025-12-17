@@ -14,5 +14,7 @@ namespace PVG.Application.Services.ProductService
         Task<BaseResponse> Update(Guid _id, ProductUpdateRequest _input);
 
         Task<BaseResponse> Delete(Guid _id, string _userName);
+
+        Task<BaseResponse> InitProductsApp();
     }
 }

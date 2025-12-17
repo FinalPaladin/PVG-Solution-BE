@@ -374,13 +374,13 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        public async Task<BaseResponse<PaginationModel<List<RequestCustomerModel>>>> Search(RQ_SearchRequestCustomerModel _input)
+        public async Task<BaseResponse<PaginationModel<RequestCustomerModel>>> Search(RQ_SearchRequestCustomerModel _input)
         {
             try
             {
                 if (_input == null)
                 {
-                    return new BaseResponse<PaginationModel<List<RequestCustomerModel>>>()
+                    return new BaseResponse<PaginationModel<RequestCustomerModel>>()
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
@@ -405,7 +405,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 //data.ForEach(c => c.CreatedDate = requestCutomers.FirstOrDefault(m => m.RequestCode == c.RequestCode)?.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss"));
 
-                return new BaseResponse<PaginationModel<List<RequestCustomerModel>>>()
+                return new BaseResponse<PaginationModel<RequestCustomerModel>>()
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
@@ -422,7 +422,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
-                return new BaseResponse<PaginationModel<List<RequestCustomerModel>>>()
+                return new BaseResponse<PaginationModel<RequestCustomerModel>>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,

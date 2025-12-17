@@ -32,6 +32,6 @@
         public int TotalPages { get; set; }
         public int PerPage { get; set; }
         public int PageNumber { get; set; }
-        public T Items { get; set; }
+        public List<T> Items { get; set; }
     }
 }

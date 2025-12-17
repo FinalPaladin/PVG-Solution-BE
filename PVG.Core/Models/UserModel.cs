@@ -33,7 +33,7 @@
 
     public class RS_SearchUserModel
     {
-        public PaginationModel<List<UserModel>> Data { get; set; } = new();
+        public PaginationModel<UserModel> Data { get; set; } = new();
     }
 
     public class UserModel

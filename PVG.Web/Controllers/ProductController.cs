@@ -53,5 +53,14 @@ namespace PVG.Web.Controllers
             Guid id,
             [FromQuery] string userName)
             => ReturnData(await _service.Delete(id, userName));
+
+        [HttpGet]
+        [Route("app/init")]
+        public async Task<IActionResult> InitProductPage()
+            => ReturnData(await _service.InitProductsApp());
+
+        [HttpGet("app/{id:guid}")]
+        public async Task<IActionResult> GetByIdPage(Guid id)
+            => ReturnData(await _service.GetById(id));
     }
 }
