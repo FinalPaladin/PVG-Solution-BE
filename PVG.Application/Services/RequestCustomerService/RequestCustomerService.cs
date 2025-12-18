@@ -907,6 +907,7 @@ namespace PVG.Application.Services.RequestCustomerService
                 };
 
                 await _requestCustomerRepository.CreateAsync(dataCreate);
+                await _requestCustomerRepository.SaveChangesAsync();
 
                 List<RequestCustomerDetail> dataDetailCreate = new();
 
@@ -935,6 +936,9 @@ namespace PVG.Application.Services.RequestCustomerService
                         dataDetailCreate.Add(data);
                     }
                 }
+
+                await _requestCustomerDetailRepository.CreateListAsync(dataDetailCreate);
+                await _requestCustomerDetailRepository.SaveChangesAsync();
 
                 return new BaseResponse<RS_InserRequestCustomerModel>()
                 {
