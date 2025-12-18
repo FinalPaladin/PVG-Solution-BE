@@ -17,6 +17,7 @@ using PVG.Domain.Models;
 using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.ImageRequestRepository;
+using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
@@ -41,6 +42,7 @@ namespace PVG.Application.Services.RequestCustomerService
         private readonly IImageRequestRepository _imageRequestRepository;
         private readonly IUserRepository _userRepository;
         private readonly IRecaptchaService _recaptchaService;
+        private readonly IProductRepository _productRepository;
 
         public RequestCustomerService(
             IOptions<AppSettings> options,
@@ -53,7 +55,8 @@ namespace PVG.Application.Services.RequestCustomerService
             ICloudflareR2Service cloudflareR2Service,
             IImageRequestRepository imageRequestRepository,
             IUserRepository userRepository,
-            IRecaptchaService recaptchaService) : base(options, mapper)
+            IRecaptchaService recaptchaService,
+            IProductRepository productRepository) : base(options, mapper)
         {
             _logger = logger;
             _requestCustomerRepository = requestCustomerRepository;
@@ -63,6 +66,7 @@ namespace PVG.Application.Services.RequestCustomerService
             _imageRequestRepository = imageRequestRepository;
             _userRepository = userRepository;
             _recaptchaService = recaptchaService;
+            _productRepository = productRepository;
         }
 
         public async Task<BaseResponse> Save(RQ_SaveRequestCustomerModel _input)
@@ -333,6 +337,13 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
 
                 var data = _mapper.Map<RequestCustomerModel>(requestCutomerEntity);
+
+                var product = _productRepository.FindByCondition(x => x.Id == data.ProductId).FirstOrDefault();
+
+                if(product != null)
+                {
+                    data.ProductName = product.Name;
+                }
 
                 var requestCustomerDetailEntity = await _requestCustomerDetailRepository.FindByCondition(x => !x.IsDeleted
                 && x.RequestCode == _input.RequestCode).ToListAsync();

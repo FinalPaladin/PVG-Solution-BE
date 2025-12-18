@@ -101,6 +101,7 @@ namespace PVG.Domain.Models
             }
         }
         public List<RequestCustomerDetailModel> Details { get; set; } = new();
+        public string ProductName { get; set; }
     }
 
     public class RQ_DeleteRequestCustomerModel
