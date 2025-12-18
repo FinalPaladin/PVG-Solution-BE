@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Enums;
+using PVG.Domain.Extensions;
 using PVG.Domain.Models;
 using PVG.Domain.Settings;
 using PVG.Domain.Utilities;
@@ -15,12 +16,10 @@ namespace PVG.Application.Services.MDataService
 {
     public class MDataService : BaseService, IMDataService
     {
-        private readonly ILogger<MDataService> _logger;
         private readonly IMDataRepository _mDataRepository;
 
-        public MDataService(IOptions<AppSettings> settings, IMapper mapper, ILogger<MDataService> logger, IMDataRepository mDataRepository) : base(settings, mapper)
+        public MDataService(IOptions<AppSettings> settings, IMapper mapper, IMDataRepository mDataRepository) : base(settings, mapper)
         {
-            _logger = logger;
             _mDataRepository = mDataRepository;
         }
 
@@ -41,8 +40,8 @@ namespace PVG.Application.Services.MDataService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "CreateMdata");
-                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, "Error creating MData.");
+                Logger.Error(ex, $"CreateMdata - {ex.Message}");
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, "Lỗi hệ thống.");
             }
         }
 
@@ -63,8 +62,8 @@ namespace PVG.Application.Services.MDataService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "UpdateMdata");
-                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, "Error creating MData.");
+                Logger.Error(ex, $"UpdateMdata - {ex.Message}");
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, "Lỗi hệ thống.");
             }
         }
 
@@ -85,19 +84,27 @@ namespace PVG.Application.Services.MDataService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "UpdateMdata");
-                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, "Error removing MData.");
+                Logger.Error(ex, $"RemoveMData - {ex.Message}");
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, "Lỗi hệ thống.");
             }
         }
 
         public async Task<BaseResponse> GetMDataByGroupAsync(List<MDataEnum_Group> _group)
         {
-            if (_group == null || _group.Count == 0)
-                return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Vui lòng chọn ít nhất 1 group.");
+            try
+            {
+                if (_group == null || _group.Count == 0)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Vui lòng chọn ít nhất 1 group.");
 
-            var mdataEntities = await _mDataRepository.FindByCondition(c => _group.Contains(c.Group)).ToListAsync();
-            var mdataModels = _mapper.Map<List<MDataResponseModel>>(mdataEntities);
-            return SuccessResponse(mdataModels);
+                var mdataEntities = await _mDataRepository.FindByCondition(c => _group.Contains(c.Group)).ToListAsync();
+                var mdataModels = _mapper.Map<List<MDataResponseModel>>(mdataEntities);
+                return SuccessResponse(mdataModels);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, $"GetMDataByGroupAsync - {ex.Message}");
+                return BadRequestResponse(ErrorCodeConst.ERROR_SYS_ERR, "Lỗi hệ thống.");
+            }
         }
     }
 }

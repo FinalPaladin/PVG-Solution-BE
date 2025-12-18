@@ -3,16 +3,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MimeKit;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using Org.BouncyCastle.Ocsp;
 using PVG.Application.Services.CloudflareR2Service;
 using PVG.Application.Services.EmailService;
 using PVG.Application.Services.RecaptchaService;
 using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
+using PVG.Domain.Extensions;
 using PVG.Domain.Models;
 using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
@@ -21,19 +20,15 @@ using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
-using System;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text.Json;
 using static PVG.Domain.Enums.UserEnum;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PVG.Application.Services.RequestCustomerService
 {
     public class RequestCustomerService : BaseService, IRequestCustomerService
     {
-        private readonly ILogger<RequestCustomerService> _logger;
         private readonly IRequestCustomerRepository _requestCustomerRepository;
         private readonly IRequestCustomerDetailRepository _requestCustomerDetailRepository;
         private readonly IEmailService _emailService;
@@ -47,7 +42,6 @@ namespace PVG.Application.Services.RequestCustomerService
         public RequestCustomerService(
             IOptions<AppSettings> options,
             IMapper mapper,
-            ILogger<RequestCustomerService> logger,
             IRequestCustomerRepository requestCustomerRepository,
             IRequestCustomerDetailRepository requestCustomerDetailRepository,
             IEmailService emailService,
@@ -58,7 +52,6 @@ namespace PVG.Application.Services.RequestCustomerService
             IRecaptchaService recaptchaService,
             IProductRepository productRepository) : base(options, mapper)
         {
-            _logger = logger;
             _requestCustomerRepository = requestCustomerRepository;
             _requestCustomerDetailRepository = requestCustomerDetailRepository;
             _emailService = emailService;
@@ -350,7 +343,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 var details = new List<RequestCustomerDetailModel>();
 
-                if(requestCustomerDetailEntity != null)
+                if (requestCustomerDetailEntity != null)
                     details = _mapper.Map<List<RequestCustomerDetailModel>>(requestCustomerDetailEntity);
 
                 var imgs = await _imageRequestRepository.FindByCondition(c => c.RequestCode == _input.RequestCode && !c.IsDeleted).ToListAsync();
@@ -375,6 +368,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer GetData - {ex.Message}");
                 return new BaseResponse<RS_GetRequestCustomerModel>()
                 {
                     IsSuccess = false,
@@ -433,6 +427,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer Search - {ex.Message}");
                 return new BaseResponse<PaginationModel<RequestCustomerModel>>()
                 {
                     IsSuccess = false,
@@ -501,6 +496,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer DeleteDetail - {ex.Message}");
                 return new BaseResponse()
                 {
                     IsSuccess = false,
@@ -539,7 +535,6 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-
                 checkExist.IsDeleted = true;
                 checkExist.DeletedBy = isAdmin.Result.Id;
                 checkExist.DeletedDate = DateTime.Now;
@@ -556,6 +551,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer Delete - {ex.Message}");
                 return new BaseResponse()
                 {
                     IsSuccess = false,
@@ -586,10 +582,11 @@ namespace PVG.Application.Services.RequestCustomerService
                     case "title":
                         content += string.Format(title, item.Name);
                         break;
+
                     default:
                         content += string.Format(row, item.Name, GetValueByKey(_data, item.Value));
                         break;
-                }                
+                }
             }
 
             string result = string.Format(@"
@@ -634,7 +631,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
-                _logger.LogError("GetRequestDetail: {0}", ex.Message);
+                Logger.Error(ex, $"GetRequestDetail: {ex.Message}");
                 return CatchErrorResponse(ex);
             }
         }
@@ -710,6 +707,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer ExportExcel - {ex.Message}");
                 return new BaseResponse<byte[]>()
                 {
                     IsSuccess = false,
@@ -749,7 +747,7 @@ namespace PVG.Application.Services.RequestCustomerService
             header.Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
             header.AutoFitColumns();
         }
-        
+
         private void ExcelBody(ExcelWorksheet ws, int _row, int _col)
         {
             var header = ws.Cells[_row, _col];
@@ -831,6 +829,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer Processed - {ex.Message}");
                 return new BaseResponse()
                 {
                     IsSuccess = false,
@@ -953,6 +952,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer Insert - {ex.Message}");
                 return new BaseResponse<RS_InserRequestCustomerModel>()
                 {
                     IsSuccess = false,
@@ -984,7 +984,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 var images = await _imageRequestRepository.FindByCondition(x => x.RequestCode == _requestCode).ToListAsync();
 
-                if(images != null)
+                if (images != null)
                 {
                     foreach (var img in images)
                     {
@@ -1005,7 +1005,7 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(request.FullName, request.Phone, detailModel), attacheds);
 
-                if(sendEmail == null || !sendEmail.IsSuccessed)
+                if (sendEmail == null || !sendEmail.IsSuccessed)
                 {
                     return new BaseResponse()
                     {
@@ -1067,6 +1067,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer SendEmailRequest - {ex.Message}");
                 return new BaseResponse()
                 {
                     IsSuccess = false,
@@ -1146,6 +1147,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer UploadImageRequestCustomer - {ex.Message}");
                 return new BaseResponse<RS_UploadImageRequestCustomerModel>()
                 {
                     IsSuccess = false,
@@ -1186,7 +1188,6 @@ namespace PVG.Application.Services.RequestCustomerService
                 await _imageRequestRepository.DeleteAsync(img);
                 await _imageRequestRepository.SaveChangesAsync();
 
-
                 return new BaseResponse()
                 {
                     IsSuccess = true,
@@ -1196,6 +1197,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, $"RequestCustomer RemoveImageRequestCustomer - {ex.Message}");
                 return new BaseResponse()
                 {
                     IsSuccess = false,

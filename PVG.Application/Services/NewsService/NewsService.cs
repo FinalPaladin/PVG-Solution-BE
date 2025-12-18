@@ -198,7 +198,7 @@ namespace PVG.Application.Services.NewsService
                 CreatedDate = today,
             };
 
-            return await CreateNews(news, categoryId, newsRequest.ThumbnailFile, newsRequest.Files, newsRequest.IsNotify.Value);
+            return await CreateNews(news, categoryId, newsRequest.ThumbnailFile, newsRequest.Files);
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace PVG.Application.Services.NewsService
             //newsDB.ModifiedBy = loginContactId;
             newsDB.ModifiedDate = DateTime.Now;
 
-            return await UpdateNews(newsDB, categoryId, newsRequest.ThumbnailFile, newsRequest.Files, newsRequest.IsNotify.Value);
+            return await UpdateNews(newsDB, categoryId, newsRequest.ThumbnailFile, newsRequest.Files);
         }
 
         /// <summary>

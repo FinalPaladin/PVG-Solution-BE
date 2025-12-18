@@ -45,7 +45,7 @@ namespace PVG.Application.Services.NewsCategoryService
 
                 if (categories?.Count > 0)
                 {
-                    var response = _mapper.Map<List<CategoryResponseModel>>(categories);
+                    var response = _mapper.Map<List<NewsCategoryResponseModel>>(categories);
                     if (isUserSite)
                         response = response.OrderBy(c => c.DisplayOrder).ToList();
                     else
@@ -53,12 +53,12 @@ namespace PVG.Application.Services.NewsCategoryService
 
 
                     if (input.IsPaging)
-                        return SuccessResponse(Paging(response, input.PageNumber, input.PerPage), "success");
+                        return SuccessResponse(Paging(response, input.Page, input.PageSize), "success");
                     else
                         return SuccessResponse(response, "success");
                 }
                 else
-                    return SuccessResponse(Paging(new List<CategoryResponseModel>(), input.PageNumber, input.PerPage), "success");
+                    return SuccessResponse(Paging(new List<NewsCategoryResponseModel>(), input.Page, input.PageSize), "success");
             }
             catch (Exception ex)
             {
@@ -80,7 +80,7 @@ namespace PVG.Application.Services.NewsCategoryService
             }
         }
 
-        public async Task<BaseResponse> CreateCategory(CategoryModel category, string userName)
+        public async Task<BaseResponse> CreateCategory(NewsCategoryModel category, string userName)
         {
             try
             {
@@ -123,7 +123,7 @@ namespace PVG.Application.Services.NewsCategoryService
             }
         }
 
-        public async Task<BaseResponse> UpdateCategory(Guid id, CategoryModel category, string userName)
+        public async Task<BaseResponse> UpdateCategory(Guid id, NewsCategoryModel category, string userName)
         {
             try
             {
@@ -172,13 +172,13 @@ namespace PVG.Application.Services.NewsCategoryService
                 if (newsCategories?.Count > 0)
                 {
                     var newsIds = newsCategories.Select(m => m.NewsId).ToList();
-                    var news = await _newsRepository.FindByCondition(m => newsIds.Contains(m.Id) && !m.IsDeleted).ToListAsync();
-                    if (news?.Count > 0)
+                    var news = await _newsRepository.FindByCondition(m => newsIds.Contains(m.Id) && !m.IsDeleted && m.Active).ToListAsync();
+                    if (news?.Count > 0 && categoryEntity.Status)
                         return BadRequestResponse(ErrorCodeConst.ERROR_MAPPING_ITEMS_STILL_VALID,
-                            "Không thể xóa danh mục do tồn tại tin tức còn hiệu lực");
+                            "Không thể chuyển trạng thái danh mục do tồn tại tin tức còn hiệu lực");
                 }
 
-                categoryEntity.IsDeleted = true;
+                categoryEntity.Status = categoryEntity.Status ? false : true;
                 //categoryEntity.DeletedByName = userName;
                 categoryEntity.DeletedDate = DateTime.Now;
 

@@ -30,8 +30,8 @@ namespace PVG.Domain.Models
         public DTOFile ThumbnailFile { get; set; }
         public List<DTOFile> Files { get; set; }
 
-        [Required(ErrorMessage = "isNotify_ERR_REQUIRED")]
-        public bool? IsNotify { get; set; } = false;
+        //[Required(ErrorMessage = "isNotify_ERR_REQUIRED")]
+        //public bool? IsNotify { get; set; } = false;
 
         public int? DisplayOrder { get; set; }
     }

@@ -58,7 +58,7 @@ namespace PVG.Web.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        public async Task<ObjectResult> CreateCategory([FromBody] CategoryModel category)
+        public async Task<ObjectResult> CreateCategory([FromBody] NewsCategoryModel category)
             => ReturnData(await _newsCategoryService.CreateCategory(category, category.UserName));
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace PVG.Web.Controllers
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(BaseResponse), StatusCodes.Status500InternalServerError)]
-        public async Task<ObjectResult> UpdateCategory(Guid id, [FromBody] CategoryModel category)
+        public async Task<ObjectResult> UpdateCategory(Guid id, [FromBody] NewsCategoryModel category)
             => ReturnData(await _newsCategoryService.UpdateCategory(id, category, category.UserName));
 
         /// <summary>
