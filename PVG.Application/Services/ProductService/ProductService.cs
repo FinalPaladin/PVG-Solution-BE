@@ -53,8 +53,7 @@ namespace PVG.Application.Services.ProductService
                     return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Điều kiện nhập trống");
 
                 var query = _productRepository.FindByCondition(x =>
-                    !x.Inactive
-                    && (_input.ProductCategoryId == null || x.ProductCategoryId == _input.ProductCategoryId)
+                    (_input.ProductCategoryId == null || x.ProductCategoryId == _input.ProductCategoryId)
                     && (string.IsNullOrEmpty(_input.FilterKeyword) || x.Name.Contains(_input.FilterKeyword))
                 ).AsQueryable();
 
@@ -91,7 +90,6 @@ namespace PVG.Application.Services.ProductService
         {
             try
             {
-                // 1️⃣ Lấy product
                 var productEntity = await _productRepository.GetByIdAsync(_id);
 
                 if (productEntity == null)
@@ -100,11 +98,14 @@ namespace PVG.Application.Services.ProductService
                         "Sản phẩm không tồn tại"
                     );
 
+                var mData = await _mDataRepository.FindAll().ToListAsync();
                 var detailEntities = await _productDetailRepository.FindByCondition(c => c.ProductId == _id && !c.IsDeleted).ToListAsync();
 
                 var productResponse = _mapper.Map<ProductResponseModel>(productEntity);
                 productResponse.ImageUrl = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{productResponse.ImageUrl}";
                 productResponse.Details = _mapper.Map<List<ProductDetailResponseModel>>(detailEntities);
+                productResponse.LoanAmount = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_AMOUNT && c.Key == productResponse.LoanAmountId.ToString())?.Value ?? "";
+                productResponse.LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == productResponse.LoanTermId.ToString())?.Value ?? "";
 
                 return SuccessResponse(productResponse);
             }
@@ -305,18 +306,18 @@ namespace PVG.Application.Services.ProductService
             try
             {
                 var categoriesDb = await _productCategoryRepository
-                    .FindAll()
+                    .FindByCondition(c => !c.Inactive)
                     .ToListAsync();
 
                 var productsDb = await _productRepository
-                    .FindAll()
+                    .FindByCondition(c => !c.Inactive)
                     .ToListAsync();
 
                 var categoriesRes = new List<object>
                     {
                         new
                         {
-                            Id = string.Empty,
+                            Id = "all",
                             Name = "Tất cả sản phẩm"
                         }
                     };
