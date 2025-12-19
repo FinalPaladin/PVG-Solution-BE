@@ -103,6 +103,8 @@ namespace PVG.Infrastucture
                       .HasMaxLength(255);
 
                 entity.Property(e => e.ModifiedDate);
+
+                entity.HasIndex(e => e.Slug);
             });
 
             #endregion Product
@@ -469,6 +471,8 @@ namespace PVG.Infrastucture
                 entity.ToTable("News");
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.HasIndex(e => e.Slug);
             });
 
             #endregion News

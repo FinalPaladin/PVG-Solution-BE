@@ -14,5 +14,7 @@ namespace PVG.Application.Services.NewsCategoryService
         Task<BaseResponse> UpdateCategory(Guid id, NewsCategoryModel category, string userName);
 
         Task<BaseResponse> DeleteCategory(Guid id);
+
+        Task<BaseResponse> GetAll();
     }
 }

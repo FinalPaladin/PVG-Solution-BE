@@ -32,6 +32,7 @@ namespace PVG.Application.Services.NewsService
             _newsRepository = newsRepository;
             _categoryRepository = categoryRepository;
             _newsRepository = newsRepository;
+            _newsCategoryMappingRepository = newsCategoryMappingRepository;
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace PVG.Application.Services.NewsService
                 searchNews.Search = searchNews.Search?.ToLower();
 
                 var listNewsCategory = new List<NewsCategoryMapping>();
-                if (searchNews != null)
+                if (searchNews.CategoryId != null)
                     listNewsCategory = await _newsCategoryMappingRepository
                             .FindByCondition(m => !m.IsDeleted && m.CategoryId == searchNews.CategoryId)
                             .ToListAsync();
@@ -59,7 +60,7 @@ namespace PVG.Application.Services.NewsService
 
                 //List<DTONewsResponse>
                 var newsList = await _newsRepository.FindByCondition(m =>
-                    !m.IsDeleted && m.PublishDate <= today
+                    !m.IsDeleted && (!isMobile || m.PublishDate.Date <= today.Date)
                     && (!isMobile || m.Active)
                     && (searchNews.CategoryId == null || listNewsCategory.Select(c => c.NewsId).Contains(m.Id))
                     && (searchNews.HasDisplayOrder == null
@@ -69,7 +70,7 @@ namespace PVG.Application.Services.NewsService
                     && (searchNews.Type == null || m.Type == searchNews.Type)
                     && (searchNews.Search == null || m.Title.ToLower().Contains(searchNews.Search))
                     && (!isMobile || (m.ExpireDate == null || (m.ExpireDate != null && today <= m.ExpireDate)))
-                    && (!m.NeedApproved || (m.NeedApproved && m.IsApproved == true))
+                    && (!isMobile || !m.NeedApproved || (m.NeedApproved && m.IsApproved == true))
                     && (searchNews.CreatedDateFrom == null || m.CreatedDate >= searchNews.CreatedDateFrom)
                     && (searchNews.CreatedDateTo == null || m.CreatedDate <= searchNews.CreatedDateTo)
                     && (isMobile ||
@@ -106,28 +107,34 @@ namespace PVG.Application.Services.NewsService
 
                 var response = _mapper.Map<List<NewsResponseModel>>(newsList);
                 var listNewsIds = response.Select(c => c.Id).ToList();
-                var listNewsCategoryUpdate = await _newsCategoryMappingRepository.FindByCondition(c => listNewsIds.Contains((Guid)c.NewsId) && !c.IsDeleted).AsNoTracking().ToListAsync();
-                if (listNewsCategoryUpdate?.Count > 0)
+                if (listNewsIds?.Count > 0)
                 {
-                    var listCategory = await _categoryRepository
-                        .FindByCondition(c => listNewsCategoryUpdate.Select(m => m.CategoryId).Contains(c.Id))
-                        .AsNoTracking()
-                        .ToListAsync();
-                    foreach (var item in listNewsCategoryUpdate)
+                    var listNewsCategoryUpdate = await _newsCategoryMappingRepository.FindByCondition(c => listNewsIds.Contains((Guid)c.NewsId) && !c.IsDeleted).AsNoTracking().ToListAsync();
+                    if (listNewsCategoryUpdate?.Count > 0)
                     {
-                        response.ForEach(c =>
+                        var listCategory = await _categoryRepository
+                            .FindByCondition(c => listNewsCategoryUpdate.Select(m => m.CategoryId).Contains(c.Id))
+                            .AsNoTracking()
+                            .ToListAsync();
+                        if (listCategory?.Count > 0)
                         {
-                            if (c.Id == item.NewsId)
+                            foreach (var item in listNewsCategoryUpdate)
                             {
-                                c.CategoryId = item.CategoryId;
-                                c.CategoryName = listCategory.Where(m => m.Id == item.CategoryId).FirstOrDefault().Name;
+                                response.ForEach(c =>
+                                {
+                                    if (c.Id == item.NewsId)
+                                    {
+                                        c.CategoryId = item.CategoryId;
+                                        c.CategoryName = listCategory.FirstOrDefault(m => m.Id == item.CategoryId)?.Name!;
+                                    }
+                                });
                             }
-                        });
+                        }                        
                     }
                 }
 
                 if (searchNews.IsPaging)
-                    return SuccessResponse(Paging(response, searchNews.PageNumber, searchNews.PerPage), "success");
+                    return SuccessResponse(Paging(response, searchNews.Page, searchNews.PageSize), "success");
                 else
                     return SuccessResponse(response, "success");
             }
@@ -185,11 +192,11 @@ namespace PVG.Application.Services.NewsService
                 Slug = CreateSlug(newsRequest.Title),
                 Type = NewsTypeEnum.News,
                 Description = newsRequest.Description,
-                NeedApproved = newsRequest.NeedApprove,
+                NeedApproved = newsRequest.NeedApprove ?? true,
                 PublishDate = newsRequest.PublishDate ?? today,
                 ExpireDate = newsRequest.ExpireDate,
-                ImageLink = newsRequest.Files.FirstOrDefault().Path,
-                ImageName = newsRequest.Files.FirstOrDefault().FileName,
+                ImageLink = newsRequest.ThumbnailFile.Path,
+                ImageName = newsRequest.ThumbnailFile.FileName,
                 Thumbnail = newsRequest.ThumbnailFile.Path,
                 ThumbnailName = newsRequest.ThumbnailFile.FileName,
                 Active = newsRequest.Active,
@@ -198,7 +205,7 @@ namespace PVG.Application.Services.NewsService
                 CreatedDate = today,
             };
 
-            return await CreateNews(news, categoryId, newsRequest.ThumbnailFile, newsRequest.Files);
+            return await CreateNews(news, categoryId, newsRequest.ThumbnailFile);
         }
 
         /// <summary>
@@ -333,7 +340,7 @@ namespace PVG.Application.Services.NewsService
             //newsDB.ModifiedBy = loginContactId;
             newsDB.ModifiedDate = DateTime.Now;
 
-            return await UpdateNews(newsDB, categoryId, newsRequest.ThumbnailFile, newsRequest.Files);
+            return await UpdateNews(newsDB, categoryId, newsRequest.ThumbnailFile);
         }
 
         /// <summary>

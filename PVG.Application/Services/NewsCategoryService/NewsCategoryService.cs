@@ -207,5 +207,19 @@ namespace PVG.Application.Services.NewsCategoryService
                 return CatchErrorResponse(ex);
             }
         }
+
+        public async Task<BaseResponse> GetAll()
+        {
+            try
+            {
+                var newsCategoriesDb = await _categoryRepository.FindAll().ToListAsync();
+                return SuccessResponse(newsCategoriesDb.Select(c => new { Id = c.Id, Name = c.Name }).ToList(), "success");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return CatchErrorResponse(ex);
+            }
+        }
     }
 }

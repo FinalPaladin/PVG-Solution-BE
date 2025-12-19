@@ -1,9 +1,10 @@
-﻿using PVG.Domain.Enums;
+﻿using PVG.Domain.BaseModels;
+using PVG.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace PVG.Domain.Models
 {
-    public class DTOSearchNews : PaginationModel
+    public class DTOSearchNews : RequestPagingModel
     {
         public DTOSearchNews()
         {
@@ -19,7 +20,7 @@ namespace PVG.Domain.Models
 
         public bool? ForApp { get; set; }
 
-        public string Search { get; set; }
+        public string? Search { get; set; }
 
         [EnumDataType(typeof(NewsTypeEnum), ErrorMessage = "type_ERR_INVALID_VALUE")]
         public NewsTypeEnum? Type { get; set; }

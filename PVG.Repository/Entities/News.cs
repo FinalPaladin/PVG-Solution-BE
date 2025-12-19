@@ -38,9 +38,9 @@ namespace PVG.Infrastucture.Entities
         public DateTime? ExpireDate { get; set; }
 
         [MaxLength(1000)]
-        public string ImageLink { get; set; }
+        public string? ImageLink { get; set; }
 
-        public string ImageName { get; set; }
+        public string? ImageName { get; set; }
 
         [MaxLength(1000)]
         public string Thumbnail { get; set; }

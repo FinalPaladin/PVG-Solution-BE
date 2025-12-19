@@ -4,11 +4,6 @@ namespace PVG.Domain.Models
 {
     public class DTONewsRequest
     {
-        public DTONewsRequest()
-        {
-            Files = new List<DTOFile>();
-        }
-
         [Required(ErrorMessage = "title_ERR_REQUIRED")]
         [MaxLength(100, ErrorMessage = "title_ERR_MAX_LENGTH_100")]
         public string Title { get; set; }
@@ -25,10 +20,10 @@ namespace PVG.Domain.Models
         public DateTime? ExpireDate { get; set; }
 
         [Required(ErrorMessage = "needApprove_ERR_REQUIRED")]
-        public bool NeedApprove { get; set; }
+        public bool? NeedApprove { get; set; } = true;
 
-        public DTOFile ThumbnailFile { get; set; }
-        public List<DTOFile> Files { get; set; }
+        public DTOFile? ThumbnailFile { get; set; }
+        //public List<DTOFile> Files { get; set; }
 
         //[Required(ErrorMessage = "isNotify_ERR_REQUIRED")]
         //public bool? IsNotify { get; set; } = false;

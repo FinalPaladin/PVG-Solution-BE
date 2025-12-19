@@ -28,7 +28,7 @@ namespace PVG.Web.Controllers
         {
             if (searchNews.IsPaging)
             {
-                if (searchNews.PerPage <= 0 || searchNews.PageNumber <= 0)
+                if (searchNews.Page <= 0 || searchNews.PageSize <= 0)
                 {
                     return BadRequestResponse(CreateModel(null, ErrorCodeConst.ERROR_PAGGING_INPUT_INVALID, 400));
                 }
@@ -49,7 +49,7 @@ namespace PVG.Web.Controllers
         {
             if (searchNews.IsPaging)
             {
-                if (searchNews.PerPage <= 0 || searchNews.PageNumber <= 0)
+                if (searchNews.Page <= 0 || searchNews.PageSize <= 0)
                 {
                     return BadRequestResponse(CreateModel(null, ErrorCodeConst.ERROR_PAGGING_INPUT_INVALID, 400));
                 }
@@ -87,7 +87,7 @@ namespace PVG.Web.Controllers
         //[Authorize]
         [HttpGet]
         [Route("app/{newsId}")]
-        public async Task<ObjectResult> GetNewsMobile(Guid newsId, [FromQuery] string slug)
+        public async Task<ObjectResult> GetNewsApp(Guid newsId, [FromQuery] string slug)
         {
             if (newsId == Guid.Empty && string.IsNullOrWhiteSpace(slug))
             {

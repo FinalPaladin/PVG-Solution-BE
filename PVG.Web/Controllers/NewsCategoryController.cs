@@ -109,6 +109,11 @@ namespace PVG.Web.Controllers
         public async Task<ObjectResult> GetCategoriesMobile([FromQuery] NewsCategorySearchModel input)
             => ReturnData(await _newsCategoryService.GetCategory(input));
 
+
+        [HttpGet]
+        [Route("all")]
+        public async Task<ObjectResult> GetAll()
+            => ReturnData(await _newsCategoryService.GetAll());
         #endregion APIs
     }
 }
