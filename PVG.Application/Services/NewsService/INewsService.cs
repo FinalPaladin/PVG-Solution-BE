@@ -10,6 +10,8 @@ namespace PVG.Application.Services.NewsService
 
         Task<BaseResponse> GetNews(Guid id, string slug = null);
 
+        Task<BaseResponse> GetNewsBySlug(string _slug);
+
         Task<BaseResponse> CreateNews(Guid categoryId, DTONewsRequest newsRequest);
 
         Task<BaseResponse> CreateNews(News news, Guid? categoryId, DTOFile thumbnail = null, List<DTOFile> attachments = null, bool isNotify = false);

@@ -146,5 +146,11 @@ namespace PVG.Web.Controllers
             BaseResponse response = await _newsService.DeleteNews(newsId);
             return ReturnData(response);
         }
+
+
+        [HttpGet]
+        [Route("app/slug/{slug}")]
+        public async Task<ObjectResult> GetBySlug(string slug)
+            => ReturnData(await _newsService.GetNewsBySlug(slug));
     }
 }

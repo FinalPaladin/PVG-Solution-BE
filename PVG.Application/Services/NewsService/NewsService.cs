@@ -40,7 +40,7 @@ namespace PVG.Application.Services.NewsService
         /// </summary>
         /// <param name="searchNews"></param>
         /// <returns></returns>
-        public async Task<BaseResponse> GetNewsList(DTOSearchNews searchNews, bool isMobile = true)
+        public async Task<BaseResponse> GetNewsList(DTOSearchNews searchNews, bool isApp = true)
         {
             try
             {
@@ -60,8 +60,8 @@ namespace PVG.Application.Services.NewsService
 
                 //List<DTONewsResponse>
                 var newsList = await _newsRepository.FindByCondition(m =>
-                    !m.IsDeleted && (!isMobile || m.PublishDate.Date <= today.Date)
-                    && (!isMobile || m.Active)
+                    !m.IsDeleted && (!isApp || m.PublishDate.Date <= today.Date)
+                    && (!isApp || m.Active)
                     && (searchNews.CategoryId == null || listNewsCategory.Select(c => c.NewsId).Contains(m.Id))
                     && (searchNews.HasDisplayOrder == null
                         || (searchNews.HasDisplayOrder == true && m.DisplayOrder != null)
@@ -69,11 +69,11 @@ namespace PVG.Application.Services.NewsService
                     && (searchNews.Active == null || m.Active == searchNews.Active)
                     && (searchNews.Type == null || m.Type == searchNews.Type)
                     && (searchNews.Search == null || m.Title.ToLower().Contains(searchNews.Search))
-                    && (!isMobile || (m.ExpireDate == null || (m.ExpireDate != null && today <= m.ExpireDate)))
-                    && (!isMobile || !m.NeedApproved || (m.NeedApproved && m.IsApproved == true))
+                    && (!isApp || (m.ExpireDate == null || (m.ExpireDate != null && today <= m.ExpireDate)))
+                    && (!isApp || !m.NeedApproved || (m.NeedApproved && m.IsApproved == true))
                     && (searchNews.CreatedDateFrom == null || m.CreatedDate >= searchNews.CreatedDateFrom)
                     && (searchNews.CreatedDateTo == null || m.CreatedDate <= searchNews.CreatedDateTo)
-                    && (isMobile ||
+                    && (isApp ||
                         ((searchNews.PublishFrom == null || searchNews.PublishFrom <= m.PublishDate)
                         && (searchNews.PublishTo == null || m.PublishDate <= searchNews.PublishTo)))
                     )
@@ -155,6 +155,32 @@ namespace PVG.Application.Services.NewsService
             try
             {
                 var news = await _newsRepository.FindByCondition(m => m.Id == id && (slug == null || m.Slug.Contains(slug))).FirstOrDefaultAsync();
+                if (news == null)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Không tìm thấy tin tức phù hợp");
+
+                var res = _mapper.Map<NewsResponseModel>(news);
+                var newsCategoryUpdate = await _newsCategoryMappingRepository.FindByCondition(c => c.NewsId == res.Id).FirstOrDefaultAsync();
+                if (newsCategoryUpdate != null)
+                {
+                    var category = await _categoryRepository.FindByCondition(c => c.Id == newsCategoryUpdate.CategoryId).FirstOrDefaultAsync();
+                    res.CategoryId = newsCategoryUpdate.CategoryId;
+                    res.CategoryName = category.Name;
+                }
+
+                return SuccessResponse(res);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return CatchErrorResponse(ex);
+            }
+        }
+
+        public async Task<BaseResponse> GetNewsBySlug(string _slug)
+        {
+            try
+            {
+                var news = await _newsRepository.FindByCondition(m => m.Slug == _slug).FirstOrDefaultAsync();
                 if (news == null)
                     return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Không tìm thấy tin tức phù hợp");
 

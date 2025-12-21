@@ -114,6 +114,7 @@ namespace PVG.Web.Controllers
         [Route("all")]
         public async Task<ObjectResult> GetAll()
             => ReturnData(await _newsCategoryService.GetAll());
+
         #endregion APIs
     }
 }
