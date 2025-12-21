@@ -23,5 +23,7 @@ namespace PVG.Application.Services.NewsService
         //Task<BaseResponse> UpdateNewsOrder(DTONewsOrderRequest newsOrderRequest);
 
         Task<BaseResponse> DeleteNews(Guid id);
+
+        Task<BaseResponse> GetAllForWeb();
     }
 }

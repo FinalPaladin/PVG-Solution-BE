@@ -228,7 +228,7 @@ namespace PVG.Application.Services.NewsService
                 Slug = CreateSlug(newsRequest.Title),
                 Type = NewsTypeEnum.News,
                 Description = newsRequest.Description,
-                NeedApproved = newsRequest.NeedApprove ?? true,
+                NeedApproved = true,
                 PublishDate = newsRequest.PublishDate ?? today,
                 ExpireDate = newsRequest.ExpireDate,
                 ImageLink = newsRequest.ThumbnailFile.Path,
@@ -694,5 +694,110 @@ namespace PVG.Application.Services.NewsService
         {
             return StringHelper.GenerateSlug($"{title} {Guid.NewGuid()}");
         }
+
+        public async Task<BaseResponse> GetAllForWeb()
+        {
+            try
+            {
+                var today = DateTime.Now;
+
+                // 1. Lấy news hợp lệ (chỉ field cần)
+                var validNews = await _newsRepository
+                    .FindByCondition(n =>
+                        !n.IsDeleted
+                        && n.Active
+                        && n.Type == NewsTypeEnum.News
+                        && n.PublishDate.Date <= today.Date
+                        && (
+                            n.ExpireDate == null
+                            || today <= n.ExpireDate
+                        )
+                        && (
+                            !n.NeedApproved
+                            || (n.NeedApproved && (n.IsApproved ?? false))
+                        )
+                    )
+                    .AsNoTracking()
+                    .Select(n => new
+                    {
+                        n.Id,
+                        n.Title,
+                        n.CreatedDate,
+                        n.ThumbnailName
+                    })
+                    .ToListAsync();
+
+                if (!validNews.Any())
+                {
+                    return SuccessResponse(new
+                    {
+                        categories = new List<object>(),
+                        news = new List<object>()
+                    });
+                }
+
+                // 2. Lấy mapping theo newsId
+                var validNewsIds = validNews.Select(n => n.Id).ToList();
+
+                var mappings = await _newsCategoryMappingRepository
+                    .FindByCondition(m =>
+                        !m.IsDeleted &&
+                        validNewsIds.Contains(m.NewsId)
+                    )
+                    .AsNoTracking()
+                    .Select(m => new
+                    {
+                        m.NewsId,
+                        m.CategoryId
+                    })
+                    .ToListAsync();
+
+                if (!mappings.Any())
+                {
+                    return SuccessResponse(new
+                    {
+                        categories = new List<object>(),
+                        news = new List<object>()
+                    });
+                }
+
+                // 3. CategoryId có news
+                var categoryIdsHasNews = mappings
+                    .Select(m => m.CategoryId)
+                    .Distinct()
+                    .ToList();
+
+                // 4. Lấy category (chỉ Id & Name)
+                var categories = await _categoryRepository
+                    .FindByCondition(c =>
+                        !c.IsDeleted &&
+                        categoryIdsHasNews.Contains(c.Id)
+                    )
+                    .AsNoTracking()
+                    .Select(c => new
+                    {
+                        c.Id,
+                        c.Name
+                    })
+                    .ToListAsync();
+
+                // 5. News (đảm bảo có mapping)
+                var news = validNews
+                    .Where(n => mappings.Any(m => m.NewsId == n.Id))
+                    .ToList();
+
+                return SuccessResponse(new
+                {
+                    categories,
+                    news
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return CatchErrorResponse(ex);
+            }
+        }
+
     }
 }
