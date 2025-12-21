@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using PVG.Application.Services.ViewLogService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Enums;
@@ -13,6 +14,7 @@ using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.NewsCategoryMappingRepository;
 using PVG.Infrastucture.Repositories.NewsCategoryRepository;
 using PVG.Infrastucture.Repositories.NewsRepository;
+using static PVG.Domain.Enums.ViewLogEnum;
 
 namespace PVG.Application.Services.NewsService
 {
@@ -21,17 +23,20 @@ namespace PVG.Application.Services.NewsService
         private readonly INewsRepository _newsRepository;
         private readonly INewsCategoryRepository _categoryRepository;
         private readonly INewsCategoryMappingRepository _newsCategoryMappingRepository;
+        private readonly IViewLogService _viewLogService;
         public NewsService(
             IOptions<AppSettings> settings, 
             IMapper mapper,
             INewsRepository newsRepository,
             INewsCategoryRepository categoryRepository,
-            INewsCategoryMappingRepository newsCategoryMappingRepository
+            INewsCategoryMappingRepository newsCategoryMappingRepository,
+            IViewLogService viewLogService
             ) : base(settings, mapper)
         {
             _newsRepository = newsRepository;
             _categoryRepository = categoryRepository;
             _newsRepository = newsRepository;
+            _viewLogService = viewLogService;
         }
 
         /// <summary>
@@ -151,6 +156,11 @@ namespace PVG.Application.Services.NewsService
                 if (news == null)
                     return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Không tìm thấy tin tức phù hợp");
 
+                await _viewLogService.Save(new()
+                {
+                    DetailId = id,
+                    Screen = ScreenView.News
+                });
                 var res = _mapper.Map<NewsResponseModel>(news);
                 var newsCategoryUpdate = await _newsCategoryMappingRepository.FindByCondition(c => c.NewsId == res.Id).FirstOrDefaultAsync();
                 if (newsCategoryUpdate != null)

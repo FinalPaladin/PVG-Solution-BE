@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PVG.Application.Services.UserService;
+using PVG.Application.Services.ViewLogService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Enums;
@@ -14,6 +15,7 @@ using PVG.Infrastucture.Repositories.ProductDetailRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
 using static PVG.Domain.Enums.UserEnum;
+using static PVG.Domain.Enums.ViewLogEnum;
 
 namespace PVG.Application.Services.ProductService
 {
@@ -25,6 +27,7 @@ namespace PVG.Application.Services.ProductService
         private readonly IUserService _userService;
         private readonly IProductCategoryRepository _productCategoryRepository;
         private readonly IMDataRepository _mDataRepository;
+        private readonly IViewLogService _viewLogService;
 
         public ProductService(
             IOptions<AppSettings> options,
@@ -34,7 +37,8 @@ namespace PVG.Application.Services.ProductService
             IUserRepository userRepository,
             IUserService userService,
             IProductCategoryRepository productCategoryRepository,
-            IMDataRepository mDataRepository
+            IMDataRepository mDataRepository,
+            IViewLogService viewLogService
             ) : base(options, mapper)
         {
             _productRepository = productRepository;
@@ -43,6 +47,7 @@ namespace PVG.Application.Services.ProductService
             _userService = userService;
             _productCategoryRepository = productCategoryRepository;
             _mDataRepository = mDataRepository;
+            _viewLogService = viewLogService;
         }
 
         public async Task<BaseResponse> Search(ProductSearchRequest _input)
@@ -98,6 +103,11 @@ namespace PVG.Application.Services.ProductService
                         "Sản phẩm không tồn tại"
                     );
 
+                await _viewLogService.Save(new()
+                {
+                    DetailId = _id,
+                    Screen = ScreenView.Product
+                });
                 var mData = await _mDataRepository.FindAll().ToListAsync();
                 var detailEntities = await _productDetailRepository.FindByCondition(c => c.ProductId == _id && !c.IsDeleted).ToListAsync();
 
