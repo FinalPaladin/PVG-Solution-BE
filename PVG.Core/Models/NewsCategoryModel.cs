@@ -1,9 +1,10 @@
-﻿using PVG.Domain.Enums;
+﻿using PVG.Domain.BaseModels;
+using PVG.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace PVG.Domain.Models
 {
-    public class NewsCategorySearchModel : PaginationModel
+    public class NewsCategorySearchModel : RequestPagingModel
     {
         /// <summary>
         /// Trạng thái
@@ -15,7 +16,7 @@ namespace PVG.Domain.Models
         public string? Keywords { get; set; }
     }
 
-    public class CategoryModel
+    public class NewsCategoryModel
     {
         [Required]
         [MaxLength(255)]
@@ -31,7 +32,7 @@ namespace PVG.Domain.Models
         public string UserName { get; set; }
     }
 
-    public class CategoryResponseModel
+    public class NewsCategoryResponseModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -46,5 +47,8 @@ namespace PVG.Domain.Models
         public Guid? DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
         public bool IsDeleted { get; set; }
+        public string? CreatedByName { get; set; }
+        public string? ModifiedByName { get; set; }
+        public string? DeletedByName { get; set; }
     }
 }

@@ -10,37 +10,33 @@ namespace PVG.Domain.Extensions
 
         static Logger()
         {
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+
             var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false)
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory) // Đảm bảo đúng thư mục gốc
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env}.json", optional: true) // Nạp file theo môi trường (Development/Staging/...)
+                .AddEnvironmentVariables()
                 .Build();
 
-            var logFolder = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "App_Data",
-                "Logs"
-            );
-
+            var logFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "Logs");
             Directory.CreateDirectory(logFolder);
 
             _logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .Enrich.WithExceptionDetails()
-
                 .WriteTo.File(
                     Path.Combine(logFolder, "SysLogs-.txt"),
                     rollingInterval: RollingInterval.Day,
                     rollOnFileSizeLimit: true,
                     retainedFileCountLimit: 10
                 )
-
                 .WriteTo.Console()
-
                 .WriteTo.MySQL(
-                    connectionString: config.GetConnectionString("DefaultConnection"),
+                    connectionString: config.GetConnectionString("DefaultConnection"), // Giờ sẽ không bị null nữa
                     tableName: "SysLogs",
                     restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error
                 )
-
                 .CreateLogger();
         }
 

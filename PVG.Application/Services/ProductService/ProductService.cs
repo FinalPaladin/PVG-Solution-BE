@@ -112,7 +112,7 @@ namespace PVG.Application.Services.ProductService
                 var detailEntities = await _productDetailRepository.FindByCondition(c => c.ProductId == _id && !c.IsDeleted).ToListAsync();
 
                 var productResponse = _mapper.Map<ProductResponseModel>(productEntity);
-                productResponse.ImageUrl = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{productResponse.ImageUrl}";
+                productResponse.ImageUrl = string.IsNullOrEmpty(productResponse.ImageUrl) ? "" : $"{_appSettings.CloudflareR2.PublicBaseUrl}/{productResponse.ImageUrl}";
                 productResponse.Details = _mapper.Map<List<ProductDetailResponseModel>>(detailEntities);
                 productResponse.LoanAmount = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_AMOUNT && c.Key == productResponse.LoanAmountId.ToString())?.Value ?? "";
                 productResponse.LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == productResponse.LoanTermId.ToString())?.Value ?? "";
@@ -348,7 +348,7 @@ namespace PVG.Application.Services.ProductService
                     Id = p.Id,
                     Name = p.Name,
                     ProductCategoryId = p.ProductCategoryId,
-                    ImageUrl = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{p.ImageUrl}",
+                    ImageUrl = string.IsNullOrEmpty(p.ImageUrl) ? "" : $"{_appSettings.CloudflareR2.PublicBaseUrl}/{p.ImageUrl}",
                     LoanAmount = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_AMOUNT && c.Key == p.LoanAmountId.ToString())?.Value ?? "",
                     LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == p.LoanTermId.ToString())?.Value ?? ""
                 }).ToList();

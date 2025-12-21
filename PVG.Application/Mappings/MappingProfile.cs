@@ -46,6 +46,10 @@ namespace PVG.Application.Mappings
                 .ForMember(x => x.CreatedBy, opt => opt.Ignore())
                 .ForMember(x => x.CreatedByName, opt => opt.Ignore())
                 .ForMember(x => x.CreatedDate, opt => opt.Ignore());
+
+            CreateMap<NewsCategoryResponseModel, NewsCategory>().ReverseMap();
+            CreateMap<NewsCategoryModel, NewsCategory>().ReverseMap();
+            CreateMap<NewsResponseModel, News>().ReverseMap();
         }
     }
 }

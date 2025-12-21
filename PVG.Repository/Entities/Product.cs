@@ -10,6 +10,7 @@ namespace PVG.Infrastucture.Entities
         public int LoanTermId { get; set; }
         public string ImageUrl { get; set; }
         public bool Inactive { get; set; } = false;
+        public string? Slug { get; set; }
         public Guid? CreatedBy { get; set; }
         public string? CreatedByName { get; set; }
         public DateTime CreatedDate { get; set; }

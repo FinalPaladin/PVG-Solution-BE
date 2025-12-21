@@ -15,7 +15,7 @@ namespace PVG.Infrastucture.Entities
 
         [Required]
         public NewsTypeEnum Type { get; set; }
-
+        public string? Slug { get; set; }
         public int? DisplayOrder { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }

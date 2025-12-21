@@ -9,10 +9,12 @@ namespace PVG.Application.Services.NewsCategoryService
 
         Task<BaseResponse> GetCategoryById(Guid id);
 
-        Task<BaseResponse> CreateCategory(CategoryModel category, string userName);
+        Task<BaseResponse> CreateCategory(NewsCategoryModel category, string userName);
 
-        Task<BaseResponse> UpdateCategory(Guid id, CategoryModel category, string userName);
+        Task<BaseResponse> UpdateCategory(Guid id, NewsCategoryModel category, string userName);
 
         Task<BaseResponse> DeleteCategory(Guid id);
+
+        Task<BaseResponse> GetAll();
     }
 }
