@@ -43,23 +43,23 @@ namespace PVG.Web.Controllers
         /// </summary>
         /// <returns></returns>
         //[Authorize]
-        [HttpGet]
-        [Route("app")]
-        public async Task<ObjectResult> GetNewsListMobile([FromQuery] DTOSearchNews searchNews)
-        {
-            if (searchNews.IsPaging)
-            {
-                if (searchNews.Page <= 0 || searchNews.PageSize <= 0)
-                {
-                    return BadRequestResponse(CreateModel(null, ErrorCodeConst.ERROR_PAGGING_INPUT_INVALID, 400));
-                }
-            }
-            searchNews.ForApp = true;
-            searchNews.Type = NewsTypeEnum.News;
+        //[HttpGet]
+        //[Route("app")]
+        //public async Task<ObjectResult> GetNewsListMobile([FromQuery] DTOSearchNews searchNews)
+        //{
+        //    if (searchNews.IsPaging)
+        //    {
+        //        if (searchNews.Page <= 0 || searchNews.PageSize <= 0)
+        //        {
+        //            return BadRequestResponse(CreateModel(null, ErrorCodeConst.ERROR_PAGGING_INPUT_INVALID, 400));
+        //        }
+        //    }
+        //    searchNews.ForApp = true;
+        //    searchNews.Type = NewsTypeEnum.News;
 
-            BaseResponse response = await _newsService.GetNewsList(searchNews);
-            return ReturnData(response);
-        }
+        //    BaseResponse response = await _newsService.GetNewsList(searchNews);
+        //    return ReturnData(response);
+        //}
 
         /// <summary>
         /// API xem chi tiết tin tức cho phía web
@@ -152,5 +152,10 @@ namespace PVG.Web.Controllers
         [Route("app/slug/{slug}")]
         public async Task<ObjectResult> GetBySlug(string slug)
             => ReturnData(await _newsService.GetNewsBySlug(slug));
+
+        [HttpGet]
+        [Route("app")]
+        public async Task<ObjectResult> GetAllNewForWeb()
+            => ReturnData(await _newsService.GetAllForWeb());
     }
 }
