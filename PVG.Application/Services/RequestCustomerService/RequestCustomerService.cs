@@ -561,7 +561,7 @@ namespace PVG.Application.Services.RequestCustomerService
             }
         }
 
-        private string GenBodyEmail(string _fullName, string _phone, List<RequestCustomerDetailModel> _data)
+        private string GenBodyEmail(List<RequestCustomerDetailModel> _data)
         {
             string title = @"<tr>
                                 <td colspan='2' style='border: 1px solid; font-weight: bold; padding: 6px 0; background-color: #36C920; padding:5px; width: 40%;'><b>{0}</b></td>
@@ -1003,7 +1003,13 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 var detailModel = _mapper.Map<List<RequestCustomerDetailModel>>(details);
 
-                var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(request.FullName, request.Phone, detailModel), attacheds);
+                var product = await _productRepository.FindByCondition(x => x.Id == request.ProductId).FirstOrDefaultAsync();
+                string productName = "";
+
+                if (product != null)
+                    detailModel.Add(new() { Key = ConstRequestCustomer.RC_LoanProductType, Value = product?.Name });
+
+                var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(detailModel), attacheds);
 
                 if (sendEmail == null || !sendEmail.IsSuccessed)
                 {
