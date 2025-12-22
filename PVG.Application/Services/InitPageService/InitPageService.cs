@@ -481,7 +481,7 @@ namespace PVG.Application.Services.InitPageService
                 return new BaseResponse<RS_DashboardInitPageModel>()
                 {
                     IsSuccess = true,
-                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusCode = StatusCodes.Status200OK,
                     Message = "Lấy dữ liệu thành công",
                     Result = new()
                     {
