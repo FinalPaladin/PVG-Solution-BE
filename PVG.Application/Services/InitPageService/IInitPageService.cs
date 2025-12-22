@@ -12,5 +12,6 @@ namespace PVG.Application.Services.InitPageService
     {
         public Task<BaseResponse<ProductInitPageModel>> Product();
         public Task<BaseResponse> System();
+        public Task<BaseResponse<RS_DashboardInitPageModel>> Dashboard();
     }
 }

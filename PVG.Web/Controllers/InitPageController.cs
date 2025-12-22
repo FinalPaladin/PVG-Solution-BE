@@ -34,5 +34,13 @@ namespace PVG.Web.Controllers
             return ReturnData(result);
         }
 
+        [HttpGet]
+        [Route("dashboard")]
+        public async Task<IActionResult> Dashboard()
+        {
+            var result = await _service.Dashboard();
+            return ReturnData(result);
+        }
+
     }
 }

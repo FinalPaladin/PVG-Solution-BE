@@ -9,8 +9,10 @@ using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
+using PVG.Infrastucture.Repositories.RequestCustomerRepository;
 using PVG.Infrastucture.Repositories.UserPermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
+using PVG.Infrastucture.Repositories.ViewLogRepository;
 
 namespace PVG.Application.Services.InitPageService
 {
@@ -24,6 +26,8 @@ namespace PVG.Application.Services.InitPageService
         private readonly IUserPermissionRepository _userPermissionRepository;
         private readonly IConfigurationRepository _configurationRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IViewLogRepository _viewLogRepository;
+        private readonly IRequestCustomerRepository _requestCustomerRepository;
 
         public InitPageService(IProductRepository productRepository,
             IProductCategoryRepository productCategoryRepository,
@@ -32,7 +36,9 @@ namespace PVG.Application.Services.InitPageService
             IPermissionRepository permissionRepository,
             IUserPermissionRepository userPermissionRepository,
             IConfigurationRepository configurationRepository,
-            IPasswordHasher<User> passwordHasher)
+            IPasswordHasher<User> passwordHasher,
+            IViewLogRepository viewLogRepository,
+            IRequestCustomerRepository requestCustomerRepository)
         {
             _mapper = mapper;
             _productRepository = productRepository;
@@ -42,6 +48,8 @@ namespace PVG.Application.Services.InitPageService
             _userPermissionRepository = userPermissionRepository;
             _configurationRepository = configurationRepository;
             _passwordHasher = passwordHasher;
+            _viewLogRepository = viewLogRepository;
+            _requestCustomerRepository = requestCustomerRepository;
         }
 
         public async Task<BaseResponse<ProductInitPageModel>> Product()
@@ -405,6 +413,93 @@ namespace PVG.Application.Services.InitPageService
             catch (Exception ex)
             {
                 return new BaseResponse()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
+    
+        public async Task<BaseResponse<RS_DashboardInitPageModel>> Dashboard()
+        {
+            try
+            {
+                var viewlogRepo = await _viewLogRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
+
+                int viewhome = 0, viewproducts = 0, viewnews = 0;
+
+                if(viewlogRepo != null && viewlogRepo.Count > 0)
+                {
+                    viewhome = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Home).ToList().Count;
+                    viewproducts = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Product).ToList().Count;
+                    viewnews = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.News).ToList().Count;
+                }
+
+                var request = await _requestCustomerRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
+
+                int yesterday = 0, yesterdayProcessed = 0, thisweek = 0, thisweekProcessed = 0, thismonth = 0, thismonthProcessed = 0;
+
+                if(request !=null && request.Count > 0)
+                {
+                    DateTime today = DateTime.Now;
+                    var startOfMonth = new DateTime(today.Year, today.Month, 1);
+                    var startOfNextMonth = startOfMonth.AddMonths(1);
+
+                    var listmonth = request.Where(x => x.CreatedDate >= startOfMonth && x.CreatedDate < startOfNextMonth).ToList();
+
+                    if(listmonth !=null && listmonth.Count > 0)
+                    {
+                        thismonth = listmonth.Count;
+                        thismonthProcessed = listmonth.Where(x => x.IsProcessed).ToList().Count;
+
+                        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+                        var startOfWeek = today.AddDays(-diff);
+                        var startOfNextWeek = startOfWeek.AddDays(7);
+
+                        var listweek = listmonth.Where(x => x.CreatedDate >= startOfWeek && x.CreatedDate < startOfNextWeek).ToList();
+
+                        if (listweek != null && listweek.Count > 0)
+                        {
+                            thisweek = listweek.Count;
+                            thisweekProcessed = listweek.Where(x => x.IsProcessed).ToList().Count;
+
+                            var startOfYesterday = today.AddDays(-1);
+                            var startOfToday = today;
+
+                            var listyesterday = listweek.Where(x => x.CreatedDate >= startOfYesterday && x.CreatedDate < startOfToday).ToList();
+
+                            if (listyesterday != null && listyesterday.Count > 0)
+                            {
+                                yesterday = listyesterday.Count;
+                                yesterdayProcessed = listyesterday.Where(x => x.IsProcessed).ToList().Count;
+                            }
+                        }
+                    }
+                }
+
+                return new BaseResponse<RS_DashboardInitPageModel>()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Lấy dữ liệu thành công",
+                    Result = new()
+                    {
+                        ViewHome = viewhome,
+                        ViewNews = viewnews,
+                        ViewProducts = viewproducts,
+                        RequestThisMonth = thismonth,
+                        RequestThisWeek = thisweek,
+                        RequestYesterday = yesterday,
+                        RequestThisMonthProcessed = thismonthProcessed,
+                        RequestThisWeekProcessed = thisweekProcessed,
+                        RequestYesterdayProcessed = yesterdayProcessed,
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<RS_DashboardInitPageModel>()
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
