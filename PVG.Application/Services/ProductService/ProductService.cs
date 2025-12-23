@@ -355,6 +355,11 @@ namespace PVG.Application.Services.ProductService
                     LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == p.LoanTermId.ToString())?.Value ?? ""
                 }).ToList();
 
+                await _viewLogService.Save(new()
+                {
+                    Screen = ScreenView.Products
+                });
+
                 return SuccessResponse(new
                 {
                     Categories = categoriesRes,

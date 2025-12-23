@@ -27,5 +27,6 @@ namespace PVG.Application.Services.NewsService
         Task<BaseResponse> GetAllForWeb();
 
         Task<BaseResponse> ApproveNews(ApproveNewsRequestDto _payload);
+        Task<BaseResponse> UnApproveNews(ApproveNewsRequestDto _payload);
     }
 }

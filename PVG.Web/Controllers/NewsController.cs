@@ -156,6 +156,11 @@ namespace PVG.Web.Controllers
         public async Task<ObjectResult> ApproveNews([FromBody] ApproveNewsRequestDto dtoApproveNews)
             => ReturnData(await _newsService.ApproveNews(dtoApproveNews));
 
+        [HttpPost]
+        [Route("unapprove")]
+        public async Task<ObjectResult> UnApproveNews([FromBody] ApproveNewsRequestDto dtoApproveNews)
+            => ReturnData(await _newsService.UnApproveNews(dtoApproveNews));
+
         [HttpGet]
         [Route("app")]
         public async Task<ObjectResult> GetAllNewForWeb()

@@ -14,6 +14,7 @@ namespace PVG.Domain.Models
     public class RS_DashboardInitPageModel
     {
         public int ViewHome { get; set; }
+        public int Viewproduct { get; set; }
         public int ViewProducts { get; set; }
         public int ViewNews { get; set; }
         public int total { get; set; }

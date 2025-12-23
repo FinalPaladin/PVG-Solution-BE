@@ -427,12 +427,13 @@ namespace PVG.Application.Services.InitPageService
             {
                 var viewlogRepo = await _viewLogRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
 
-                int viewhome = 0, viewproducts = 0, viewnews = 0;
+                int viewhome = 0, viewproduct = 0, viewproducts = 0, viewnews = 0;
 
                 if(viewlogRepo != null && viewlogRepo.Count > 0)
                 {
                     viewhome = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Home).ToList().Count;
-                    viewproducts = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Product).ToList().Count;
+                    viewproduct = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Product).ToList().Count;
+                    viewproducts = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Products).ToList().Count;
                     viewnews = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.News).ToList().Count;
                 }
 
@@ -490,6 +491,7 @@ namespace PVG.Application.Services.InitPageService
                     {
                         ViewHome = viewhome,
                         ViewNews = viewnews,
+                        Viewproduct = viewproduct,
                         ViewProducts = viewproducts,
                         total = total,
                         totalProcessed = totalProcessed,

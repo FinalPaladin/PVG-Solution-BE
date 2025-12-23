@@ -840,5 +840,23 @@ namespace PVG.Application.Services.NewsService
                 return CatchErrorResponse(ex);
             }
         }
+
+        public async Task<BaseResponse> UnApproveNews(ApproveNewsRequestDto _payload)
+        {
+            try
+            {
+                var news = await _newsRepository.FindByCondition(x => !x.IsDeleted && x.Id == _payload.Id).FirstOrDefaultAsync();
+                if (news == null)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Không tìm thấy tin tức hợp lệ");
+                news.IsApproved = false;
+                await _newsRepository.UpdateAsync(news);
+                return SuccessResponse(null, "success");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return CatchErrorResponse(ex);
+            }
+        }
     }
 }

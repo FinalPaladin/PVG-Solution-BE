@@ -12,6 +12,7 @@ namespace PVG.Domain.Enums
         {
             Home = 0,
             Product = 1,
+            Products = 2,
             News = 3
         }
     }
