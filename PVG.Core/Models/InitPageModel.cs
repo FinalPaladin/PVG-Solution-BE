@@ -16,6 +16,8 @@ namespace PVG.Domain.Models
         public int ViewHome { get; set; }
         public int ViewProducts { get; set; }
         public int ViewNews { get; set; }
+        public int total { get; set; }
+        public int totalProcessed { get; set; }
         public int RequestYesterday { get; set; }
         public int RequestYesterdayProcessed { get; set; }
         public int RequestThisWeek { get; set; }

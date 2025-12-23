@@ -438,10 +438,13 @@ namespace PVG.Application.Services.InitPageService
 
                 var request = await _requestCustomerRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
 
-                int yesterday = 0, yesterdayProcessed = 0, thisweek = 0, thisweekProcessed = 0, thismonth = 0, thismonthProcessed = 0;
+                int total = 0, totalProcessed = 0, yesterday = 0, yesterdayProcessed = 0, thisweek = 0, thisweekProcessed = 0, thismonth = 0, thismonthProcessed = 0;
 
                 if(request !=null && request.Count > 0)
                 {
+                    total = request.Count;
+                    totalProcessed = request.Where(x => x.IsProcessed).ToList().Count;
+
                     DateTime today = DateTime.Now;
                     var startOfMonth = new DateTime(today.Year, today.Month, 1);
                     var startOfNextMonth = startOfMonth.AddMonths(1);
@@ -488,6 +491,8 @@ namespace PVG.Application.Services.InitPageService
                         ViewHome = viewhome,
                         ViewNews = viewnews,
                         ViewProducts = viewproducts,
+                        total = total,
+                        totalProcessed = totalProcessed,
                         RequestThisMonth = thismonth,
                         RequestThisWeek = thisweek,
                         RequestYesterday = yesterday,
