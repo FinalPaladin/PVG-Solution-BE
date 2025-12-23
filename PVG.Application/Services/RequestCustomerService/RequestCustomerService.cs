@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Org.BouncyCastle.Asn1.Ocsp;
 using PVG.Application.Services.CloudflareR2Service;
 using PVG.Application.Services.EmailService;
 using PVG.Application.Services.RecaptchaService;
@@ -655,6 +656,20 @@ namespace PVG.Application.Services.RequestCustomerService
 
                 var details = await _requestCustomerDetailRepository.FindByCondition(x => requestCodes.Contains(x.RequestCode)).ToListAsync();
 
+                foreach (var requesHeadert in headers)
+                {
+                    var product = await _productRepository.FindByCondition(x => x.Id == requesHeadert.ProductId).FirstOrDefaultAsync();
+                    if (product != null)
+                    {
+                        int index = details.FindIndex(x => !x.IsDeleted && x.RequestCode == requesHeadert.RequestCode && x.Key.ToLower() == ConstRequestCustomer.RC_LoanProductType.ToLower());
+                        if(index > -1)
+                        {
+                            details[index].Value = product.Name;
+                        }
+                    }
+
+                }
+
                 using (ExcelPackage package = new ExcelPackage())
                 {
                     var ws = package.Workbook.Worksheets.Add("Report");
@@ -694,7 +709,7 @@ namespace PVG.Application.Services.RequestCustomerService
                             ws.Cells[row, i + 1].Value = value;
                         }
                     }
-
+                    ws.Cells[ws.Dimension.Address].AutoFitColumns(12, 40);
                     fileBytes = package.GetAsByteArray();
                 }
 
@@ -745,7 +760,6 @@ namespace PVG.Application.Services.RequestCustomerService
             header.Style.Font.Size = 12;
             header.Style.Font.Bold = true;
             header.Style.Border.BorderAround(ExcelBorderStyle.Thin, Color.Black);
-            header.AutoFitColumns();
         }
 
         private void ExcelBody(ExcelWorksheet ws, int _row, int _col)
@@ -762,6 +776,7 @@ namespace PVG.Application.Services.RequestCustomerService
             header.Style.Border.Bottom.Color.SetColor(Color.Black);
             header.Style.Border.Left.Color.SetColor(Color.Black);
             header.Style.Border.Right.Color.SetColor(Color.Black);
+            header.AutoFitColumns();
         }
 
         public async Task<BaseResponse> Processed(RQ_ProcessedModel _input)
