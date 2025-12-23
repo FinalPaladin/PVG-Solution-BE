@@ -6,6 +6,7 @@ using PVG.Domain.Constants;
 using PVG.Domain.Extensions;
 using PVG.Domain.Models;
 using PVG.Domain.Settings;
+using PVG.Domain.Utilities;
 using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.NewsCategoryMappingRepository;
 using PVG.Infrastucture.Repositories.NewsCategoryRepository;
@@ -97,6 +98,7 @@ namespace PVG.Application.Services.NewsCategoryService
                 //newCategory.CreatedBy = _claimsPrincipalExtension.GetUserId();
                 newCategory.CreatedByName = userName;
                 newCategory.CreatedDate = DateTime.Now;
+                newCategory.Slug = StringHelper.GenerateSlug($"{category.Name}");
 
                 Guid newCategoryId;
                 using (var transaction = await _categoryRepository.BeginTransactionAsync())

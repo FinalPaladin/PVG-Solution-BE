@@ -225,7 +225,6 @@ namespace PVG.Application.Services.NewsService
                 Id = Guid.NewGuid(),
                 Title = newsRequest.Title,
                 Content = newsRequest.Content,
-                Slug = CreateSlug(newsRequest.Title),
                 Type = NewsTypeEnum.News,
                 Description = newsRequest.Description,
                 NeedApproved = true,
@@ -270,6 +269,7 @@ namespace PVG.Application.Services.NewsService
                     .AsNoTracking()
                     .FirstOrDefaultAsync();
                 news.Code = latestNews != null ? latestNews.Code + 1 : 1;
+                news.Slug = CreateSlug(news.Title, news.Code.ToString() ?? Guid.NewGuid().ToString());
 
                 //cập nhật đường dẫn thumbnail
                 //if (thumbnail != null)
@@ -690,9 +690,9 @@ namespace PVG.Application.Services.NewsService
         /// </summary>
         /// <param name="title"></param>
         /// <returns></returns>
-        private string CreateSlug(string title)
+        private string CreateSlug(string title, string code)
         {
-            return StringHelper.GenerateSlug($"{title} {Guid.NewGuid()}");
+            return StringHelper.GenerateSlug($"{title} {code}");
         }
 
         public async Task<BaseResponse> GetAllForWeb()

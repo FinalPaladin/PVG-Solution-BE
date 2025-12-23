@@ -8,6 +8,7 @@ using PVG.Domain.Constants;
 using PVG.Domain.Enums;
 using PVG.Domain.Models;
 using PVG.Domain.Settings;
+using PVG.Domain.Utilities;
 using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.MDataRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
@@ -140,6 +141,7 @@ namespace PVG.Application.Services.ProductService
 
                 var productEntity = _mapper.Map<Product>(_input);
                 productEntity.Id = Guid.NewGuid();
+                productEntity.Slug = StringHelper.GenerateSlug($"{productEntity.Name}");
                 productEntity.CreatedByName = _input.UserName;
                 productEntity.CreatedDate = DateTime.UtcNow;
 
