@@ -228,19 +228,20 @@ namespace PVG.Application.Services.NewsService
                 Type = NewsTypeEnum.News,
                 Description = newsRequest.Description,
                 NeedApproved = true,
+                IsApproved = false,
                 PublishDate = newsRequest.PublishDate ?? today,
                 ExpireDate = newsRequest.ExpireDate,
-                ImageLink = newsRequest.ThumbnailFile.Path,
-                ImageName = newsRequest.ThumbnailFile.FileName,
-                Thumbnail = newsRequest.ThumbnailFile.Path,
-                ThumbnailName = newsRequest.ThumbnailFile.FileName,
+                ImageLink = newsRequest.ThumbnailFile?.Path,
+                ImageName = newsRequest.ThumbnailFile?.FileName,
+                Thumbnail = newsRequest.ThumbnailFile?.Path ?? string.Empty,
+                ThumbnailName = newsRequest.ThumbnailFile?.FileName ?? string.Empty,
                 Active = newsRequest.Active,
                 DisplayOrder = newsRequest.DisplayOrder,
                 //CreatedBy = _claimsPrincipalExtension.GetUserId(),
                 CreatedDate = today,
             };
 
-            return await CreateNews(news, categoryId, newsRequest.ThumbnailFile);
+            return await CreateNews(news, categoryId, newsRequest.ThumbnailFile!);
         }
 
         /// <summary>
