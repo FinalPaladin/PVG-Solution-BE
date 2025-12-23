@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MimeKit;
 using PVG.Application.Services.ViewLogService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
@@ -24,8 +23,9 @@ namespace PVG.Application.Services.NewsService
         private readonly INewsCategoryRepository _categoryRepository;
         private readonly INewsCategoryMappingRepository _newsCategoryMappingRepository;
         private readonly IViewLogService _viewLogService;
+
         public NewsService(
-            IOptions<AppSettings> settings, 
+            IOptions<AppSettings> settings,
             IMapper mapper,
             INewsRepository newsRepository,
             INewsCategoryRepository categoryRepository,
@@ -134,7 +134,7 @@ namespace PVG.Application.Services.NewsService
                                     }
                                 });
                             }
-                        }                        
+                        }
                     }
                 }
 
@@ -239,6 +239,7 @@ namespace PVG.Application.Services.NewsService
                 DisplayOrder = newsRequest.DisplayOrder,
                 //CreatedBy = _claimsPrincipalExtension.GetUserId(),
                 CreatedDate = today,
+                CreatedByName = newsRequest.UserName,
             };
 
             return await CreateNews(news, categoryId, newsRequest.ThumbnailFile!);
@@ -820,5 +821,24 @@ namespace PVG.Application.Services.NewsService
             }
         }
 
+        public async Task<BaseResponse> ApproveNews(ApproveNewsRequestDto _payload)
+        {
+            try
+            {
+                var news = await _newsRepository.FindByCondition(x => !x.IsDeleted && x.Id == _payload.Id).FirstOrDefaultAsync();
+                if (news == null)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Không tìm thấy tin tức hợp lệ");
+                news.IsApproved = true;
+                news.ApprovedDate = DateTime.Now;
+                news.ApprovedByName = _payload.UserName;
+                await _newsRepository.UpdateAsync(news);
+                return SuccessResponse(null, "success");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return CatchErrorResponse(ex);
+            }
+        }
     }
 }
