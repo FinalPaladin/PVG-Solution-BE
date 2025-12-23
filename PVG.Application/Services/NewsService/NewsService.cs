@@ -701,7 +701,7 @@ namespace PVG.Application.Services.NewsService
             {
                 var today = DateTime.Now;
 
-                // 1. Lấy news hợp lệ (chỉ field cần)
+                // 1. Lấy news hợp lệ
                 var validNews = await _newsRepository
                     .FindByCondition(n =>
                         !n.IsDeleted
@@ -723,7 +723,8 @@ namespace PVG.Application.Services.NewsService
                         n.Id,
                         n.Title,
                         n.CreatedDate,
-                        n.ThumbnailName
+                        n.ThumbnailName,
+                        n.Slug
                     })
                     .ToListAsync();
 
@@ -736,7 +737,7 @@ namespace PVG.Application.Services.NewsService
                     });
                 }
 
-                // 2. Lấy mapping theo newsId
+                // 2. Mapping news - category
                 var validNewsIds = validNews.Select(n => n.Id).ToList();
 
                 var mappings = await _newsCategoryMappingRepository
@@ -761,13 +762,13 @@ namespace PVG.Application.Services.NewsService
                     });
                 }
 
-                // 3. CategoryId có news
+                // 3. Category có news
                 var categoryIdsHasNews = mappings
                     .Select(m => m.CategoryId)
                     .Distinct()
                     .ToList();
 
-                // 4. Lấy category (chỉ Id & Name)
+                // 4. Lấy category (Id + Name)
                 var categories = await _categoryRepository
                     .FindByCondition(c =>
                         !c.IsDeleted &&
@@ -777,18 +778,37 @@ namespace PVG.Application.Services.NewsService
                     .Select(c => new
                     {
                         c.Id,
-                        c.Name
+                        c.Name,
+                        c.Slug
                     })
                     .ToListAsync();
 
-                // 5. News (đảm bảo có mapping)
-                var news = validNews
-                    .Where(n => mappings.Any(m => m.NewsId == n.Id))
-                    .ToList();
+                // ➕ thêm category "Tất cả"
+                var finalCategories = new List<object>();
+                //{
+                //    new { Id = "all", Name = "Tất cả" }
+                //};
+                finalCategories.AddRange(categories);
+
+                // 5. News + CategoryId
+                var news = (
+                    from n in validNews
+                    join m in mappings on n.Id equals m.NewsId
+                    select new
+                    {
+                        n.Id,
+                        n.Title,
+                        n.CreatedDate,
+                        CategoryId = m.CategoryId,
+                        Slug = n.Slug,
+                        SlugCategory = categories.FirstOrDefault(c => c.Id == m.CategoryId)?.Slug,
+                        Thumbnail = $"{_appSettings.CloudflareR2.PublicBaseUrl}/{n.ThumbnailName}"
+                    }
+                ).ToList();
 
                 return SuccessResponse(new
                 {
-                    categories,
+                    categories = finalCategories,
                     news
                 });
             }
