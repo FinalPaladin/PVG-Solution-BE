@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MimeKit;
 using PVG.Application.Services.ViewLogService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
@@ -24,8 +23,9 @@ namespace PVG.Application.Services.NewsService
         private readonly INewsCategoryRepository _categoryRepository;
         private readonly INewsCategoryMappingRepository _newsCategoryMappingRepository;
         private readonly IViewLogService _viewLogService;
+
         public NewsService(
-            IOptions<AppSettings> settings, 
+            IOptions<AppSettings> settings,
             IMapper mapper,
             INewsRepository newsRepository,
             INewsCategoryRepository categoryRepository,
@@ -134,7 +134,7 @@ namespace PVG.Application.Services.NewsService
                                     }
                                 });
                             }
-                        }                        
+                        }
                     }
                 }
 
@@ -225,23 +225,24 @@ namespace PVG.Application.Services.NewsService
                 Id = Guid.NewGuid(),
                 Title = newsRequest.Title,
                 Content = newsRequest.Content,
-                Slug = CreateSlug(newsRequest.Title),
                 Type = NewsTypeEnum.News,
                 Description = newsRequest.Description,
                 NeedApproved = true,
+                IsApproved = false,
                 PublishDate = newsRequest.PublishDate ?? today,
                 ExpireDate = newsRequest.ExpireDate,
-                ImageLink = newsRequest.ThumbnailFile.Path,
-                ImageName = newsRequest.ThumbnailFile.FileName,
-                Thumbnail = newsRequest.ThumbnailFile.Path,
-                ThumbnailName = newsRequest.ThumbnailFile.FileName,
+                ImageLink = newsRequest.ThumbnailFile?.Path,
+                ImageName = newsRequest.ThumbnailFile?.FileName,
+                Thumbnail = newsRequest.ThumbnailFile?.Path ?? string.Empty,
+                ThumbnailName = newsRequest.ThumbnailFile?.FileName ?? string.Empty,
                 Active = newsRequest.Active,
                 DisplayOrder = newsRequest.DisplayOrder,
                 //CreatedBy = _claimsPrincipalExtension.GetUserId(),
                 CreatedDate = today,
+                CreatedByName = newsRequest.UserName,
             };
 
-            return await CreateNews(news, categoryId, newsRequest.ThumbnailFile);
+            return await CreateNews(news, categoryId, newsRequest.ThumbnailFile!);
         }
 
         /// <summary>
@@ -270,6 +271,7 @@ namespace PVG.Application.Services.NewsService
                     .AsNoTracking()
                     .FirstOrDefaultAsync();
                 news.Code = latestNews != null ? latestNews.Code + 1 : 1;
+                news.Slug = CreateSlug(news.Title, news.Code.ToString() ?? Guid.NewGuid().ToString());
 
                 //cập nhật đường dẫn thumbnail
                 //if (thumbnail != null)
@@ -690,9 +692,9 @@ namespace PVG.Application.Services.NewsService
         /// </summary>
         /// <param name="title"></param>
         /// <returns></returns>
-        private string CreateSlug(string title)
+        private string CreateSlug(string title, string code)
         {
-            return StringHelper.GenerateSlug($"{title} {Guid.NewGuid()}");
+            return StringHelper.GenerateSlug($"{title} {code}");
         }
 
         public async Task<BaseResponse> GetAllForWeb()
@@ -819,5 +821,24 @@ namespace PVG.Application.Services.NewsService
             }
         }
 
+        public async Task<BaseResponse> ApproveNews(ApproveNewsRequestDto _payload)
+        {
+            try
+            {
+                var news = await _newsRepository.FindByCondition(x => !x.IsDeleted && x.Id == _payload.Id).FirstOrDefaultAsync();
+                if (news == null)
+                    return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Không tìm thấy tin tức hợp lệ");
+                news.IsApproved = true;
+                news.ApprovedDate = DateTime.Now;
+                news.ApprovedByName = _payload.UserName;
+                await _newsRepository.UpdateAsync(news);
+                return SuccessResponse(null, "success");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return CatchErrorResponse(ex);
+            }
+        }
     }
 }

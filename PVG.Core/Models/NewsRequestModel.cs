@@ -29,5 +29,12 @@ namespace PVG.Domain.Models
         //public bool? IsNotify { get; set; } = false;
 
         public int? DisplayOrder { get; set; }
+        public string? UserName { get; set; }
+    }
+
+    public class ApproveNewsRequestDto
+    {
+        public Guid Id { get; set; }
+        public string UserName { get; set; }
     }
 }

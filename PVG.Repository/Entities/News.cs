@@ -58,5 +58,6 @@ namespace PVG.Infrastucture.Entities
         public string? CreatedByName { get ; set ; }
         public string? ModifiedByName { get ; set ; }
         public string? DeletedByName { get ; set ; }
+        public string? ApprovedByName { get; set; }
     }
 }

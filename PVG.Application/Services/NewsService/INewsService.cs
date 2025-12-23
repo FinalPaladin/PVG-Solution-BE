@@ -25,5 +25,7 @@ namespace PVG.Application.Services.NewsService
         Task<BaseResponse> DeleteNews(Guid id);
 
         Task<BaseResponse> GetAllForWeb();
+
+        Task<BaseResponse> ApproveNews(ApproveNewsRequestDto _payload);
     }
 }

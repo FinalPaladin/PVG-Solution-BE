@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PVG.Application.Services.NewsService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
@@ -147,11 +146,15 @@ namespace PVG.Web.Controllers
             return ReturnData(response);
         }
 
-
         [HttpGet]
         [Route("app/slug/{slug}")]
         public async Task<ObjectResult> GetBySlug(string slug)
             => ReturnData(await _newsService.GetNewsBySlug(slug));
+
+        [HttpPost]
+        [Route("approve")]
+        public async Task<ObjectResult> ApproveNews([FromBody] ApproveNewsRequestDto dtoApproveNews)
+            => ReturnData(await _newsService.ApproveNews(dtoApproveNews));
 
         [HttpGet]
         [Route("app")]
