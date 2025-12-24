@@ -491,7 +491,7 @@ namespace PVG.Application.Services.InitPageService
                     {
                         ViewHome = viewhome,
                         ViewNews = viewnews,
-                        Viewproduct = viewproduct,
+                        ViewProduct = viewproduct,
                         ViewProducts = viewproducts,
                         total = total,
                         totalProcessed = totalProcessed,
