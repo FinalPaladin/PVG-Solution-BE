@@ -18,10 +18,6 @@ namespace PVG.Application.Services.NewsService
 
         Task<BaseResponse> UpdateNews(Guid categoryId, Guid newsId, DTONewsRequest newsRequest);
 
-        Task<BaseResponse> UpdateNews(News news, Guid? categoryId, DTOFile thumbnail = null, List<DTOFile> attachments = null, bool isNotify = false);
-
-        //Task<BaseResponse> UpdateNewsOrder(DTONewsOrderRequest newsOrderRequest);
-
         Task<BaseResponse> DeleteNews(Guid id);
 
         Task<BaseResponse> GetAllForWeb();

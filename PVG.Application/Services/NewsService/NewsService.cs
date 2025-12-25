@@ -382,8 +382,12 @@ namespace PVG.Application.Services.NewsService
             newsDB = await _newsRepository.UpdateValueAsync(newsDB, newsRequest);
             //newsDB.ModifiedBy = loginContactId;
             newsDB.ModifiedDate = DateTime.Now;
+            newsDB.Thumbnail = newsRequest.ThumbnailFile?.Path ?? newsDB.Thumbnail;
+            newsDB.ThumbnailName = newsRequest.ThumbnailFile?.FileName ?? newsDB.ThumbnailName;
+            newsDB.ImageLink = newsRequest.ThumbnailFile?.Path ?? newsDB.Thumbnail;
+            newsDB.ImageName = newsRequest.ThumbnailFile?.FileName ?? newsDB.ThumbnailName;
 
-            return await UpdateNews(newsDB, categoryId, newsRequest.ThumbnailFile);
+            return await UpdateNews(newsDB, categoryId);
         }
 
         /// <summary>
@@ -391,92 +395,10 @@ namespace PVG.Application.Services.NewsService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public async Task<BaseResponse> UpdateNews(News news, Guid? categoryId, DTOFile thumbnail = null, List<DTOFile> attachments = null, bool isNotify = false)
+        private async Task<BaseResponse> UpdateNews(News news, Guid? categoryId)
         {
             try
             {
-                //var loginContactId = _claimsPrincipalExtension.GetUserId();
-                //if (loginContactId == Guid.Empty)
-                //    return BadRequestResponse(ErrorCodeConst.ERROR_USER_NOT_FOUND, "login_ERR_NOT_FOUND");
-
-                //FileEntity thumbnailOld = null;
-                //List<FileEntity> attachmentsOld = new List<FileEntity>();
-                //var filesAdd = new List<DTOFile>();
-                //var filesDelete = new List<FileEntity>();
-                //var fileService = new FileHandle(
-                //                        EventBusPublisher.CallEventBusAsync,
-                //                        currentServiceName: ConstEventBus.CURRENT_SERVICE,
-                //                        currnetExchangeName: ConstEventBus.CURRENT_EXCHANGE,
-                //                        fileServiceName: ConstEventBus.SERVICE_FILE,
-                //                        fileExchangeName: ConstEventBus.EXCHANGE_FILE
-                //                    );
-
-                ////lấy các file cũ của tin đăng
-                //var fileBusiness = new FileBusiness();
-                //var files = await fileBusiness.GetFileList(news.Id);
-                //if (files != null && files.Count > 0)
-                //{
-                //    thumbnailOld = files.FirstOrDefault(x => x.Path.Equals(news.Thumbnail));
-                //    if (thumbnailOld != null) files.Remove(thumbnailOld);
-                //    attachmentsOld = files;
-                //}
-
-                ////cập nhật đường dẫn thumbnail
-                //if (thumbnail != null)
-                //{
-                //    //nếu đường dẫn thumbnail bị đổi thì đi cập nhật lại
-                //    if (!thumbnail.Path.Equals(news.Thumbnail))
-                //    {
-                //        //xóa file ở đường dẫn cũ
-                //        if (thumbnailOld != null)
-                //        {
-                //            await fileService.DeleteFile(thumbnailOld);
-                //            filesDelete.Add(thumbnailOld);
-                //        }
-
-                //        //thêm file mới
-                //        var thumbnailNew = await fileService.MoveFile(thumbnail);
-                //        filesAdd.Add(thumbnailNew);
-                //        news.Thumbnail = thumbnailNew.Path;
-                //    }
-                //}
-
-                ////cập nhật đường dẫn các file đính kèm
-                //if (attachments != null && attachments.Count > 0)
-                //{
-                //    var listDeleteFile = attachmentsOld.Where(e => !attachments.Any(f => f.Path == e.Path)).ToList();
-                //    var listMoveFile = attachments.Where(e => !attachmentsOld.Any(f => f.Path == e.Path)).ToList();
-                //    await fileService.DeleteFile(listDeleteFile);
-                //    listMoveFile = await fileService.MoveFile(listMoveFile);
-
-                //    filesDelete.AddRange(listDeleteFile);
-                //    filesAdd.AddRange(listMoveFile);
-                //}
-                //else
-                //{
-                //    filesDelete.AddRange(attachmentsOld);
-                //}
-
-                ////thêm file vào bảng CR_File
-                //if (filesAdd.Count > 0)
-                //{
-                //    var saveFiles = new List<FileEntity>();
-
-                //    foreach (var item in filesAdd)
-                //    {
-                //        var file = fileBusiness.CreateFileModel(item.FileName, item.Path, news.Id);
-                //        saveFiles.Add(file);
-                //    }
-
-                //    await fileBusiness.CreateFile(saveFiles, loginContactId);
-                //}
-
-                ////xóa file vào bảng CR_File
-                //if (filesDelete.Count > 0)
-                //{
-                //    await fileBusiness.DeleteFile(filesDelete, loginContactId);
-                //}
-
                 using (var trans = await _newsRepository.BeginTransactionAsync())
                 {
                     try
