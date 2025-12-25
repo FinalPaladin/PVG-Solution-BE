@@ -66,9 +66,10 @@ namespace PVG.Domain.Models
         public Guid? ProductId { get; set; }
         public string? Phone { get; set; }
         public string? FullName { get; set; }
-        public bool IsProcessed { get; set; }
+        public bool? IsProcessed { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+        public DateTime? CreatedDate { get; set; }
     }
 
     public class RS_GetRequestCustomerModel

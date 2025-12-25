@@ -439,7 +439,7 @@ namespace PVG.Application.Services.InitPageService
 
                 var request = await _requestCustomerRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
 
-                int total = 0, totalProcessed = 0, yesterday = 0, yesterdayProcessed = 0, thisweek = 0, thisweekProcessed = 0, thismonth = 0, thismonthProcessed = 0;
+                int total = 0, totalProcessed = 0, rqtoday = 0, todayProcessed = 0, yesterday = 0, yesterdayProcessed = 0, thisweek = 0, thisweekProcessed = 0, thismonth = 0, thismonthProcessed = 0;
 
                 if(request !=null && request.Count > 0)
                 {
@@ -469,14 +469,22 @@ namespace PVG.Application.Services.InitPageService
                             thisweekProcessed = listweek.Where(x => x.IsProcessed).ToList().Count;
 
                             var startOfYesterday = today.AddDays(-1);
-                            var startOfToday = today;
+                            var endOfToday = new DateTime(today.Year, today.Month, today.Day, 23, 59, 59);
 
-                            var listyesterday = listweek.Where(x => x.CreatedDate >= startOfYesterday && x.CreatedDate < startOfToday).ToList();
+                            var listyesterday = listweek.Where(x => x.CreatedDate >= startOfYesterday && x.CreatedDate < endOfToday).ToList();
 
                             if (listyesterday != null && listyesterday.Count > 0)
                             {
                                 yesterday = listyesterday.Count;
                                 yesterdayProcessed = listyesterday.Where(x => x.IsProcessed).ToList().Count;
+
+                                var startOfToday = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+                                var listtoday = listweek.Where(x => x.CreatedDate >= startOfToday && x.CreatedDate < endOfToday).ToList();
+                                if (listtoday != null && listtoday.Count > 0)
+                                {
+                                    rqtoday = listtoday.Count;
+                                    todayProcessed = listtoday.Where(x => x.IsProcessed).ToList().Count;
+                                }
                             }
                         }
                     }
@@ -495,6 +503,8 @@ namespace PVG.Application.Services.InitPageService
                         ViewProducts = viewproducts,
                         total = total,
                         totalProcessed = totalProcessed,
+                        RequestToday = rqtoday,
+                        RequestTodayProcessed = todayProcessed,
                         RequestThisMonth = thismonth,
                         RequestThisWeek = thisweek,
                         RequestYesterday = yesterday,

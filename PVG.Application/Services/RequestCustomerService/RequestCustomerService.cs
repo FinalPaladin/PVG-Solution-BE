@@ -397,9 +397,9 @@ namespace PVG.Application.Services.RequestCustomerService
                 IQueryable<RequestCustomer> query = _requestCustomerRepository.FindByCondition(x => x.IsDeleted == false
                     && (string.IsNullOrEmpty(_input.Phone) || x.Phone.Contains(_input.Phone))
                     && (_input.ProductId == null || x.ProductId == _input.ProductId)
-                    //&& (_input.RequestCode == null || x.ProductId == _input.RequestCode)
                     && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower()))
-                    && x.IsProcessed == _input.IsProcessed
+                    && (_input.IsProcessed == null || x.IsProcessed == _input.IsProcessed)
+                    && (_input.CreatedDate == null || (_input.CreatedDate >= x.CreatedDate && x.CreatedDate <= x.CreatedDate))
                 ).OrderByDescending(x => x.CreatedDate).AsQueryable();
 
                 var pagination = await _requestCustomerRepository.OffsetPagination<RequestCustomer>(query, _input.Page, _input.PageSize);
@@ -649,7 +649,8 @@ namespace PVG.Application.Services.RequestCustomerService
                     && (_input.ProductId == null || x.ProductId == _input.ProductId)
                     && (_input.RequestCode == null || x.ProductId == _input.RequestCode)
                     && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower()))
-                    && x.IsProcessed == _input.IsProcessed
+                    && (_input.IsProcessed == null || x.IsProcessed == _input.IsProcessed)
+                    && (_input.CreatedDate == null || (_input.CreatedDate >= x.CreatedDate && x.CreatedDate <= x.CreatedDate))
                 ).OrderByDescending(x => x.CreatedDate).ToListAsync();
 
                 var requestCodes = headers.Select(x => x.RequestCode).ToList();
@@ -665,6 +666,14 @@ namespace PVG.Application.Services.RequestCustomerService
                         if(index > -1)
                         {
                             details[index].Value = product.Name;
+                        }
+                        else
+                        {
+                            details.Add(new()
+                            {
+                                Key = ConstRequestCustomer.RC_LoanProductType,
+                                Value = product.Name,
+                            });
                         }
                     }
 
@@ -1019,10 +1028,20 @@ namespace PVG.Application.Services.RequestCustomerService
                 var detailModel = _mapper.Map<List<RequestCustomerDetailModel>>(details);
 
                 var product = await _productRepository.FindByCondition(x => x.Id == request.ProductId).FirstOrDefaultAsync();
-                string productName = "";
 
                 if (product != null)
-                    detailModel.Add(new() { Key = ConstRequestCustomer.RC_LoanProductType, Value = product?.Name });
+                {
+                    var index = detailModel.FindIndex(x => x.Key.ToLower() == ConstRequestCustomer.RC_LoanProductType.ToLower());
+                    if(index >= -1)
+                    {
+                        detailModel[index].Value = product?.Name;
+                    }
+                    else
+                    {
+                        detailModel.Add(new() { Key = ConstRequestCustomer.RC_LoanProductType, Value = product?.Name });
+                    }
+
+                }
 
                 var sendEmail = await _emailService.SendEmailRequest(emailTitle, GenBodyEmail(detailModel), attacheds);
 
