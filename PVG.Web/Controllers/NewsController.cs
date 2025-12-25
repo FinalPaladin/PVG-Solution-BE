@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using PVG.Application.Services.NewsService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Enums;
 using PVG.Domain.Models;
+using PVG.Domain.Settings;
+using PVG.Web.Extensions;
 
 namespace PVG.Web.Controllers
 {
@@ -11,10 +14,12 @@ namespace PVG.Web.Controllers
     [ApiController]
     public class NewsController : PVGControllerBase
     {
+        private readonly AppSettings _appSettings;
         private readonly INewsService _newsService;
 
-        public NewsController(INewsService newsService)
+        public NewsController(IOptions<AppSettings> options, INewsService newsService)
         {
+            _appSettings = options.Value;
             _newsService = newsService;
         }
 
@@ -150,6 +155,24 @@ namespace PVG.Web.Controllers
         [Route("app/slug/{slug}")]
         public async Task<ObjectResult> GetBySlug(string slug)
             => ReturnData(await _newsService.GetNewsBySlug(slug));
+
+        [HttpGet("app/share/news/{slug}")]
+        public async Task<IActionResult> ShareNews(string slug)
+        {
+            var result = await _newsService.GetNewsBySlug(slug);
+            if (result == null)
+                return NotFound();
+
+            var news = result.Result as NewsResponseModel;
+            var html = OgHtmlBuilder.BuildNewsHtml(
+                title: news?.Title ?? "",
+                description: news?.Description ?? "",
+                image: news?.Thumbnail ?? "",
+                url: $"{_appSettings.Root.PublicDomain}/api/news/app/slug/{slug}"
+            );
+
+            return Content(html, "text/html; charset=utf-8");
+        }
 
         [HttpPost]
         [Route("approve")]
