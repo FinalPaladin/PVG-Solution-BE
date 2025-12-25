@@ -16,6 +16,7 @@ using PVG.Domain.Extensions;
 using PVG.Domain.Models;
 using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
+using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.ImageRequestRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
@@ -39,6 +40,7 @@ namespace PVG.Application.Services.RequestCustomerService
         private readonly IUserRepository _userRepository;
         private readonly IRecaptchaService _recaptchaService;
         private readonly IProductRepository _productRepository;
+        private readonly IConfigurationRepository _configurationRepository;
 
         public RequestCustomerService(
             IOptions<AppSettings> options,
@@ -51,7 +53,8 @@ namespace PVG.Application.Services.RequestCustomerService
             IImageRequestRepository imageRequestRepository,
             IUserRepository userRepository,
             IRecaptchaService recaptchaService,
-            IProductRepository productRepository) : base(options, mapper)
+            IProductRepository productRepository,
+            IConfigurationRepository configurationRepository) : base(options, mapper)
         {
             _requestCustomerRepository = requestCustomerRepository;
             _requestCustomerDetailRepository = requestCustomerDetailRepository;
@@ -61,6 +64,7 @@ namespace PVG.Application.Services.RequestCustomerService
             _userRepository = userRepository;
             _recaptchaService = recaptchaService;
             _productRepository = productRepository;
+            _configurationRepository = configurationRepository;
         }
 
         public async Task<BaseResponse> Save(RQ_SaveRequestCustomerModel _input)
@@ -1002,7 +1006,15 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                string emailTitle = string.Format("[Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", request.Phone, DateTime.Now.ToString("dd/MM/yyyy"));
+                string keywebname = "WebName", webname = "NO";
+                var configwebname = await _configurationRepository.FindByCondition(x => x.Key.ToLower() == keywebname.ToLower()).FirstOrDefaultAsync();
+
+                if(configwebname !=null)
+                {
+                    webname = configwebname.Value;
+                }
+
+                string emailTitle = string.Format("[{2}][Yêu cầu từ khách hàng SĐT: {0}, ngày: {1}", request.Phone, DateTime.Now.ToString("dd/MM/yyyy"), webname);
 
                 List<IFormFile> attacheds = new List<IFormFile>();
 
