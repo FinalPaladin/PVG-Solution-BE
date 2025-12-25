@@ -352,7 +352,8 @@ namespace PVG.Application.Services.ProductService
                     ProductCategoryId = p.ProductCategoryId,
                     ImageUrl = string.IsNullOrEmpty(p.ImageUrl) ? "" : $"{_appSettings.CloudflareR2.PublicBaseUrl}/{p.ImageUrl}",
                     LoanAmount = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_AMOUNT && c.Key == p.LoanAmountId.ToString())?.Value ?? "",
-                    LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == p.LoanTermId.ToString())?.Value ?? ""
+                    LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == p.LoanTermId.ToString())?.Value ?? "",
+                    Slug = p.Slug
                 }).ToList();
 
                 await _viewLogService.Save(new()
@@ -365,6 +366,43 @@ namespace PVG.Application.Services.ProductService
                     Categories = categoriesRes,
                     Products = productsRes
                 });
+            }
+            catch (Exception ex)
+            {
+                return BadRequestResponse(
+                    ErrorCodeConst.ERROR_SYS_ERR,
+                    ex.Message
+                );
+            }
+        }
+
+        public async Task<BaseResponse> GetBySlug(string _slug)
+        {
+            try
+            {
+                var productEntity = await _productRepository.FindByCondition(c => c.Slug == _slug).FirstOrDefaultAsync();
+
+                if (productEntity == null)
+                    return BadRequestResponse(
+                        ErrorCodeConst.ERROR_REQUEST_NOT_FOUND,
+                        "Sản phẩm không tồn tại"
+                    );
+
+                await _viewLogService.Save(new()
+                {
+                    DetailId = productEntity.Id,
+                    Screen = ScreenView.Product
+                });
+                var mData = await _mDataRepository.FindAll().ToListAsync();
+                var detailEntities = await _productDetailRepository.FindByCondition(c => c.ProductId == productEntity.Id && !c.IsDeleted).ToListAsync();
+
+                var productResponse = _mapper.Map<ProductResponseModel>(productEntity);
+                productResponse.ImageUrl = string.IsNullOrEmpty(productResponse.ImageUrl) ? "" : $"{_appSettings.CloudflareR2.PublicBaseUrl}/{productResponse.ImageUrl}";
+                productResponse.Details = _mapper.Map<List<ProductDetailResponseModel>>(detailEntities);
+                productResponse.LoanAmount = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_AMOUNT && c.Key == productResponse.LoanAmountId.ToString())?.Value ?? "";
+                productResponse.LoanTerm = mData.FirstOrDefault(c => c.Group == MDataEnum_Group.PRODUCT_TIME && c.Key == productResponse.LoanTermId.ToString())?.Value ?? "";
+
+                return SuccessResponse(productResponse);
             }
             catch (Exception ex)
             {

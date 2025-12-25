@@ -16,5 +16,7 @@ namespace PVG.Application.Services.ProductService
         Task<BaseResponse> Delete(Guid _id, string _userName);
 
         Task<BaseResponse> InitProductsApp();
+
+        Task<BaseResponse> GetBySlug(string _slug);
     }
 }
