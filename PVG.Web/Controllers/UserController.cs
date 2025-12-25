@@ -58,5 +58,11 @@ namespace PVG.Web.Controllers
         //    var result = await _service.Delete(_input);
         //    return ReturnData(result);
         //}
+
+        [HttpGet]
+        [Route("reset-password/{_username}/{_password}")]
+        public async Task<IActionResult> ResetPassword(string _username, string _password)
+            => ReturnData(await _service.ResetPassword(_username, _password));
+
     }
 }

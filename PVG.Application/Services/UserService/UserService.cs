@@ -372,5 +372,17 @@ namespace PVG.Application.Services.UserService
                 };
             }
         }
+    
+        public async Task<BaseResponse> ResetPassword(string _userName, string _password)
+        {
+            var exists = await _userRepository.FindByCondition(u => u.UserName == _userName).FirstOrDefaultAsync();
+            if(exists == null)
+                return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Tài khoản không tồn tại");
+            string pass = _passwordHasher.HashPassword(exists, _password);
+            exists.Password = pass;
+            await _userRepository.UpdateAsync(exists);
+            await _userRepository.SaveChangesAsync();
+            return SuccessResponse(true);
+        }
     }
 }
