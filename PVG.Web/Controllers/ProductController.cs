@@ -62,5 +62,10 @@ namespace PVG.Web.Controllers
         [HttpGet("app/{id:guid}")]
         public async Task<IActionResult> GetByIdPage(Guid id)
             => ReturnData(await _service.GetById(id));
+
+        [HttpGet]
+        [Route("app/slug/{slug}")]
+        public async Task<IActionResult> GetBySlugPage(string slug)
+            => ReturnData(await _service.GetBySlug(slug));
     }
 }
