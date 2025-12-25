@@ -398,7 +398,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     && (string.IsNullOrEmpty(_input.Phone) || x.Phone.Contains(_input.Phone))
                     && (_input.ProductId == null || x.ProductId == _input.ProductId)
                     && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower()))
-                    && (_input.IsProcessed == null || x.IsProcessed == _input.IsProcessed)
+                    && (string.IsNullOrEmpty(_input.IsProcessed) || x.IsProcessed == bool.Parse(_input.IsProcessed))
                     && (_input.CreatedDate == null || (_input.CreatedDate >= x.CreatedDate && x.CreatedDate <= x.CreatedDate))
                 ).OrderByDescending(x => x.CreatedDate).AsQueryable();
 
@@ -649,7 +649,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     && (_input.ProductId == null || x.ProductId == _input.ProductId)
                     && (_input.RequestCode == null || x.ProductId == _input.RequestCode)
                     && (string.IsNullOrEmpty(_input.FullName) || x.FullName.ToLower().Contains(_input.FullName.ToLower()))
-                    && (_input.IsProcessed == null || x.IsProcessed == _input.IsProcessed)
+                    && (string.IsNullOrEmpty(_input.IsProcessed) || x.IsProcessed == bool.Parse(_input.IsProcessed))
                     && (_input.CreatedDate == null || (_input.CreatedDate >= x.CreatedDate && x.CreatedDate <= x.CreatedDate))
                 ).OrderByDescending(x => x.CreatedDate).ToListAsync();
 
