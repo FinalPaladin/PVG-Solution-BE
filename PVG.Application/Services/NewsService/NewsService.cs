@@ -194,6 +194,11 @@ namespace PVG.Application.Services.NewsService
                 if (news == null)
                     return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Không tìm thấy tin tức phù hợp");
 
+                await _viewLogService.Save(new()
+                {
+                    DetailId = news.Id,
+                    Screen = ScreenView.News
+                });
                 var res = _mapper.Map<NewsResponseModel>(news);
                 var newsCategoryUpdate = await _newsCategoryMappingRepository.FindByCondition(c => c.NewsId == res.Id).FirstOrDefaultAsync();
                 if (newsCategoryUpdate != null)
