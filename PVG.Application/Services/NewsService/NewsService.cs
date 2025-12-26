@@ -174,7 +174,8 @@ namespace PVG.Application.Services.NewsService
                 {
                     var category = await _categoryRepository.FindByCondition(c => c.Id == newsCategoryUpdate.CategoryId).FirstOrDefaultAsync();
                     res.CategoryId = newsCategoryUpdate.CategoryId;
-                    res.CategoryName = category.Name;
+                    res.CategoryName = category?.Name ?? "";
+                    res.CategorySlug = category?.Slug ?? "";
                 }
 
                 return SuccessResponse(res);
