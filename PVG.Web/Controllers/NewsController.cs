@@ -168,7 +168,7 @@ namespace PVG.Web.Controllers
                 title: news?.Title ?? "",
                 description: news?.Description ?? "",
                 image: news?.Thumbnail ?? "",
-                url: $"{_appSettings.Root.PublicDomain}/tin-tuc/${news?.CategorySlug ?? ""}/{slug}"
+                url: $"{_appSettings.Root.PublicDomain}/tin-tuc/{news?.CategorySlug ?? ""}/{slug}"
             );
 
             return Content(html, "text/html; charset=utf-8");
