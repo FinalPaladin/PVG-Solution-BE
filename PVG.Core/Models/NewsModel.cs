@@ -61,7 +61,8 @@ namespace PVG.Domain.Models
         public string ThumbnailName { get; set; }
         public int? DisplayOrder { get; set; }
         public Guid? CategoryId { get; set; }
-        public string CategoryName { get; set; }
+        public string? CategoryName { get; set; }
+        public string? CategorySlug { get; set; }
         public Guid? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public string? CreatedByName { get; set; }
