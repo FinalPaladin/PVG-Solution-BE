@@ -891,7 +891,7 @@ namespace PVG.Application.Services.RequestCustomerService
                     };
                 }
 
-                if (_input.ProductId == null || string.IsNullOrEmpty(_input.Phone))
+                if (string.IsNullOrEmpty(_input.Phone))
                 {
                     return new BaseResponse<RS_InserRequestCustomerModel>()
                     {
