@@ -446,9 +446,9 @@ namespace PVG.Application.Services.InitPageService
                     total = request.Count;
                     totalProcessed = request.Where(x => x.IsProcessed).ToList().Count;
 
-                    DateTime today = DateTime.Now;
-                    var startOfMonth = new DateTime(today.Year, today.Month, 1);
-                    var startOfNextMonth = startOfMonth.AddMonths(1);
+                    DateTime today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                    var startOfMonth = new DateTime(today.Year, today.Month, 1, 0, 0, 0);
+                    var startOfNextMonth = new DateTime(startOfMonth.AddMonths(1).Year, startOfMonth.AddMonths(1).Month, startOfMonth.AddMonths(1).Day, 0, 0, 0);
 
                     var listmonth = request.Where(x => x.CreatedDate >= startOfMonth && x.CreatedDate < startOfNextMonth).ToList();
 
