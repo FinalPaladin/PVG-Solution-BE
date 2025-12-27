@@ -469,16 +469,16 @@ namespace PVG.Application.Services.InitPageService
                             thisweekProcessed = listweek.Where(x => x.IsProcessed).ToList().Count;
 
                             var startOfYesterday = today.AddDays(-1);
-                            var endOfToday = new DateTime(today.Year, today.Month, today.Day, 23, 59, 59);
+                            var startOfToday = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
 
-                            var listyesterday = listweek.Where(x => x.CreatedDate >= startOfYesterday && x.CreatedDate < endOfToday).ToList();
+                            var listyesterday = listweek.Where(x => x.CreatedDate >= startOfYesterday && x.CreatedDate < startOfToday).ToList();
 
                             if (listyesterday != null && listyesterday.Count > 0)
                             {
                                 yesterday = listyesterday.Count;
                                 yesterdayProcessed = listyesterday.Where(x => x.IsProcessed).ToList().Count;
 
-                                var startOfToday = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+                                var endOfToday = new DateTime(today.Year, today.Month, today.Day, 23, 59, 59);
                                 var listtoday = listweek.Where(x => x.CreatedDate >= startOfToday && x.CreatedDate < endOfToday).ToList();
                                 if (listtoday != null && listtoday.Count > 0)
                                 {
