@@ -9,16 +9,13 @@
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+		<PackageReference Include="MySql.Data" Version="9.5.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
 		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
-		<PackageReference Include="Serilog.Sinks.PostgreSQL" Version="2.3.0" />
 		<PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Utilities\" />
+		<PackageReference Include="Serilog.Sinks.MySQL" Version="5.0.0" />
 	</ItemGroup>
 
 </Project>

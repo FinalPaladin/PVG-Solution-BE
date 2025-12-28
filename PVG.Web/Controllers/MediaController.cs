@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PVG.Application.Services.CloudflareR2Service;
+using PVG.Domain.Models;
 
 namespace PVG.Web.Controllers
 {
@@ -23,5 +24,11 @@ namespace PVG.Web.Controllers
         [HttpDelete("delete")]
         public async Task<ObjectResult> Delete(string key)
             => ReturnData(await _cloudflareR2Service.DeleteAsync(key));
+
+
+        [HttpPost]
+        [Route("upload-images")]
+        public async Task<ObjectResult> UploadImages([FromForm]RQ_CloudflareUploadListImageModel _input)
+            => ReturnData(await _cloudflareR2Service.UploadListImage(_input));
     }
 }

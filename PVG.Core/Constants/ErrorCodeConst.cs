@@ -5,6 +5,9 @@
         public const string ERROR_SYS_ERR = "ERR:00001";
         public const string ERROR_REQUEST_NOT_FOUND = "ERR:00002";
         public const string ERROR_UPLOAD_IMAGE_FAIL = "ERR:00003";
+        public const string ERROR_INPUT_INVALID = "ERR:00004";
+        public const string ERROR_MAPPING_ITEMS_STILL_VALID = "ERR:00005";
+        public const string ERROR_PAGGING_INPUT_INVALID = "ERR:00006";
 
         public const string ERROR_LOGIN_INVALID_INPUT = "ERR:10001";
         public const string ERROR_LOGIN_USER_NOT_FOUND = "ERR:10002";

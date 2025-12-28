@@ -7,31 +7,44 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 123qwe
       MYSQL_DATABASE: pvg_sln_vaythuechap
-      # charset cho chuẩn UTF8
+      # optional: tạo user không phải root
+      MYSQL_USER: pvguser
+      MYSQL_PASSWORD: pvgpass123
       TZ: Asia/Ho_Chi_Minh
     volumes:
-      - pvg_mysql_data:/var/lib/mysql
+      - pvg_mysql_data:/var/lib/mysql        # named volume (persistent)
+      # hoặc bind mount (thay dòng trên bằng dòng dưới để dữ liệu nằm trên host)
+      # - ./data/mysql:/var/lib/mysql
     ports:
       - "3306:3306"
     restart: unless-stopped
     networks:
       - pvg_back_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   backend:
     build:
       context: .
-      dockerfile: Dockerfile     # chính là Dockerfile t đã chỉnh cho PVG.Web
+      dockerfile: Dockerfile
     container_name: pvg-backend
     depends_on:
       - mysql
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       TZ: Asia/Ho_Chi_Minh
+      # connection string example (nếu muốn override)
+      # ConnectionStrings__DefaultConnection: "Server=mysql;Database=pvg_sln_vaythuechap;User=pvguser;Password=pvgpass123;"
     ports:
       - "7138:7138"
     restart: unless-stopped
     networks:
       - pvg_back_net
+    # Gợi ý: backend nên wait-for mysql ready trước khi chạy migrate. Có thể làm trong entrypoint.
 
 networks:
   pvg_back_net:
@@ -39,3 +52,4 @@ networks:
 
 volumes:
   pvg_mysql_data:
+    driver: local

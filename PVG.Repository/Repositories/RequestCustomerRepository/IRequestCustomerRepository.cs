@@ -11,5 +11,6 @@ namespace PVG.Infrastucture.Repositories.RequestCustomerRepository
 {
     public interface IRequestCustomerRepository : IRepositoryBase<RequestCustomer, Guid>
     {
+        public Task EditAsync(RequestCustomer entity);
     }
 }

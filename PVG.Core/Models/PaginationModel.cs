@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PVG.Domain.Models
+﻿namespace PVG.Domain.Models
 {
     public class PaginationModel
     {
@@ -15,7 +9,7 @@ namespace PVG.Domain.Models
             PerPage = 0;
             PageNumber = 0;
         }
-
+        public bool IsPaging { get; set; } = true;
         public int TotalItems { get; set; }
         public int TotalPages { get; set; }
         public int PerPage { get; set; }
@@ -33,10 +27,11 @@ namespace PVG.Domain.Models
             PageNumber = 0;
         }
 
+        public bool IsPaging { get; set; } = true;
         public int TotalItems { get; set; }
         public int TotalPages { get; set; }
         public int PerPage { get; set; }
         public int PageNumber { get; set; }
-        public T Items { get; set; }
+        public List<T> Items { get; set; }
     }
 }

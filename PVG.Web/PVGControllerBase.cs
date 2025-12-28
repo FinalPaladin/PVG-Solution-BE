@@ -107,5 +107,15 @@ namespace PVG.Web
                 default: return null;
             }
         }
+
+        protected BaseResponse CreateModel(object data = null, string message = "", int statusCode = 200)
+        {
+            return new BaseResponse()
+            {
+                StatusCode = statusCode,
+                Result = data,
+                Message = message,
+            };
+        }
     }
 }

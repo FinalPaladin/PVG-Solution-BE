@@ -9,12 +9,24 @@ namespace PVG.Application.Services.RequestCustomerService
 
         public Task<BaseResponse<RS_GetRequestCustomerModel>> GetData(RQ_GetRequestCustomerModel _input);
 
-        public Task<BaseResponse<PaginationModel<List<RequestCustomerModel>>>> Search(RQ_SearchRequestCustomerModel _input);
+        public Task<BaseResponse<PaginationModel<RequestCustomerModel>>> Search(RQ_SearchRequestCustomerModel _input);
 
         public Task<BaseResponse> DeleteDetail(RQ_DeleteRequestCustomerModel _input);
 
         public Task<BaseResponse> Delete(RQ_DeleteRequestCustomerModel _input);
 
         Task<BaseResponse> GetRequestDetail(Guid _requestCode);
+
+        public Task<BaseResponse<byte[]>> ExportExcel(RQ_SearchRequestCustomerModel _input);
+
+        public Task<BaseResponse> Processed(RQ_ProcessedModel _input);
+
+        public Task<BaseResponse<RS_InserRequestCustomerModel>> Insert(RQ_InserRequestCustomerModel _input);
+
+        public Task<BaseResponse> SendEmailRequest(Guid _requestCode);
+
+        public Task<BaseResponse<RS_UploadImageRequestCustomerModel>> UploadImageRequestCustomer(RQ_UploadImageRequestCustomerModel _input);
+
+        public Task<BaseResponse> RemoveImageRequestCustomer(RQ_RemoveImageRequestCustomerModel _input);
     }
 }

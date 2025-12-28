@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities.BaseEntities;
-using PVG.Infrastucture.Persistence;
 using System.Data;
 using System.Linq.Expressions;
 

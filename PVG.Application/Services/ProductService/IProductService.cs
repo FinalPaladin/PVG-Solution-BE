@@ -1,18 +1,22 @@
 ﻿using PVG.Core.BaseModels;
 using PVG.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PVG.Application.Services.ProductService
 {
     public interface IProductService
     {
-        public Task<BaseResponse> Save(RQ_SaveProductModel _input);
-        public Task<BaseResponse<RS_SearchProductModel>> Search(RQ_SearchProductModel _input);
-        public Task<BaseResponse<RS_GetProductModel>> Get(RQ_GetProductModel _input);
-        public Task<BaseResponse> Delete(RQ_DeleteProductModel _input);
+        Task<BaseResponse> Search(ProductSearchRequest _input);
+
+        Task<BaseResponse> GetById(Guid _id);
+
+        Task<BaseResponse> Create(ProductCreateRequest _input);
+
+        Task<BaseResponse> Update(Guid _id, ProductUpdateRequest _input);
+
+        Task<BaseResponse> Delete(Guid _id, string _userName);
+
+        Task<BaseResponse> InitProductsApp();
+
+        Task<BaseResponse> GetBySlug(string _slug);
     }
 }

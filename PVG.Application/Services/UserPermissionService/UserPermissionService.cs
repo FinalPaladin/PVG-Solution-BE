@@ -1,10 +1,4 @@
-﻿using PVG.Infrastucture.Repositories.ProductInfoRepository;
-using PVG.Infrastucture.Repositories.UserPermissionRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PVG.Infrastucture.Repositories.UserPermissionRepository;
 
 namespace PVG.Application.Services.UserPermissionService
 {

@@ -4,6 +4,38 @@ using System.Text.Json.Serialization;
 
 namespace PVG.Domain.Models
 {
+    public class RQ_UploadImageRequestCustomerModel
+    {
+        public IFormFile ImgFile { get; set; }
+        public Guid RequestCode { get; set; }
+    }
+
+    public class RS_UploadImageRequestCustomerModel
+    {
+        public string Key { get; set; }
+        public string PublicUrl { get; set; }
+    }
+
+    public class RQ_RemoveImageRequestCustomerModel
+    {
+        public string Key { get; set; }
+        public Guid RequestCode { get; set; }
+    }
+
+    public class RQ_InserRequestCustomerModel
+    {
+        public string Phone { get; set; }
+        public Guid? ProductId { get; set; }
+        public string FullName { get; set; }
+        public string Token { get; set; }
+        public List<SaveRequestCustomerModel> Data { get; set; } = new();
+    }
+
+    public class RS_InserRequestCustomerModel
+    {
+        public Guid RequestCode { get; set; }
+    }
+
     public class RQ_SaveRequestCustomerModel
     {
         public Guid? RequestCode { get; set; }
@@ -21,8 +53,6 @@ namespace PVG.Domain.Models
         public string Key { get; set; }
         [JsonPropertyName("value")]
         public string Value { get; set; }
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
     }
 
     public class ImageRequestCustomerModel
@@ -35,21 +65,24 @@ namespace PVG.Domain.Models
         public Guid? RequestCode { get; set; }
         public Guid? ProductId { get; set; }
         public string? Phone { get; set; }
-        public string FullName { get; set; }
-        public bool IsProcessed { get; set; }
+        public string? FullName { get; set; }
+        public string? IsProcessed { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;
+        public DateTime? CreatedDate { get; set; }
     }
 
     public class RS_GetRequestCustomerModel
     {
         public RequestCustomerModel Data { get; set; } = new();
+        public List<RequestCustomerDetailModel> Details { get; set; } = new();
     }
 
     public class RequestCustomerDetailModel
     {
         public string Key { get; set; }
         public string Value { get; set; }
+        public string CreatedDate { get; set; }
     }
 
     public class RequestCustomerModel
@@ -69,21 +102,31 @@ namespace PVG.Domain.Models
             }
         }
         public List<RequestCustomerDetailModel> Details { get; set; } = new();
+        public string ProductName { get; set; }
     }
 
     public class RQ_DeleteRequestCustomerModel
     {
         public string UserDelete { get; set; }
-        public Guid? Id { get; set; }
+        public Guid? IdDetail { get; set; }
+
         public Guid? RequestCode { get; set; }
-        public string Phone { get; set; }
-        public Guid? ProductId { get; set; }
     }
 
     public class RQ_GetRequestCustomerModel
     {
         public Guid? RequestCode { get; set; }
-        public string Phone { get; set; }
-        public Guid? ProductId { get; set; }
+    }
+
+    public class RequestCustomerHeaderReport
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+    }
+
+    public class RQ_ProcessedModel
+    {
+        public Guid? RequestCode { get; set; }
+        public string UserName { get; set; }
     }
 }

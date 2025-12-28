@@ -1,6 +1,4 @@
-﻿using PVG.Infrastucture.Persistence;
-
-namespace PVG.Infrastucture.Domain
+﻿namespace PVG.Infrastucture.Domain
 {
     public class UnitOfWork : IUnitOfWork
     {

@@ -83,18 +83,25 @@ namespace PVG.Application.Services
             return query;
         }
 
-        protected async Task<PaginationModel> OffsetPagination<T>(IQueryable<T> query, int page, int pageSize)
+        protected async Task<PaginationModel<T>> OffsetPagination<T>(IQueryable<T> query, int page, int pageSize)
         {
-            var pagination = new PaginationModel();
+            // Đảm bảo page tối thiểu là 1 để tránh lỗi khi tính Skip
+            page = page < 1 ? 1 : page;
+
+            var pagination = new PaginationModel<T>();
+
+            // Gán trực tiếp List<T> vào Items
             pagination.Items = await query
-                            .Skip((page - 1) * pageSize)
-                            .Take(pageSize)
-                            .ToListAsync();
+                                .Skip((page - 1) * pageSize)
+                                .Take(pageSize)
+                                .ToListAsync();
 
             pagination.PageNumber = page;
             pagination.PerPage = pageSize;
             pagination.TotalItems = await query.CountAsync();
-            pagination.TotalPages = (int)Math.Ceiling(pagination.TotalItems / (double)pagination.PerPage);
+
+            // Tính toán số trang
+            pagination.TotalPages = (int)Math.Ceiling(pagination.TotalItems / (double)pageSize);
 
             return pagination;
         }

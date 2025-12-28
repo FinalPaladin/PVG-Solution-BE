@@ -1,51 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PVG.Application.Services.ConfigurationService;
 using PVG.Application.Services.ProductCategoryService;
-using PVG.Application.Services.ProductService;
-using PVG.Application.Services.RequestCustomerService;
-using PVG.Core.BaseModels;
 using PVG.Domain.Models;
-using System.Threading.Tasks;
 
 namespace PVG.Web.Controllers
 {
-    [Route("api/productcategory")]
+    [Route("api/product/category")]
     [ApiController]
     public class ProductCategoryController : PVGControllerBase
     {
-        IProductCategoryService _service;
+        private IProductCategoryService _service;
+
         public ProductCategoryController(IProductCategoryService service)
         {
             _service = service;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("search")]
-        public async Task<IActionResult> Search([FromBody] RQ_SearchProductCategoryModel _input)
-        {
-            var result = await _service.Search(_input);
-            return ReturnData(result);
-        }
+        public async Task<IActionResult> Search([FromQuery] RQ_SearchProductCategoryModel _input)
+            => ReturnData(await _service.Search(_input));
+
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] RQ_GetProductCategoryModel _input)
+            => ReturnData(await _service.Get(_input));
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+            => ReturnData(await _service.GetAll());
 
         [HttpPost]
-        [Route("get")]
-        public async Task<IActionResult> Save([FromBody] RQ_GetProductCategoryModel _input)
-        {
-            return ReturnData(await _service.Get(_input));
-        }
-
-        [HttpPost]
-        [Route("save")]
         public async Task<IActionResult> Save([FromBody] RQ_SaveProductCategoryModel _input)
-        {
-            return ReturnData(await _service.Save(_input));
-        }
+            => ReturnData(await _service.Save(_input));
 
-        [HttpPost]
-        [Route("delete")]
-        public async Task<IActionResult> Save([FromBody] RQ_DeleteProductCategoryModel _input)
-        {
-            return ReturnData(await _service.Delete(_input));
-        }
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> Delete(Guid _id)
+            => ReturnData(await _service.Delete(_id));
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] RQ_UpdateProductCategoryModel _input)
+            => ReturnData(await _service.Update(_input));
     }
 }
