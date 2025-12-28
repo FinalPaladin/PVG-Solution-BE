@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: pvg-mysql-prod
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: pvguser
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Ho_Chi_Minh
+    volumes:
+      - pvg_mysql_prod_data:/var/lib/mysql
+    networks:
+      - pvg_prod_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  backend:
+    image: pvg-backend:latest
+    container_name: pvg-backend-prod
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: >
+        Server=mysql;
+        Database=${MYSQL_DATABASE};
+        User=pvguser;
+        Password=${MYSQL_PASSWORD};
+      TZ: Asia/Ho_Chi_Minh
+    expose:
+      - "8080"
+    networks:
+      - pvg_prod_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+
+networks:
+  pvg_prod_net:
+    driver: bridge
+
+volumes:
+  pvg_mysql_prod_data:
+    driver: local
