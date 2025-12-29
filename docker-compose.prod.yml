@@ -39,8 +39,8 @@ services:
         User=pvguser;
         Password=${MYSQL_PASSWORD};
       TZ: Asia/Ho_Chi_Minh
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"
     networks:
       - pvg_prod_net
     healthcheck:
