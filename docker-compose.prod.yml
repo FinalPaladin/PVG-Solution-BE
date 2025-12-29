@@ -48,7 +48,7 @@ services:
 
 networks:
   pvg_prod_net:
-    driver: bridge
+    external: true
 
 volumes:
   pvg_mysql_prod_data:
