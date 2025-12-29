@@ -109,7 +109,7 @@ namespace PVG.Web
             app.UseHealthChecks("/health");
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseCors(_policyName); 
+            app.UseCors(_policyName);
 
             if (!env.IsDevelopment())
             {
