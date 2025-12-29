@@ -21,7 +21,10 @@ services:
       start_period: 30s
 
   backend:
-    image: pvg-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pvg-backend:v1.0.0-281226
     container_name: pvg-backend-prod
     restart: always
     depends_on:
