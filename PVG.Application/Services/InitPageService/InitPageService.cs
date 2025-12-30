@@ -477,14 +477,14 @@ namespace PVG.Application.Services.InitPageService
                             {
                                 yesterday = listyesterday.Count;
                                 yesterdayProcessed = listyesterday.Where(x => x.IsProcessed).ToList().Count;
+                            }
 
-                                var endOfToday = new DateTime(today.Year, today.Month, today.Day, 23, 59, 59);
-                                var listtoday = listweek.Where(x => x.CreatedDate >= startOfToday && x.CreatedDate < endOfToday).ToList();
-                                if (listtoday != null && listtoday.Count > 0)
-                                {
-                                    rqtoday = listtoday.Count;
-                                    todayProcessed = listtoday.Where(x => x.IsProcessed).ToList().Count;
-                                }
+                            var endOfToday = new DateTime(today.Year, today.Month, today.Day, 23, 59, 59);
+                            var listtoday = listweek.Where(x => x.CreatedDate >= startOfToday && x.CreatedDate < endOfToday).ToList();
+                            if (listtoday != null && listtoday.Count > 0)
+                            {
+                                rqtoday = listtoday.Count;
+                                todayProcessed = listtoday.Where(x => x.IsProcessed).ToList().Count;
                             }
                         }
                     }
