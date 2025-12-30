@@ -19,7 +19,7 @@ namespace PVG.Web.Controllers
         }
 
         [HttpGet]
-        [Route("System")]
+        [Route("system")]
         public async Task<IActionResult> System()
         {
             var result = await _service.System();
@@ -31,6 +31,14 @@ namespace PVG.Web.Controllers
         public async Task<IActionResult> Product()
         {
             var result = await _service.Product();
+            return ReturnData(result);
+        }
+
+        [HttpGet]
+        [Route("dashboard")]
+        public async Task<IActionResult> Dashboard()
+        {
+            var result = await _service.Dashboard();
             return ReturnData(result);
         }
 

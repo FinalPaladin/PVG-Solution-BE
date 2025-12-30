@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
+using PVG.Domain.Models;
 using PVG.Domain.Settings;
 using System.IO;
 using System.Threading.Tasks;
@@ -120,6 +121,77 @@ namespace PVG.Application.Services.CloudflareR2Service
             }
 
             return "";
+        }
+
+        public async Task<IFormFile> GetImageAsFormFile(string imageUrl)
+        {
+            var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync(imageUrl);
+            response.EnsureSuccessStatusCode();
+
+            var stream = await response.Content.ReadAsStreamAsync();
+            var fileName = Path.GetFileName(imageUrl);
+
+            return new FormFile(stream, 0, response.Content.Headers.ContentLength ?? 0,
+                "file", fileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = response.Content.Headers.ContentType?.ToString()
+            };
+        }
+
+        public async Task<BaseResponse<RS_CloudflareUploadListImageModel>> UploadListImage(RQ_CloudflareUploadListImageModel _input)
+        {
+            try
+            {
+                if(_input == null)
+                {
+                    return new BaseResponse<RS_CloudflareUploadListImageModel>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Dữ liệu đầu vào không hợp lệ",
+                    };
+                }
+
+                List<CloudflareUploadModel> data = new();
+
+                if(_input.DataImage != null && _input.DataImage.Count > 0)
+                {
+                    foreach (var img in _input.DataImage)
+                    {
+                        var upload = await UpImage("", img.ImgFile);
+                        if(!string.IsNullOrEmpty(upload))
+                        {
+                            data.Add(new CloudflareUploadModel()
+                            {
+                                Key = upload,
+                                PublicUrl = GetPublicUrl(upload)
+                            });
+                        }
+                    }
+                }
+
+                return new BaseResponse<RS_CloudflareUploadListImageModel>()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Lưu dữ liệu thành công",
+                    Result = new()
+                    {
+                        Data = data
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<RS_CloudflareUploadListImageModel>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
         }
     }
 }

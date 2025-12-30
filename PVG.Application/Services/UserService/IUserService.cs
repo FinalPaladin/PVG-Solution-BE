@@ -21,5 +21,6 @@ namespace PVG.Application.Services.UserService
         Task<BaseResponse> Delete(RQ_DeleteUserModel _input);
 
         Task<BaseResponse<UserModel>> CheckAdmin(string _userName, UserAdminType _adminType);
+        Task<BaseResponse> ResetPassword(string _userName, string _password);
     }
 }

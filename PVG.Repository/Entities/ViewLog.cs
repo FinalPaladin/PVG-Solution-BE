@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static PVG.Domain.Enums.ViewLogEnum;
+﻿using static PVG.Domain.Enums.ViewLogEnum;
 
 namespace PVG.Infrastucture.Entities
 {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -70,9 +71,16 @@ namespace PVG.Application.Services.UserService
 
                 var newToken = await _tokenService.CreateTokenAsync(user);
 
+                string permission = "";
+                var permissions = await _permissionRepository.FindAll().ToListAsync();
+                var userpermisssion = await _userPermissionRepository.FindByCondition(x => x.UserId == user.Id).FirstOrDefaultAsync();
+                if(userpermisssion != null)
+                    permission = permissions.Find(x => x.Id == userpermisssion.PermissionId).Code;
+
                 return SuccessResponse(new
                 {
                     Token = newToken,
+                    Permission = permission,
                     FullName = user.UserName,
                     ExpireAt = DateTime.UtcNow.AddDays(30),
                 });
@@ -363,6 +371,18 @@ namespace PVG.Application.Services.UserService
                     Message = ex.Message,
                 };
             }
+        }
+    
+        public async Task<BaseResponse> ResetPassword(string _userName, string _password)
+        {
+            var exists = await _userRepository.FindByCondition(u => u.UserName == _userName).FirstOrDefaultAsync();
+            if(exists == null)
+                return BadRequestResponse(ErrorCodeConst.ERROR_INPUT_INVALID, "Tài khoản không tồn tại");
+            string pass = _passwordHasher.HashPassword(exists, _password);
+            exists.Password = pass;
+            await _userRepository.UpdateAsync(exists);
+            await _userRepository.SaveChangesAsync();
+            return SuccessResponse(true);
         }
     }
 }

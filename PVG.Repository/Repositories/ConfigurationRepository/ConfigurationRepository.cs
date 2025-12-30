@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Persistence;
 using PVG.Infrastucture.Repositories.UserRepository;
 using System;
 using System.Collections.Generic;

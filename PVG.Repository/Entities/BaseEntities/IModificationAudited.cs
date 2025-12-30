@@ -3,6 +3,6 @@
     public interface IModificationAudited : IHasModificationTime
     {
         public Guid? ModifiedBy { get; set; }
-        public string ModifiedByName { get; set; }
+        public string? ModifiedByName { get; set; }
     }
 }

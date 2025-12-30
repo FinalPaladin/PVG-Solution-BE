@@ -2,9 +2,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using PVG.Application.Services.PermissionService;
-using PVG.Application.Services.UserPermissionService;
-using PVG.Application.Services.UserService;
 using PVG.Core.BaseModels;
 using PVG.Domain.Models;
 using PVG.Infrastucture.Entities;
@@ -12,19 +9,14 @@ using PVG.Infrastucture.Repositories.ConfigurationRepository;
 using PVG.Infrastucture.Repositories.PermissionRepository;
 using PVG.Infrastucture.Repositories.ProductCategoryRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
+using PVG.Infrastucture.Repositories.RequestCustomerRepository;
 using PVG.Infrastucture.Repositories.UserPermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using PVG.Infrastucture.Repositories.ViewLogRepository;
 
 namespace PVG.Application.Services.InitPageService
 {
-    public class InitPageService: IInitPageService
+    public class InitPageService : IInitPageService
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
@@ -34,6 +26,8 @@ namespace PVG.Application.Services.InitPageService
         private readonly IUserPermissionRepository _userPermissionRepository;
         private readonly IConfigurationRepository _configurationRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly IViewLogRepository _viewLogRepository;
+        private readonly IRequestCustomerRepository _requestCustomerRepository;
 
         public InitPageService(IProductRepository productRepository,
             IProductCategoryRepository productCategoryRepository,
@@ -42,7 +36,9 @@ namespace PVG.Application.Services.InitPageService
             IPermissionRepository permissionRepository,
             IUserPermissionRepository userPermissionRepository,
             IConfigurationRepository configurationRepository,
-            IPasswordHasher<User> passwordHasher)
+            IPasswordHasher<User> passwordHasher,
+            IViewLogRepository viewLogRepository,
+            IRequestCustomerRepository requestCustomerRepository)
         {
             _mapper = mapper;
             _productRepository = productRepository;
@@ -52,15 +48,17 @@ namespace PVG.Application.Services.InitPageService
             _userPermissionRepository = userPermissionRepository;
             _configurationRepository = configurationRepository;
             _passwordHasher = passwordHasher;
+            _viewLogRepository = viewLogRepository;
+            _requestCustomerRepository = requestCustomerRepository;
         }
 
         public async Task<BaseResponse<ProductInitPageModel>> Product()
         {
             try
             {
-                var productCategoriesEntity = await _productCategoryRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
+                var productCategoriesEntity = await _productCategoryRepository.FindByCondition(x => !x.Inactive).ToListAsync();
 
-                if(productCategoriesEntity == null || productCategoriesEntity.Count == 0)
+                if (productCategoriesEntity == null || productCategoriesEntity.Count == 0)
                 {
                     return new BaseResponse<ProductInitPageModel>()
                     {
@@ -72,7 +70,7 @@ namespace PVG.Application.Services.InitPageService
 
                 var productcategories = _mapper.Map<List<ProductCategoryModel>>(productCategoriesEntity);
 
-                var productsEntity = await _productRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
+                var productsEntity = await _productRepository.FindByCondition(x => !x.Inactive).ToListAsync();
 
                 if (productCategoriesEntity != null && productCategoriesEntity.Count > 0)
                 {
@@ -121,7 +119,7 @@ namespace PVG.Application.Services.InitPageService
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status404NotFound,
-                        Message = "",
+                        Message = "Hàm khởi tạo đã chạy",
                     };
 
                 var initUsers = new List<User>
@@ -174,7 +172,7 @@ namespace PVG.Application.Services.InitPageService
                     new Permission()
                     {
                         Id = 1,
-                        Code = "SYS_AD",                        
+                        Code = "SYS_AD",
                     },
                     new Permission()
                     {
@@ -422,6 +420,109 @@ namespace PVG.Application.Services.InitPageService
                 };
             }
         }
+    
+        public async Task<BaseResponse<RS_DashboardInitPageModel>> Dashboard()
+        {
+            try
+            {
+                var viewlogRepo = await _viewLogRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
 
+                int viewhome = 0, viewproduct = 0, viewproducts = 0, viewnews = 0;
+
+                if(viewlogRepo != null && viewlogRepo.Count > 0)
+                {
+                    viewhome = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Home).ToList().Count;
+                    viewproduct = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Product).ToList().Count;
+                    viewproducts = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.Products).ToList().Count;
+                    viewnews = viewlogRepo.Where(x => x.Screen == Domain.Enums.ViewLogEnum.ScreenView.News).ToList().Count;
+                }
+
+                var request = await _requestCustomerRepository.FindByCondition(x => !x.IsDeleted).ToListAsync();
+
+                int total = 0, totalProcessed = 0, rqtoday = 0, todayProcessed = 0, yesterday = 0, yesterdayProcessed = 0, thisweek = 0, thisweekProcessed = 0, thismonth = 0, thismonthProcessed = 0;
+
+                if(request !=null && request.Count > 0)
+                {
+                    total = request.Count;
+                    totalProcessed = request.Where(x => x.IsProcessed).ToList().Count;
+
+                    DateTime today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0);
+                    var startOfMonth = new DateTime(today.Year, today.Month, 1, 0, 0, 0);
+                    var startOfNextMonth = new DateTime(startOfMonth.AddMonths(1).Year, startOfMonth.AddMonths(1).Month, startOfMonth.AddMonths(1).Day, 0, 0, 0);
+
+                    var listmonth = request.Where(x => x.CreatedDate >= startOfMonth && x.CreatedDate < startOfNextMonth).ToList();
+
+                    if(listmonth !=null && listmonth.Count > 0)
+                    {
+                        thismonth = listmonth.Count;
+                        thismonthProcessed = listmonth.Where(x => x.IsProcessed).ToList().Count;
+
+                        int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+                        var startOfWeek = today.AddDays(-diff);
+                        var startOfNextWeek = startOfWeek.AddDays(7);
+
+                        var listweek = listmonth.Where(x => x.CreatedDate >= startOfWeek && x.CreatedDate < startOfNextWeek).ToList();
+
+                        if (listweek != null && listweek.Count > 0)
+                        {
+                            thisweek = listweek.Count;
+                            thisweekProcessed = listweek.Where(x => x.IsProcessed).ToList().Count;
+
+                            var startOfYesterday = today.AddDays(-1);
+                            var startOfToday = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+
+                            var listyesterday = listweek.Where(x => x.CreatedDate >= startOfYesterday && x.CreatedDate < startOfToday).ToList();
+
+                            if (listyesterday != null && listyesterday.Count > 0)
+                            {
+                                yesterday = listyesterday.Count;
+                                yesterdayProcessed = listyesterday.Where(x => x.IsProcessed).ToList().Count;
+
+                                var endOfToday = new DateTime(today.Year, today.Month, today.Day, 23, 59, 59);
+                                var listtoday = listweek.Where(x => x.CreatedDate >= startOfToday && x.CreatedDate < endOfToday).ToList();
+                                if (listtoday != null && listtoday.Count > 0)
+                                {
+                                    rqtoday = listtoday.Count;
+                                    todayProcessed = listtoday.Where(x => x.IsProcessed).ToList().Count;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return new BaseResponse<RS_DashboardInitPageModel>()
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Lấy dữ liệu thành công",
+                    Result = new()
+                    {
+                        ViewHome = viewhome,
+                        ViewNews = viewnews,
+                        ViewProduct = viewproduct,
+                        ViewProducts = viewproducts,
+                        total = total,
+                        totalProcessed = totalProcessed,
+                        RequestToday = rqtoday,
+                        RequestTodayProcessed = todayProcessed,
+                        RequestThisMonth = thismonth,
+                        RequestThisWeek = thisweek,
+                        RequestYesterday = yesterday,
+                        RequestThisMonthProcessed = thismonthProcessed,
+                        RequestThisWeekProcessed = thisweekProcessed,
+                        RequestYesterdayProcessed = yesterdayProcessed,
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<RS_DashboardInitPageModel>()
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = ex.Message,
+                };
+            }
+        }
     }
 }

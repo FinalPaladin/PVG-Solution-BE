@@ -1,6 +1,5 @@
 ﻿using PVG.Infrastucture.Domain;
 using PVG.Infrastucture.Entities;
-using PVG.Infrastucture.Persistence;
 using PVG.Infrastucture.Repositories.ProductDetailRepository;
 using System;
 using System.Collections.Generic;

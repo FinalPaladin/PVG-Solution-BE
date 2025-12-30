@@ -10,6 +10,7 @@ namespace PVG.Application.Services.ConfigurationService
 {
     public interface IConfigurationService
     {
+        public Task<BaseResponse<ConfigurationModel>> GetByKey(string _input);
         public Task<BaseResponse<RS_GetAllConfigurationModel>> GetAllData();
         public Task<BaseResponse> Save(RQ_SaveConfigurationModel _input);
     }

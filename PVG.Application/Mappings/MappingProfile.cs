@@ -20,9 +20,36 @@ namespace PVG.Application.Mappings
             CreateMap<Permission, PermissionModel>().ReverseMap();
             CreateMap<UserPermission, UserPermissionModel>().ReverseMap();
             CreateMap<Product, ProductModel>().ReverseMap();
+            CreateMap<Product, ProductResponseModel>().ReverseMap();
+            CreateMap<Product, ProductCreateRequest>().ReverseMap();
+            CreateMap<Product, ProductUpdateRequest>().ReverseMap();
             CreateMap<ProductCategory, ProductCategoryModel>().ReverseMap();
-            CreateMap<ProductInfo, ProductInfoModel>().ReverseMap();
-            CreateMap<New, NewModel>().ReverseMap();
+            CreateMap<RequestCustomerDetail, RequestCustomerDetailModel>()
+                .ForMember(des => des.CreatedDate, act => act.MapFrom(src => src.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss")))
+                .ReverseMap();
+
+            CreateMap<MData, MDataModel>().ReverseMap();
+            CreateMap<MData, MDataResponseModel>().ReverseMap();
+
+            CreateMap<ProductDetail, ProductDetailModel>().ReverseMap();
+            CreateMap<ProductDetail, ProductDetailResponseModel>().ReverseMap();
+
+            CreateMap<ProductUpdateRequest, Product>()
+                .ForMember(x => x.Id, opt => opt.Ignore())
+                .ForMember(x => x.CreatedBy, opt => opt.Ignore())
+                .ForMember(x => x.CreatedByName, opt => opt.Ignore())
+                .ForMember(x => x.CreatedDate, opt => opt.Ignore());
+
+            CreateMap<ProductDetailUpdateModel, ProductDetail>()
+                .ForMember(x => x.Id, opt => opt.Ignore())
+                .ForMember(x => x.ProductId, opt => opt.Ignore())
+                .ForMember(x => x.CreatedBy, opt => opt.Ignore())
+                .ForMember(x => x.CreatedByName, opt => opt.Ignore())
+                .ForMember(x => x.CreatedDate, opt => opt.Ignore());
+
+            CreateMap<NewsCategoryResponseModel, NewsCategory>().ReverseMap();
+            CreateMap<NewsCategoryModel, NewsCategory>().ReverseMap();
+            CreateMap<NewsResponseModel, News>().ReverseMap();
         }
     }
 }

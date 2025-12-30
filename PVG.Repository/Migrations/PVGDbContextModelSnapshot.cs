@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using PVG.Infrastucture.Persistence;
+using PVG.Infrastucture;
 
 #nullable disable
 
@@ -170,23 +170,99 @@ namespace PVG.Infrastucture.Migrations
                     b.ToTable("ImageRequest");
                 });
 
-            modelBuilder.Entity("PVG.Infrastucture.Entities.New", b =>
+            modelBuilder.Entity("PVG.Infrastucture.Entities.MData", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("mediumtext")
-                        .UseCollation("utf8mb4_unicode_ci");
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("CreatedByName")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Group")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GroupName")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<bool>("Inactive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Key")
                         .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("SortId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Value_ENG")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MData", (string)null);
+                });
+
+            modelBuilder.Entity("PVG.Infrastucture.Entities.News", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid?>("ApprovedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ApprovedByName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("Code")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CreatedByName")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("CreatedDate")
@@ -196,7 +272,155 @@ namespace PVG.Infrastucture.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("DeletedByName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ExpireDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ImageLink")
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("ImageName")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool?>("IsApproved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("NeedApproved")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTime>("PublishDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)");
+
+                    b.Property<string>("ThumbnailName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Slug");
+
+                    b.ToTable("News", (string)null);
+                });
+
+            modelBuilder.Entity("PVG.Infrastucture.Entities.NewsCategory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("DeletedByName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("DisplayOrder")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<Guid?>("ModifiedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ModifiedByName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Slug")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("Status")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NewsCategory", (string)null);
+                });
+
+            modelBuilder.Entity("PVG.Infrastucture.Entities.NewsCategoryMapping", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CreatedByName")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("DeletedByName")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("DeletedDate")
@@ -209,28 +433,17 @@ namespace PVG.Infrastucture.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("ModifiedByName")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<DateTime>("PostedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("varchar(250)");
-
-                    MySqlPropertyBuilderExtensions.HasCharSet(b.Property<string>("Title"), "utf8mb4");
+                    b.Property<Guid>("NewsId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("New");
+                    b.ToTable("NewsCategoryMapping", (string)null);
                 });
 
             modelBuilder.Entity("PVG.Infrastucture.Entities.Permission", b =>
@@ -269,69 +482,59 @@ namespace PVG.Infrastucture.Migrations
 
             modelBuilder.Entity("PVG.Infrastucture.Entities.Product", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("DeletedByName")
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
 
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime(6)");
+                    b.Property<bool>("Inactive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("varchar(250)");
+                    b.Property<int>("LoanAmountId")
+                        .HasColumnType("int");
 
-                    MySqlPropertyBuilderExtensions.HasCharSet(b.Property<string>("Description"), "utf8mb4");
-
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("varchar(150)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<int>("LoanTermId")
+                        .HasColumnType("int");
 
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("ModifiedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
-                    MySqlPropertyBuilderExtensions.HasCharSet(b.Property<string>("Name"), "utf8mb4");
+                    b.Property<Guid>("ProductCategoryId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("ProductCategoryId")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                    b.Property<string>("Slug")
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Slug");
 
                     b.ToTable("Product");
                 });
@@ -353,18 +556,10 @@ namespace PVG.Infrastucture.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("DeletedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<bool>("Inactive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TINYINT(1)")
+                        .HasDefaultValue(false);
 
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("char(36)");
@@ -390,186 +585,58 @@ namespace PVG.Infrastucture.Migrations
 
             modelBuilder.Entity("PVG.Infrastucture.Entities.ProductDetail", b =>
                 {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("varchar(2000)");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("DeletedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
 
                     b.Property<Guid?>("ModifiedBy")
                         .HasColumnType("char(36)");
 
                     b.Property<string>("ModifiedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("ModifiedDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("ProductDetailCategoryId")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                    b.Property<int>("ProductDetailCategoryId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ProductId")
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IsDeleted");
+
+                    b.HasIndex("ProductDetailCategoryId");
+
+                    b.HasIndex("ProductId");
 
                     b.ToTable("ProductDetail");
-                });
-
-            modelBuilder.Entity("PVG.Infrastucture.Entities.ProductDetailCategory", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("DeletedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("ModifiedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("varchar(2000)");
-
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductDetailCategory");
-                });
-
-            modelBuilder.Entity("PVG.Infrastucture.Entities.ProductInfo", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("varchar(2000)");
-
-                    MySqlPropertyBuilderExtensions.HasCharSet(b.Property<string>("Content"), "utf8mb4");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("CreatedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("DeletedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("DeletedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("varchar(250)");
-
-                    MySqlPropertyBuilderExtensions.HasCharSet(b.Property<string>("Description"), "utf8mb4");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<Guid?>("ModifiedBy")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("ModifiedByName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("varchar(36)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("varchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductInfo");
                 });
 
             modelBuilder.Entity("PVG.Infrastucture.Entities.RequestCustomer", b =>
