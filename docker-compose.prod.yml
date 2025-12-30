@@ -11,6 +11,8 @@ services:
       TZ: Asia/Ho_Chi_Minh
     volumes:
       - pvg_mysql_prod_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
     networks:
       - pvg_prod_net
     healthcheck:
