@@ -200,9 +200,12 @@ namespace PVG.Application.Services.ConfigurationService
                     }
                     else
                     {
-                        if (iExist < 0 || dataUpdate[iExist].IsImage)
+                        if (iExist >= 0)
                         {
-                            continue;
+                            if(dataUpdate[iExist].IsImage)
+                            {
+                                continue;
+                            }
                         }
                     }
 
@@ -255,7 +258,7 @@ namespace PVG.Application.Services.ConfigurationService
                 return new BaseResponse()
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status200OK,
+                    StatusCode = StatusCodes.Status403Forbidden,
                     Message = ex.Message,
                 };
             }
