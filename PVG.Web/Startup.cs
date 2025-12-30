@@ -13,7 +13,7 @@ namespace PVG.Web
 {
     public class Startup
     {
-        private const string _policyName = "PVGServicePolicy"; // "localhost"
+        private const string _policyName = "PVGServicePolicy";
         public IConfiguration _configuration { get; }
 
         public Startup(IConfiguration configuration)
@@ -27,7 +27,7 @@ namespace PVG.Web
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", builder => //_policyName
+                options.AddPolicy(_policyName, builder => //_policyName
                 {
                     builder.WithOrigins(allowOrigins!)
                         .AllowAnyHeader()
@@ -88,29 +88,6 @@ namespace PVG.Web
                     if (File.Exists(filePath))
                         c.IncludeXmlComments(filePath, true);
                 }
-
-                // Define the BearerAuth scheme that's in use
-                //var securitySchema = new OpenApiSecurityScheme
-                //{
-                //    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                //    Name = "Authorization",
-                //    In = ParameterLocation.Header,
-                //    Type = SecuritySchemeType.Http,
-                //    Scheme = JwtBearerDefaults.AuthenticationScheme.ToLower(),
-                //    BearerFormat = "JWT",
-                //    Reference = new OpenApiReference
-                //    {
-                //        Type = ReferenceType.SecurityScheme,
-                //        Id = JwtBearerDefaults.AuthenticationScheme
-                //    }
-                //};
-                //c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, securitySchema);
-
-                //var securityRequirement = new OpenApiSecurityRequirement
-                //{
-                //    { securitySchema, new[] { JwtBearerDefaults.AuthenticationScheme } }
-                //};
-                //c.AddSecurityRequirement(securityRequirement);
             });
 
             //add healthcheck
@@ -132,19 +109,21 @@ namespace PVG.Web
             app.UseHealthChecks("/health");
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseCors("AllowAll"); // ⚠️ Quan trọng: đặt trước Authorization
+            app.UseCors(_policyName);
 
-            //app.UseCors(_policyName);
-
-            app.UseSwagger(c =>
+            if (!env.IsDevelopment())
             {
-                c.RouteTemplate = "api/swagger/{documentName}/swagger.json";
-            });
-            app.UseSwaggerUI(c => 
-            { 
-                c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "PVG Services v1"); 
-                c.RoutePrefix = "api/swagger"; 
-            });
+                app.UseSwagger(c =>
+                {
+                    c.RouteTemplate = "api/swagger/{documentName}/swagger.json";
+                });
+
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "PVG Services v1");
+                    c.RoutePrefix = "api/swagger";
+                });
+            }
 
             // Add this block to perform migration using the application's service provider
             using (var scope = app.ApplicationServices.CreateScope())
