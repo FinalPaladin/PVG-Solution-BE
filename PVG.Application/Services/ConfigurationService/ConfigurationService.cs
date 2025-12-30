@@ -200,7 +200,7 @@ namespace PVG.Application.Services.ConfigurationService
                     }
                     else
                     {
-                        if (dataUpdate[iExist].IsImage)
+                        if (iExist < 0 || dataUpdate[iExist].IsImage)
                         {
                             continue;
                         }
