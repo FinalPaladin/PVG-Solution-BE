@@ -343,3 +343,6 @@ healthchecksdb
 /template.nuspec
 .vscode/launch.json
 .vscode/tasks.json
+
+docker-compose.yml
+Dockerfile
