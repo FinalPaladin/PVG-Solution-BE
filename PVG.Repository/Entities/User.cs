@@ -8,7 +8,8 @@ namespace PVG.Infrastucture.Entities
         public string Password { get; set; }
         public bool Actived { get; set; }
         public string FullName { get; set; }
-        public ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
+        public string Email { get; set; }
+        public int? RoleId { get; set; }
         public Guid? CreatedBy { get; set; }
         public string? CreatedByName { get; set; }
         public DateTime CreatedDate { get; set; }

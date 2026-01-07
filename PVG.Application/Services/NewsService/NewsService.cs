@@ -191,7 +191,7 @@ namespace PVG.Application.Services.NewsService
         {
             try
             {
-                var news = await _newsRepository.FindByCondition(m => m.Slug == _slug).FirstOrDefaultAsync();
+                var news = await _newsRepository.FindByCondition(m => m.Slug == _slug && m.Active).FirstOrDefaultAsync();
                 if (news == null)
                     return BadRequestResponse(ErrorCodeConst.ERROR_REQUEST_NOT_FOUND, "Không tìm thấy tin tức phù hợp");
 

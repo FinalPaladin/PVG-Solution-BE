@@ -18,17 +18,19 @@ namespace PVG.Infrastucture
 
         #region Database Setting
 
-        public DbSet<Product> Product { get; set; }
-        public DbSet<ProductCategory> ProductCategory { get; set; }
-        public DbSet<RequestCustomer> RequestCustomer { get; set; }
-        public DbSet<Configuration> Configuration { get; set; }
-        public DbSet<Permission> Permission { get; set; }
-        public DbSet<User> User { get; set; }
-        public DbSet<UserPermission> UserPermission { get; set; }
-        public DbSet<ViewLog> ViewLog { get; set; }
-        public DbSet<ImageRequest> ImageRequest { get; set; }
-        public DbSet<ProductDetail> ProductDetail { get; set; }
-        public DbSet<RequestCustomerDetail> RequestCustomerDetail { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<RequestCustomer> RequestCustomers { get; set; }
+        public DbSet<Configuration> Configurations { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserPermission> UserPermissions { get; set; }
+        public DbSet<ViewLog> ViewLogs { get; set; }
+        public DbSet<ImageRequest> ImageRequests { get; set; }
+        public DbSet<ProductDetail> ProductDetails { get; set; }
+        public DbSet<RequestCustomerDetail> RequestCustomerDetails { get; set; }
         public DbSet<AuthToken> AuthTokens { get; set; }
         public DbSet<MData> MDatas { get; set; }
         public DbSet<News> Newses { get; set; }
@@ -263,6 +265,22 @@ namespace PVG.Infrastucture
 
             #endregion Configuration
 
+            #region Role
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasColumnType("int")
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
+
+                entity.Property(e => e.Name)
+                    .HasColumnType(ColumType.TypeVarchar("256"))
+                    .HasMaxLength(256);
+            });
+
+            #endregion Role
+
             #region Permission
 
             modelBuilder.Entity<Permission>(entity =>
@@ -275,9 +293,33 @@ namespace PVG.Infrastucture
                 entity.Property(e => e.Code)
                     .HasColumnType(ColumType.TypeVarchar("100"))
                     .HasMaxLength(100);
+
+                entity.Property(e => e.Name)
+                    .HasColumnType(ColumType.TypeVarchar("256"))
+                    .HasMaxLength(256);
             });
 
             #endregion Permission
+
+            #region Role Permission
+
+            modelBuilder.Entity<RolePermission>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasColumnType("int")
+                    .ValueGeneratedOnAdd()
+                    .IsRequired();
+
+                entity.Property(e => e.RoleId)
+                    .HasColumnType("int")
+                    .IsRequired();
+
+                entity.Property(e => e.PermissionId)
+                    .HasColumnType("int")
+                    .IsRequired();
+            });
+
+            #endregion Role Permission
 
             #region User
 
@@ -319,16 +361,6 @@ namespace PVG.Infrastucture
             modelBuilder.Entity<UserPermission>(entity =>
             {
                 entity.HasKey(x => new { x.UserId, x.PermissionId });
-
-                entity.HasOne(x => x.User)
-                    .WithMany(u => u.UserPermissions)
-                    .HasForeignKey(x => x.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(x => x.Permission)
-                    .WithMany(p => p.UserPermissions)
-                    .HasForeignKey(x => x.PermissionId)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             #endregion UserPermission

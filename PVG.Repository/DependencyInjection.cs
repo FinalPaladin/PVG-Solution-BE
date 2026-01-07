@@ -15,6 +15,8 @@ using PVG.Infrastucture.Repositories.ProductDetailRepository;
 using PVG.Infrastucture.Repositories.ProductRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerDetailRepository;
 using PVG.Infrastucture.Repositories.RequestCustomerRepository;
+using PVG.Infrastucture.Repositories.RolePermissionRepository;
+using PVG.Infrastucture.Repositories.RoleRepository;
 using PVG.Infrastucture.Repositories.SampleRepository;
 using PVG.Infrastucture.Repositories.UserPermissionRepository;
 using PVG.Infrastucture.Repositories.UserRepository;
@@ -49,6 +51,8 @@ namespace PVG.Infrastucture
             services.AddScoped<INewsRepository, NewsRepository>();
             services.AddScoped<INewsCategoryRepository, NewsCategoryRepository>();
             services.AddScoped<INewsCategoryMappingRepository, NewsCategoryMappingRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 
             return services;
         }

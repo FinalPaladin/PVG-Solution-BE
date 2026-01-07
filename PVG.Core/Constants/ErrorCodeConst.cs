@@ -8,6 +8,7 @@
         public const string ERROR_INPUT_INVALID = "ERR:00004";
         public const string ERROR_MAPPING_ITEMS_STILL_VALID = "ERR:00005";
         public const string ERROR_PAGGING_INPUT_INVALID = "ERR:00006";
+        public const string ERROR_DATA_NOT_FOUND = "ERR:00007";
 
         public const string ERROR_LOGIN_INVALID_INPUT = "ERR:10001";
         public const string ERROR_LOGIN_USER_NOT_FOUND = "ERR:10002";
