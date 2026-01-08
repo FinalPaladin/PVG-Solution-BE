@@ -111,7 +111,7 @@ namespace PVG.Web
             app.UseRouting();
             app.UseCors(_policyName);
 
-            if (!env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseSwagger(c =>
                 {
