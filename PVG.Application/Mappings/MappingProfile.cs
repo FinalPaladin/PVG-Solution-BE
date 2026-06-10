@@ -50,6 +50,8 @@ namespace PVG.Application.Mappings
             CreateMap<NewsCategoryResponseModel, NewsCategory>().ReverseMap();
             CreateMap<NewsCategoryModel, NewsCategory>().ReverseMap();
             CreateMap<NewsResponseModel, News>().ReverseMap();
+
+            CreateMap<RoleCreatingModel, Role>().ReverseMap();
         }
     }
 }

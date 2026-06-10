@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using PVG.Core.BaseModels;
 using PVG.Domain.Constants;
 using PVG.Domain.Extensions;
+using PVG.Domain.Models;
 using PVG.Domain.Settings;
 using PVG.Infrastucture.Entities;
 using PVG.Infrastucture.Repositories.PermissionRepository;
